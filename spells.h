@@ -1,0 +1,14 @@
+
+
+
+
+namespace Spells {
+
+	void fireball() {
+
+
+
+	}
+
+
+}

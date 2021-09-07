@@ -1,0 +1,168 @@
+#pragma once
+#include "entt.hpp"
+#include <iostream>
+#include "components.h"
+#include "graphics.h"
+
+using namespace Components;
+using namespace Graphics;
+
+
+namespace Scene {
+
+	entt::registry scene;
+	
+
+	//create templates of a "type" of entity, like a skeleton
+	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
+	//
+
+	void loadEntities() {		
+		
+		
+		//player
+		auto skeleton = scene.create();			//creates a unique handle for an entity
+		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
+		scene.get<animation>(skeleton).sheet = { //populate the vector
+			{ NULL },
+			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
+			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f},//walk
+			{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f},//atack
+			{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f},
+			{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f}, 
+			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f}, //reverse to summon
+			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f},
+		};
+
+		scene.emplace<Actions>(skeleton, idle);
+		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
+		
+		//positon components
+		scene.emplace<Position_X>(skeleton, 0.0f, 100.0f, 0.0f);
+		scene.emplace<Position_Y>(skeleton, 0.0f, 100.0f, 0.0f);
+				
+		scene.emplace<Collision_Radius>(skeleton, 15.0f );
+		
+		scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
+		scene.emplace<Input>(skeleton);
+		scene.emplace<Direction>(skeleton, SE);
+		scene.emplace<Alive>(skeleton, true);
+		scene.emplace<handle>(skeleton, "Skeleton");
+		scene.emplace<Camera>(skeleton, 0, 0, resolution.w/2, resolution.h/2, 1.0f, 1.0f);
+		scene.emplace<Mass>(skeleton, 200.0f);
+		
+		//Skeletons
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
+				auto skeleton0 = scene.create();
+				scene.emplace<animation>(skeleton0, skeleton_0); /// need to load the texture nly once and pass the pointer intothis function
+				scene.get<animation>(skeleton0).sheet = { //populate the vector
+					{ NULL },
+					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
+					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f},//walk
+					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f},//atack
+					{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f},
+					{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f},
+					{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f}, //reverse to summon
+					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f},
+				};
+		
+				scene.emplace<Actions>(skeleton0, idle);
+				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
+		
+				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 75.0f), 0.0f);
+				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 75.0f), 0.0f);
+				scene.emplace<Collision_Radius>(skeleton0, 15.0f);
+		
+				scene.emplace<Velocity>(skeleton0, 0.0f, 0.0f, 0.f, 0.0f, 0.0175f);
+				scene.emplace<Direction>(skeleton0, SE);
+				scene.emplace<Alive>(skeleton0, true);
+				scene.emplace<handle>(skeleton0, "Skeleton");
+				scene.emplace<Mass>(skeleton0, 200.0f);
+				//scene.emplace<AI>(skeleton0, 100, 1);
+			}
+		}
+			
+		
+		//trees
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
+				auto tree = scene.create();
+				scene.emplace<animation>(tree, tree_0); /// need to load hetexture	 only once and pass the pointer into this function
+				scene.get<animation>(tree).sheet = {
+					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
+
+				scene.emplace<Position_X>(tree, 0.0f, -2000.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(tree, 0.0f, -2000.0f + (j * 1165.0f), 0.0f);
+
+				scene.emplace<Collision_Radius>(tree, 30.0f);
+
+
+
+				scene.emplace<Actions>(tree, isStatic);
+				scene.get<Actions>(tree).frameCount = { { 0, 0} };
+				scene.emplace<Direction>(tree, W);
+				scene.emplace<Mass>(tree, 4000000.0f);
+			}
+		}
+
+		//archers
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
+				auto archer = scene.create();			//creates a unique handle for an entity
+				scene.emplace<animation>(archer, archer_0); /// need to load the texture only onceand pass the pointer into this function
+				scene.get<animation>(archer).sheet = { //populate the vector
+					{ NULL },
+					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f },
+					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f },
+					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f },
+					{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f },
+					{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f },
+					{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f }, //reverse to summon
+					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f },
+				};
+				scene.emplace<Actions>(archer, idle);
+				scene.get<Actions>(archer).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
+
+				scene.emplace<Position_X>(archer, 0.0f, 150.0f + (i * 144.0f), 0.0f);
+				scene.emplace<Position_Y>(archer, 0.0f, 200.0f + (j * 144.0f), 0.0f);
+				
+				
+				scene.emplace<Collision_Radius>(archer, 15.0f);
+
+				scene.emplace<Direction>(archer, SE);
+				scene.emplace<Velocity>(archer, 0.0f, 0.0f, 0.f, 0.0f, 0.05f);
+				scene.emplace<Mass>(archer, 1000.0f);
+				//scene.emplace<AI>(archer, 100, 1);
+			}
+		}
+
+
+
+
+		//buildings
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
+				auto house = scene.create();
+				scene.emplace<animation>(house, house_0);
+				scene.get<animation>(house).sheet = {
+					{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
+
+				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
+
+				scene.emplace<Collision_Radius>(house, 30.0f);//needs to be made of lines ->  circle vs line collision
+
+
+				scene.emplace<Actions>(house, isStatic);
+				scene.get<Actions>(house).frameCount = { { 0, 0} };
+				scene.emplace<Direction>(house, W);
+				scene.emplace<Mass>(house, 4000000.0f);
+			}
+		}
+
+
+		
+
+	}
+}
