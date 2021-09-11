@@ -19,7 +19,6 @@ namespace Scene {
 
 	void loadEntities() {		
 		
-		
 		//player
 		auto skeleton = scene.create();			//creates a unique handle for an entity
 		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
@@ -48,14 +47,18 @@ namespace Scene {
 		scene.emplace<Direction>(skeleton, SE);
 		scene.emplace<Alive>(skeleton, true);
 		scene.emplace<handle>(skeleton, "Skeleton");
-		scene.emplace<Camera>(skeleton, 0, 0, resolution.w/2, resolution.h/2, 1.0f, 1.0f);
+		scene.emplace<Camera>(skeleton, 0, 0, resolution.w/2, resolution.h/2, 1.0f, 1.0f );
 		scene.emplace<Mass>(skeleton, 200.0f);
+		scene.emplace<Commanding>(skeleton, false);
+		
+		
+		
 		
 		//Skeletons
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 25; ++j) {
+			for (auto i = 0; i < 8; ++i) {
 				auto skeleton0 = scene.create();
-				scene.emplace<animation>(skeleton0, skeleton_0); /// need to load the texture nly once and pass the pointer intothis function
+				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector
 					{ NULL },
 					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
@@ -70,16 +73,15 @@ namespace Scene {
 				scene.emplace<Actions>(skeleton0, idle);
 				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 		
-				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 75.0f), 0.0f);
-				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 75.0f), 0.0f);
+				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 30.0f), 0.0f);
+				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 30.0f), 0.0f);
 				scene.emplace<Collision_Radius>(skeleton0, 15.0f);
 		
-				scene.emplace<Velocity>(skeleton0, 0.0f, 0.0f, 0.f, 0.0f, 0.0175f);
 				scene.emplace<Direction>(skeleton0, SE);
 				scene.emplace<Alive>(skeleton0, true);
 				scene.emplace<handle>(skeleton0, "Skeleton");
 				scene.emplace<Mass>(skeleton0, 200.0f);
-				//scene.emplace<AI>(skeleton0, 100, 1);
+				scene.emplace<Commandable>(skeleton0);
 			}
 		}
 			
@@ -94,10 +96,7 @@ namespace Scene {
 
 				scene.emplace<Position_X>(tree, 0.0f, -2000.0f + (i * 952.0f), 0.0f);
 				scene.emplace<Position_Y>(tree, 0.0f, -2000.0f + (j * 1165.0f), 0.0f);
-
 				scene.emplace<Collision_Radius>(tree, 30.0f);
-
-
 
 				scene.emplace<Actions>(tree, isStatic);
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
@@ -125,15 +124,11 @@ namespace Scene {
 				scene.get<Actions>(archer).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 				scene.emplace<Position_X>(archer, 0.0f, 150.0f + (i * 144.0f), 0.0f);
-				scene.emplace<Position_Y>(archer, 0.0f, 200.0f + (j * 144.0f), 0.0f);
-				
-				
+				scene.emplace<Position_Y>(archer, 0.0f, 200.0f + (j * 144.0f), 0.0f);				
 				scene.emplace<Collision_Radius>(archer, 15.0f);
 
 				scene.emplace<Direction>(archer, SE);
-				scene.emplace<Velocity>(archer, 0.0f, 0.0f, 0.f, 0.0f, 0.05f);
 				scene.emplace<Mass>(archer, 1000.0f);
-				//scene.emplace<AI>(archer, 100, 1);
 			}
 		}
 
@@ -150,9 +145,7 @@ namespace Scene {
 
 				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
 				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
-
 				scene.emplace<Collision_Radius>(house, 30.0f);//needs to be made of lines ->  circle vs line collision
-
 
 				scene.emplace<Actions>(house, isStatic);
 				scene.get<Actions>(house).frameCount = { { 0, 0} };
@@ -162,7 +155,13 @@ namespace Scene {
 		}
 
 
-		
+		auto view = scene.view<Position_X, Position_Y>();
+		for (auto entity : view) {
+			auto& xx = view.get<Position_X>(entity);
+			auto& yy = view.get<Position_Y>(entity);
+			xx.fX = xx.fPX;
+			yy.fY = yy.fPY;
+		}
 
 	}
 }

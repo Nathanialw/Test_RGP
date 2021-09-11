@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include "SDL_gpu.h"
 #include <iostream>
 #include <vector>
 #include "debug_components.h"
@@ -121,12 +122,33 @@ namespace Components {
 		float fKilos;
 	};
 
-	struct AI {
-		int iMaxCount;
-		int iCount;
+	struct Commanded_Move {
+		float fX_Destination;
+		float fY_Destination;
 	};
 
- 
+	struct Commandable {
+		
+	};
+
+	struct Commanding {
+		bool bSelected;
+	};
+
+	struct Selected {
+
+	};
+
+	struct Collided {
+		bool bCollision;
+	};
+
+	struct Moving {
+
+	};
+
+	std::vector<Moving>qwer;
+
 }
 
 

@@ -38,7 +38,7 @@
     <ClInclude Include="components.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pools.h">
+    <ClInclude Include="scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="world.h">
@@ -71,5 +71,23 @@
     <ClInclude Include="debug_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unit_control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse_control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ai_control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="movement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2_gpu.dll" />
   </ItemGroup>
 </Project>

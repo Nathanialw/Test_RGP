@@ -13,7 +13,6 @@ namespace Init {
 		TTF_Init();
 		
 
-
-
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 }
