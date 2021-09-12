@@ -93,7 +93,7 @@ namespace Rendering {
 				anim.sheet[act.action].timeBetweenFrames -= Timer::timeStep;
 				//if (x.sheet[z.action].timeBetweenCurrent <= 0) {
 				if (anim.sheet[act.action].timeBetweenFrames <= 0) {
-					anim.sheet[act.action].timeBetweenFrames = 60;
+					anim.sheet[act.action].timeBetweenFrames = 120;
 					Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
 				}
 
@@ -104,7 +104,7 @@ namespace Rendering {
 				y.fSY = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
 				anim.renderPosition.y = y.fSY - anim.sheet[act.action].posOffset.y;
-				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);							
 			}
 		}
 	}
@@ -122,7 +122,6 @@ namespace Rendering {
 			if (a.action == dead && a.frameCount[a.action].currentFrame >= a.frameCount[a.action].NumFrames) {
 				b.bIsAlive = false;
 				scene.remove<Input>(d);
-				//remove all input components
 			}
 		}
 	}
@@ -132,7 +131,7 @@ namespace Rendering {
 		Interface::Run_Interface();
 		SDL_RenderPresent(Graphics::renderer);
 		SDL_SetRenderDrawColor(Graphics::renderer, 12, 20, 20, SDL_ALPHA_OPAQUE);
-	//	SDL_RenderClear(Graphics::renderer);
+		SDL_RenderClear(Graphics::renderer);
 		SDL_SetRenderDrawColor(Graphics::renderer, 255, 100, 50, SDL_ALPHA_OPAQUE);
 		Draw_Tiles();
 	}

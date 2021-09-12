@@ -4,7 +4,8 @@
 
 namespace Mouse {
 
-	bool bPressed;
+	bool bRight_Mouse_Pressed = false;
+	bool bLeft_Mouse_Pressed = false;
 	int iXMouse;
 	int iYMouse;
 	int iXWorld_Mouse;
@@ -20,7 +21,5 @@ namespace Mouse {
 		}
 		else return false;
 	}
-
-
-
+	
 }

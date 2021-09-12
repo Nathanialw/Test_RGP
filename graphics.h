@@ -26,8 +26,6 @@ namespace Graphics {
 
 
 
-
-
 	struct Surface_Data {
 		SDL_Texture* pTexture;
 		SDL_Rect k;
@@ -36,7 +34,7 @@ namespace Graphics {
 
 	Surface_Data Load_Text_Texture(std::string text, SDL_Color fontColor) {
 		SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), fontColor);		//convert font to Surface
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);			//convert Surface to texture
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);			//convert Surface to texture 
 		SDL_Rect k = surface->clip_rect;
 		
 		
@@ -46,7 +44,7 @@ namespace Graphics {
 	};
 
 	void Create_Font() {
-		font = TTF_OpenFont("fonts\\FreeSans.ttf", 30);
+		font = TTF_OpenFont("fonts/FreeSans.ttf", 30);
 	}
 
 
@@ -68,12 +66,12 @@ namespace Graphics {
 
 	void Load_Textures() {
 		Create_Font();
-		skeleton_0 = createTexture("sprites\\units\\skeleton\\armoured_skeleton_00.png");
-		skeleton_1 = createTexture("sprites\\units\\skeleton\\skeleton_00.png");
-		tree_0 = createTexture("sprites\\environment\\trees\\_tree_01\\_tree_01_00000.png");
-		house_0 = createTexture("sprites\\buildings\\building_04.png");
-		archer_0 = createTexture("sprites\\units\\archer\\archer_00.png");
-		grass_0 = createTexture("sprites\\environment\\grass\\grass.png");
+		skeleton_0 = createTexture("sprites/units/skeleton/armoured_skeleton_00.png");
+		skeleton_1 = createTexture("sprites/units/skeleton/skeleton_00.png");
+		tree_0 = createTexture("sprites/environment/trees/_tree_01/_tree_01_00000.png");
+		house_0 = createTexture("sprites/buildings/building_04.png");
+		archer_0 = createTexture("sprites/units/archer/archer_00.png");
+		grass_0 = createTexture("sprites/environment/grass/grass.png");
 	}
 
 

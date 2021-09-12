@@ -7,28 +7,36 @@
 
 
 namespace Movement {
+	int Player_Move_Poll;
+	int Update_Position_Poll;
 
 	void Update_Position() {
 		auto group = Scene::scene.view<Position_X, Position_Y, Velocity>();
-		for (auto entity : group) {
-			auto& vel = group.get<Velocity>(entity);
-			auto& pX = group.get<Position_X>(entity);
-			auto& pY = group.get<Position_Y>(entity);
-			if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
-				Scene::scene.emplace_or_replace<Moving>(entity);
-				if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
-				if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
-				float angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
-				float angle = atan2f(vel.magnitude.fX, vel.magnitude.fY);
-				float velocityX = sinf(angle) * vel.speed;
-				float velocityY = sinf(angle2) * vel.speed;
-				vel.dX = velocityX;
-				vel.dY = velocityY;
-				pX.fPX += velocityX * Timer::timeStep;
-				pY.fPY += velocityY * Timer::timeStep;
-			}
-		};
+		Update_Position_Poll  -= Timer::timeStep;
+		if (Update_Position_Poll <= 0) {
+			Update_Position_Poll = 0;
+			for (auto entity : group) {
+				auto& vel = group.get<Velocity>(entity);
+				auto& pX = group.get<Position_X>(entity);
+				auto& pY = group.get<Position_Y>(entity);
+				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
+					Scene::scene.emplace_or_replace<Moving>(entity); // turns on collision searching
+					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
+					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
+					float angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
+					float angle = atan2f(vel.magnitude.fX, vel.magnitude.fY);
+					float velocityX = sinf(angle) * vel.speed;
+					float velocityY = sinf(angle2) * vel.speed;
+					vel.dX = velocityX;
+					vel.dY = velocityY;
+					pX.fPX += velocityX * Timer::timeStep;
+					pY.fPY += velocityY * Timer::timeStep;
+				}
+			};
+		}
 	};
+
+
 
 	void Update_Direction() {
 		auto view = Scene::scene.view<Direction, Actions, Velocity>();
@@ -55,7 +63,59 @@ namespace Movement {
 		}
 	}
 
+
+	void Mouse_Move_To() {
+		Player_Move_Poll -= Timer::timeStep;
+		if (Player_Move_Poll <= 0) {
+			Player_Move_Poll = 200;
+			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move>();
+			for (auto entity : view) {	
+				auto& x = view.get<Position_X>(entity);
+				auto& y = view.get<Position_Y>(entity);
+				auto& v = view.get<Velocity>(entity);
+				auto& mov = view.get<Mouse_Move>(entity);				
+				v.magnitude.fX = v.speed * (mov.fX_Destination - x.fPX);
+				v.magnitude.fY = v.speed * (mov.fY_Destination - y.fPY);
+			}
+		}
+	}
+	
+	
+	void Mouse_Move_Arrived() {
+		auto view = scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
+		for (auto entity : view) {
+			auto& act = view.get<Actions>(entity);
+			auto& v = view.get<Velocity>(entity);
+			auto& x = view.get<Position_X>(entity);
+			auto& y = view.get<Position_Y>(entity);
+			auto& mov = view.get<Mouse_Move>(entity);
+			if (Mouse::Select_Unit_With_Mouse(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 15.0f)) {
+				v.magnitude.fX = 0.0f;
+				v.magnitude.fY = 0.0f;
+				act.action = idle;
+				scene.remove<Mouse_Move>(entity);
+			}
+		}
+	}
+
+	void Mouse_Moving() {
+		if (scene.empty<Selected>()) {
+			if (Mouse::bRight_Mouse_Pressed) {
+				auto view = scene.view<Input>();
+				for (auto entity : view) {
+					scene.emplace_or_replace<Mouse_Move>(entity);
+					auto& mov = scene.get<Mouse_Move>(entity);
+					mov.fX_Destination = Mouse::iXWorld_Mouse;
+					mov.fY_Destination = Mouse::iYWorld_Mouse;
+				}
+			}
+		}
+	}
+
 	void Movement_Handler() {
+		Mouse_Moving();
+		Mouse_Move_To();
+		Mouse_Move_Arrived();
 		Update_Position();
 		Update_Direction();
 	}

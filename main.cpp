@@ -1,12 +1,12 @@
+
 #include "rendering.h"
 #include "init.h"
-#include "eventHandler.h"
+#include "event_handler.h"
 #include "collision.h"
 #include "debug_system.h"
 #include "ai_control.h"
 #include "interface.h"
 #include "movement.h"
-
 int main(int argc, char* argv[]) {
 	
 	//initialization
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
   
 	while (1) {			
 
-		EventHandler::Player_Input();
+		Event_Handler::Player_Input();
 		AI::Run_AI();
 		Movement::Movement_Handler();
 		collision::Collisions();		

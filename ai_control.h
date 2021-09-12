@@ -14,28 +14,22 @@ namespace AI {
 		AI_Move_Poll -= Timer::timeStep;
 		if (AI_Move_Poll <= 0) {
 			AI_Move_Poll = 200;
-			auto view = scene.view<Position_X, Position_Y, Commanded_Move, Actions>();
+			auto view = scene.view<Position_X, Position_Y, Commanded_Move>();
 			for (auto entity : view) {
 				scene.emplace_or_replace<Velocity>(entity);
 				auto& v = scene.get<Velocity>(entity);
 				auto& x = view.get<Position_X>(entity);
 				auto& y = view.get<Position_Y>(entity);
-				auto& mov = view.get<Commanded_Move>(entity);
-				auto& act = view.get<Actions>(entity);
+				auto& mov = view.get<Commanded_Move>(entity);			
 				v.speed = 0.175;
-				float fx = mov.fX_Destination - x.fPX;
-				float fy = mov.fY_Destination - y.fPY;
-				//	float fDistance = sqrt((fx * fx) + (fy * fy));
-				float fNormalized_x = fx;
-				float fNormalized_y = fy;
-				v.magnitude.fX = v.speed * fNormalized_x;
-				v.magnitude.fY = v.speed * fNormalized_y;
+				v.magnitude.fX = v.speed * (mov.fX_Destination - x.fPX);
+				v.magnitude.fY = v.speed * (mov.fY_Destination - y.fPY);
 			}
 		}
 	}
 
 
-	void AI_Moving_To() {
+	void AI_Move_Arrive() {
 		auto view = scene.view<Position_X, Position_Y, Velocity, Actions, Commanded_Move>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);			
@@ -56,7 +50,7 @@ namespace AI {
 
 	void Run_AI() {
 		AI_Move_To();
-		AI_Moving_To();
+		AI_Move_Arrive();
 	}
 
 

@@ -72,6 +72,7 @@ namespace Components {
 		int currentFrame;
 		int NumFrames;
 	}; 
+
 	struct Actions {
 		Action_States action;
 		std::vector<Frame_Data>frameCount;
@@ -147,7 +148,11 @@ namespace Components {
 
 	};
 
-	std::vector<Moving>qwer;
+
+	struct Mouse_Move {
+		float fX_Destination;
+		float fY_Destination;
+	};
 
 }
 

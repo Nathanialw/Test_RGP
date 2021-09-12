@@ -5,12 +5,13 @@
 #include "utilities.h"
 #include "unit_control.h"
 #include "interface.h"
+#include "movement.h"
 
 
 using namespace Scene;
 
 
-namespace EventHandler {
+namespace Event_Handler {
 
 	/*I will make a component that will be pased to this funtion tree so the functions can do work on the position value of an entity "<velocity> <player_controllable>" */
 	
@@ -88,15 +89,14 @@ namespace EventHandler {
 	};
 
 
-	void Mouse_Input() {
+	void Mouse_Input(auto& e) {
 		if (event.key.type == SDL_MOUSEBUTTONDOWN) {
-			if (event.button.button == SDL_BUTTON_LEFT) {				
+			if (event.button.button == SDL_BUTTON_LEFT) {	
 				User_Mouse_Input::Selection_Box(); //if units are currently selected				
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {
-				if (!scene.empty<Selected>()) {
-					User_Mouse_Input::Selection_Box(); //if units are currently selected
-				}
+				Mouse::bRight_Mouse_Pressed = true;
+				User_Mouse_Input::Order_Unit(); //if units are currently selected
 			}
 		}
 
@@ -104,7 +104,8 @@ namespace EventHandler {
 			if (event.button.button == SDL_BUTTON_LEFT) {
 				User_Mouse_Input::Select_Unit();
 			}
-			if (event.button.button == SDL_BUTTON_RIGHT) {
+			if (event.button.button == SDL_BUTTON_RIGHT) {				
+				Mouse::bRight_Mouse_Pressed = false;
 				User_Mouse_Input::Command_Unit();				
 			}
 		}
@@ -123,7 +124,7 @@ namespace EventHandler {
 					Interface::Update_Zoom(event);
 				}
 				if (event.key.type == SDL_MOUSEBUTTONDOWN || event.key.type == SDL_MOUSEBUTTONUP) {
-					Mouse_Input();
+					Mouse_Input(entity);
 				}				
 				
 				//if (event.key.type == SDL_JOYAXISMOTION) { // it works!

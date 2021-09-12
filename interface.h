@@ -63,9 +63,9 @@ namespace Interface {
 			auto& c = view.get<Mass>(entity);
 			auto& d = view.get<Collision_Radius>(entity);
 
-			SDL_SetRenderDrawColor(renderer, 155,155,155,255);
+			SDL_SetRenderDrawColor(renderer, 55,255,55,255);
 			SDL_Rect p = {x.fSX - 15, y.fSY - 15, 30, 30};
-			SDL_RenderDrawRect(Graphics::renderer, &p);
+			SDL_RenderDrawRect(Graphics::renderer, &p);		
 			//Debug_System::Entity_Data_Debug(x.fX, y.fY, x.fSX, y.fSY);
 		}
 	}
@@ -76,8 +76,8 @@ namespace Interface {
 		Update_Mouse_And_Camera();
 		Display_Selected();
 		SDL_Color a = {235, 201, 100, 255};
-		if (Mouse::bPressed) {
-			SDL_SetRenderDrawColor(renderer, 155, 155, 155, 255);
+		if (Mouse::bLeft_Mouse_Pressed) {
+			SDL_SetRenderDrawColor(renderer, 55, 255, 55, 255);
 			SDL_Rect p = { Mouse::Mouse_Selection_Box_x_Display, Mouse::Mouse_Selection_Box_y_Display, Mouse::iXMouse - Mouse::Mouse_Selection_Box_x_Display, Mouse::iYMouse - Mouse::Mouse_Selection_Box_y_Display };
 			SDL_RenderDrawRect(Graphics::renderer, &p);
 		}

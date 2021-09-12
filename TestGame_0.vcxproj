@@ -73,22 +73,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2\lib\x64;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2\lib\x64;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
+    <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2\lib\x64;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2\lib\x64;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;C:\Workspace\Libraries\SDL2_image\lib\x64</LibraryPath>
+    <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,6 +97,11 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableModules>true</EnableModules>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,12 +116,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableModules>true</EnableModules>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,7 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;SDL2_gpu.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -137,6 +145,11 @@
       <PreprocessorDefinitions>_DEBUG;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableModules>true</EnableModules>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,12 +164,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableModules>true</EnableModules>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +180,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;SDL2_gpu.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -180,7 +196,7 @@
     <ClInclude Include="debug_components.h" />
     <ClInclude Include="debug_system.h" />
     <ClInclude Include="entt.hpp" />
-    <ClInclude Include="eventHandler.h" />
+    <ClInclude Include="event_handler.h" />
     <ClInclude Include="gameLoop.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="init.h" />
@@ -198,7 +214,13 @@
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.dll" />
+    <None Include="SDL2.dll" />
     <None Include="SDL2_gpu.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.lib" />
+    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2main.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

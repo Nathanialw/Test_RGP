@@ -18,33 +18,33 @@ namespace Debug_System {
 	Surface_Data mouseY;
 
 	void Entity_Data_Debug(float x, float y, float sx, float sy) {
-		//displays :
-		//	x,y position
-		//	collision radius
-		////	mass
-		//	//SDL_Rect j = { sx, sy, 30, 30 };
-		//	////SDL_RenderDrawRect(Graphics::renderer, &j);			
-		//	Surface_Data x_Position = Graphics::Load_Text_Texture(std::to_string(int(x)), { 255,0,133 });
-		//	Surface_Data y_Position = Graphics::Load_Text_Texture(std::to_string(int(y)), { 255,133,0	});
-		//	//Surface_Data collision_Radius = Graphics::Load_Text_Texture(std::to_string(mas), { 133,133,133 }, renderer);
-		//	//Surface_Data mass = Graphics::Load_Text_Texture(std::to_string(radius), { 133,133,133 }, renderer);
+		displays :
+			//x,y position
+			//collision radius
+		//	mass
+			//SDL_Rect j = { sx, sy, 30, 30 };
+			////SDL_RenderDrawRect(Graphics::renderer, &j);			
+			Surface_Data x_Position = Graphics::Load_Text_Texture(std::to_string(int(x)), { 255,0,133 });
+			Surface_Data y_Position = Graphics::Load_Text_Texture(std::to_string(int(y)), { 255,133,0	});
+			//Surface_Data collision_Radius = Graphics::Load_Text_Texture(std::to_string(mas), { 133,133,133 }, renderer);
+			//Surface_Data mass = Graphics::Load_Text_Texture(std::to_string(radius), { 133,133,133 }, renderer);
 
-		//	//SDL_Rect e = { sx - 5, sy - 5, 27, 50 };
-		//	//SDL_RenderDrawRect(renderer, &e);
-		//	////SDL_RenderCopy(renderer, mass.pTexture, , );
+			//SDL_Rect e = { sx - 5, sy - 5, 27, 50 };
+			//SDL_RenderDrawRect(renderer, &e);
+			////SDL_RenderCopy(renderer, mass.pTexture, , );
 
-		//	GPU_Rect a = {sx+25, sy-20, 15, 15};
-		//	GPU_BlitRect(x_Position.pTexture, &x_Position.k, renderer, &a);
-		//	GPU_Rect b = { sx+25, sy-10, 15, 15 };
-		//	GPU_BlitRect(y_Position.pTexture, &y_Position.k, renderer, &b);
-		//	//SDL_Rect c = { sx, sy+20, 15, 10 };
-		//	//SDL_RenderCopy(renderer, collision_Radius.pTexture, &collision_Radius.k, &c);
-		//	//SDL_Rect d = { sx, sy+30, 15, 10 };
-		//	//SDL_RenderCopy(renderer, mass.pTexture, &mass.k, &d);			
-		//	//SDL_DestroyTexture(collision_Radius.pTexture);
-		//	//SDL_DestroyTexture(mass.pTexture);
-		//	GPU_FreeImage(x_Position.pTexture);
-		//	GPU_FreeImage(y_Position.pTexture);
+			SDL_Rect a = {sx+25, sy-20, 15, 15};
+			SDL_RenderCopy(renderer, x_Position.pTexture, &x_Position.k, &a);
+			SDL_Rect b = { sx+25, sy-10, 15, 15 };
+			SDL_RenderCopy(renderer, y_Position.pTexture, &y_Position.k,  &b);
+			//SDL_Rect c = { sx, sy+20, 15, 10 };
+			//SDL_RenderCopy(renderer, collision_Radius.pTexture, &collision_Radius.k, &c);
+			//SDL_Rect d = { sx, sy+30, 15, 10 };
+			//SDL_RenderCopy(renderer, mass.pTexture, &mass.k, &d);			
+			//SDL_DestroyTexture(collision_Radius.pTexture);
+			//SDL_DestroyTexture(mass.pTexture);
+			SDL_DestroyTexture(x_Position.pTexture);
+			SDL_DestroyTexture(y_Position.pTexture);
 		}
 
 	void Framerate() {		
@@ -83,7 +83,7 @@ namespace Debug_System {
 			}
 			SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
 			//GPU_Rect c = { Mouse::iXMouse, Mouse::iYMouse, 50, 50 };
-			SDL_Rect d = {Mouse::iXMouse, Mouse::iYMouse, 50, 50 };
+			SDL_Rect d = {Mouse::iXMouse, Mouse::iYMouse, 50 / componentCamera.scale.fX, 50 / componentCamera.scale.fY };
 			SDL_RenderDrawRect(Graphics::renderer, &d);
 
 			//GPU_Rect v = Mouse::mouse_cursor;
