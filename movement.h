@@ -9,10 +9,12 @@
 namespace Movement {
 	int Player_Move_Poll;
 	int Update_Position_Poll;
+	int number = 0;
 
 	void Update_Position() {
 		auto group = Scene::scene.view<Position_X, Position_Y, Velocity>();
 		Update_Position_Poll  -= Timer::timeStep;
+		number = 0;
 		if (Update_Position_Poll <= 0) {
 			Update_Position_Poll = 0;
 			for (auto entity : group) {
@@ -20,6 +22,7 @@ namespace Movement {
 				auto& pX = group.get<Position_X>(entity);
 				auto& pY = group.get<Position_Y>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
+					number++;
 					Scene::scene.emplace_or_replace<Moving>(entity); // turns on collision searching
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
 					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
@@ -34,6 +37,7 @@ namespace Movement {
 				}
 			};
 		}
+		//std::cout << "moves:  " << number << std::endl;
 	};
 
 
@@ -89,11 +93,12 @@ namespace Movement {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			auto& mov = view.get<Mouse_Move>(entity);
-			if (Mouse::Select_Unit_With_Mouse(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 15.0f)) {
+			if (Mouse::Inside_Cursor(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 15.0f)) {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;
 				scene.remove<Mouse_Move>(entity);
+				scene.remove<Moving>(entity);
 			}
 		}
 	}

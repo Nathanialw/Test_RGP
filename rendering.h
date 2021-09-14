@@ -91,20 +91,17 @@ namespace Rendering {
 				auto& act = view1.get<Actions>(entity);
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].timeBetweenFrames -= Timer::timeStep;
-				//if (x.sheet[z.action].timeBetweenCurrent <= 0) {
 				if (anim.sheet[act.action].timeBetweenFrames <= 0) {
-					anim.sheet[act.action].timeBetweenFrames = 120;
+					anim.sheet[act.action].timeBetweenFrames = 75;
 					Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
 				}
-
-				//continue update rendoring frames at full speed
 				anim.renderPosition = anim.sheet[act.action].clip;										//save sprite for vector
 				anim.clipSprite = anim.sheet[act.action].clip;											//save position for renderer
 				x.fSX = x.fX - camera_offset.screen.x;
 				y.fSY = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
 				anim.renderPosition.y = y.fSY - anim.sheet[act.action].posOffset.y;
-				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);							
+				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);				
 			}
 		}
 	}

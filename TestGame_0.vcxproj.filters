@@ -86,6 +86,12 @@
     <ClInclude Include="movement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="classes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="death_spells.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.dll" />

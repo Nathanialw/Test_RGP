@@ -37,7 +37,7 @@ namespace AI {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			auto& mov = view.get<Commanded_Move>(entity);
-			if (Mouse::Select_Unit_With_Mouse(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 15.0f)) {
+			if (Mouse::Inside_Cursor(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 3.0f)) {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;

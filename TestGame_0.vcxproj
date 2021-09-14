@@ -191,8 +191,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ai_control.h" />
+    <ClInclude Include="classes.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="components.h" />
+    <ClInclude Include="death_spells.h" />
     <ClInclude Include="debug_components.h" />
     <ClInclude Include="debug_system.h" />
     <ClInclude Include="entt.hpp" />

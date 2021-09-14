@@ -6,6 +6,7 @@
 #include "unit_control.h"
 #include "interface.h"
 #include "movement.h"
+#include "death_spells.h"
 
 
 using namespace Scene;
@@ -59,24 +60,33 @@ namespace Event_Handler {
 
 
 					//push to front of the array when key down, read from front, remove when kep released
-				case SDLK_3: act.action = slash; break;
-				case SDLK_4: act.action = stab; break;
-				case SDLK_5: act.action = block; break;
-				case SDLK_6: act.action = dead; break;
-				case SDLK_7: act.action = xbow; break;
+				//case SDLK_3: act.action = slash; break;
+				//case SDLK_4: act.action = stab; break;
+				//case SDLK_5: act.action = block; break;
+				//case SDLK_6: act.action = dead; break;
+				//case SDLK_7: act.action = xbow; break;
+
+				case SDLK_1: User_Mouse_Input::Create_Squad();  break;
+				case SDLK_2: User_Mouse_Input::Delete_Squad(); break;
+				case SDLK_3: Death_Spells::Summon_Skeleton(); break;
+				case SDLK_4: break;
+				case SDLK_5: break;
+				case SDLK_6: break;
+				case SDLK_7: break;
+
 				}
 			}
 			if (event.type == SDL_KEYUP) {
 				switch (event.key.keysym.sym)
 				{
-				case SDLK_w: vel.magnitude.fY += vel.speed; break;
-				case SDLK_s: vel.magnitude.fY -= vel.speed; break;
-				case SDLK_a: vel.magnitude.fX += vel.speed; break;
-				case SDLK_d: vel.magnitude.fX -= vel.speed; break;
-				case SDLK_q: vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed;  break;
-				case SDLK_e: vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_c: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_z: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed;  break;
+				case SDLK_w: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; break;
+				case SDLK_s: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; break;
+				case SDLK_a: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed; break;
+				case SDLK_d: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed; break;
+				case SDLK_q: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
+				case SDLK_e: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_c: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_z: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
 
 				case SDLK_3: act.action = idle; break;
 				case SDLK_4: act.action = idle; break;
@@ -102,7 +112,7 @@ namespace Event_Handler {
 
 		if (event.key.type == SDL_MOUSEBUTTONUP) {
 			if (event.button.button == SDL_BUTTON_LEFT) {
-				User_Mouse_Input::Select_Unit();
+				User_Mouse_Input::Select();
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {				
 				Mouse::bRight_Mouse_Pressed = false;
@@ -117,7 +127,12 @@ namespace Event_Handler {
 			for (auto entity : view) {
 				auto& vel = view.get<Velocity>(entity);
 				auto& act = view.get<Actions>(entity);
-				if (event.key.type == SDL_KEYDOWN || event.key.type == SDL_KEYUP) {
+				if (event.key.type == SDL_KEYDOWN || event.key.type == SDL_KEYUP) {	
+					if (scene.all_of<Mouse_Move>(entity)) {
+						scene.remove<Mouse_Move>(entity);
+						vel.magnitude.fX = 0;
+						vel.magnitude.fY = 0;
+					}
 					Keyboard_Input(vel, act);
 				}
 				if (event.key.type == SDL_MOUSEWHEEL) {

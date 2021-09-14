@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	//initialization
 	Init::init();
 	createGraphicsContext();
-	loadEntities();
+	Init_Game();
   
 	while (1) {			
 
@@ -22,10 +22,10 @@ int main(int argc, char* argv[]) {
 		collision::Collisions();		
 
 
+	
 		Rendering::Rendering();
 		Interface::Run_Interface();
 		Timer::frameTime();
-		Rendering::Rendering();
 	
 	}
 	//close

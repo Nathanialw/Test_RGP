@@ -7,39 +7,30 @@ using namespace Scene;
 
 namespace collision {
 
-	float frames = 60.0f;
-
-	bool collisionCalc() { //controls how often collision calculates
-		frames -= Timer::timeStep;
-		if (frames <= 0) { 
-			frames = 16.0f; //every this many milliseconds
-			return true;
-		}
-		else return false;
-	}
-
+	int number = 0;
+	int checked = 0;
+	Timer::Frame_Timer Collision_Calc_Rate(16.0f);
 
 	void sort_Positions () {
-
-			//auto entity1 = scene.group<Potential_Position_X, Potential_Position_Y>();
-			scene.sort<Position_X>([](const auto& lhs, const auto& rhs) { return lhs.fPX < rhs.fPX; }); //sorts position least to ighest
-			scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) { return lhs.fPY < rhs.fPY; }); //sorts position least to	
-			
-		//
-
+		//auto entity1 = scene.group<Potential_Position_X, Potential_Position_Y>();
+		scene.sort<Position_X>([](const auto& lhs, const auto& rhs) { return lhs.fPX < rhs.fPX; }); //sorts position least to ighest
+		scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) { return lhs.fPY < rhs.fPY; }); //sorts position least to	
 	}
-
 
 	//pushed other entities with a velozity componenets and just collides and stops with entities that don't I think
 
 	void collisionUpdate(){ //checks every unit against one another need to make better
-		if (collisionCalc()) {
-
+		if (Collision_Calc_Rate.Calc()) {
+			number = 0;
+			checked = 0;
 			auto entity1 = scene.view<Position_X, Position_Y, Mass, Collision_Radius, Velocity, Moving>(entt::exclude<Collided>); //vel is only here to filter for mobile entities
 			auto entity2 = scene.view<Position_Y, Position_X, Collision_Radius, Mass>();
 
+			auto observer = entt::observer{ scene, entt::collector.update<Position_X>() };
+			for (auto entity9 : observer) {				
 
-			/*scene.on_construct<Position_X>().connect<>();
+			}
+			/*sne.on_construct<Position_X>().connect<>();
 			scene.on_destroy<Position_X>().connect<>();
 			scene.on_update<Position_X>().connect<>();*/
 
@@ -105,27 +96,29 @@ namespace collision {
 
 					if (aX.fPX != bX.fPX && aY.fPY != bY.fPY) {						//x = a.x - tocheck.x
 					//	if (aX.fPX - 30 < bX.fPX && aX.fPX + 30 > bX.fPX && aY.fPY - 30 < bY.fPY && aY.fPY + 30 > bY.fPY) {
-							float fx = aX.fPX - bX.fPX;
-							//y = a.y - tocheck.y
-							float fy = aY.fPY - bY.fPY;
-							// pythagoras x,y gets the distance							
-							float fDistance = (fx * fx) + (fy * fy);
-							if (fDistance <= ((aC.fCollisionRadius + bC.fCollisionRadius) * (aC.fCollisionRadius + bC.fCollisionRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-								scene.emplace_or_replace<Collided>(ii);
-								auto& k = scene.get<Collided>(ii);
-								k.bCollision = true;
-								fDistance = sqrtf(fDistance);
-								float fOverlap = fDistance - (aC.fCollisionRadius + bC.fCollisionRadius);
-								f2d resolver;
-								resolver.fX = fOverlap * (bX.fPX - aX.fPX) / fDistance;
-								resolver.fY = fOverlap * (bY.fPY - aY.fPY) / fDistance;
-								float fTotalmass = aM.fKilos + bM.fKilos;
-								float fNomalizedMassA = (aM.fKilos / fTotalmass);
-								float fNomalizedMassB = (bM.fKilos / fTotalmass);
-								aX.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
-								aY.fPY += (resolver.fY * fNomalizedMassB);
-								bX.fPX -= (resolver.fX * fNomalizedMassA);
-								bY.fPY -= (resolver.fY * fNomalizedMassA);
+						checked++;
+						float fx = aX.fPX - bX.fPX;
+						//y = a.y - tocheck.y
+						float fy = aY.fPY - bY.fPY;
+						// pythagoras x,y gets the distance							
+						float fDistance = (fx * fx) + (fy * fy);
+						if (fDistance <= ((aC.fCollisionRadius + bC.fCollisionRadius) * (aC.fCollisionRadius + bC.fCollisionRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+							number++;
+							scene.emplace_or_replace<Collided>(ii);
+							auto& k = scene.get<Collided>(ii);
+							k.bCollision = true;
+							fDistance = sqrtf(fDistance);
+							float fOverlap = fDistance - (aC.fCollisionRadius + bC.fCollisionRadius);
+							f2d resolver;
+							resolver.fX = fOverlap * (bX.fPX - aX.fPX) / fDistance;
+							resolver.fY = fOverlap * (bY.fPY - aY.fPY) / fDistance;
+							float fTotalmass = aM.fKilos + bM.fKilos;
+							float fNomalizedMassA = (aM.fKilos / fTotalmass);
+							float fNomalizedMassB = (bM.fKilos / fTotalmass);
+							aX.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+							aY.fPY += (resolver.fY * fNomalizedMassB);
+							bX.fPX -= (resolver.fX * fNomalizedMassA);
+							bY.fPY -= (resolver.fY * fNomalizedMassA);
 
 							}
 						//}
@@ -151,27 +144,29 @@ namespace collision {
 
 					if (aX.fPX != bX.fPX && aY.fPY != bY.fPY) {						//x = a.x - tocheck.x
 					//	if (aX.fPX - 30 < bX.fPX && aX.fPX + 30 > bX.fPX && aY.fPY - 30 < bY.fPY && aY.fPY + 30 > bY.fPY) {
-							float fx = aX.fPX - bX.fPX;
-							//y = a.y - tocheck.y
-							float fy = aY.fPY - bY.fPY;
-							// pythagoras x,y gets the distance							
-							float fDistance = (fx * fx) + (fy * fy);
-							if (fDistance <= ((aC.fCollisionRadius + bC.fCollisionRadius) * (aC.fCollisionRadius + bC.fCollisionRadius)) * 0.9f) { // the constant keeps it from check collisions overlapping by round errors							
-								scene.emplace_or_replace<Collided>(ii);
-								k.bCollision = true;
-								fDistance = sqrtf(fDistance);
-								float fOverlap = fDistance - (aC.fCollisionRadius + bC.fCollisionRadius);
-								f2d resolver;
-								resolver.fX = fOverlap * (bX.fPX - aX.fPX) / fDistance;
-								resolver.fY = fOverlap * (bY.fPY - aY.fPY) / fDistance;
-								float fTotalmass = aM.fKilos + bM.fKilos;
-								float fNomalizedMassA = (aM.fKilos / fTotalmass);
-								float fNomalizedMassB = (bM.fKilos / fTotalmass);
-								aX.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
-								aY.fPY += (resolver.fY * fNomalizedMassB);
-								bX.fPX -= (resolver.fX * fNomalizedMassA);
-								bY.fPY -= (resolver.fY * fNomalizedMassA);
-							}
+						checked++;
+						float fx = aX.fPX - bX.fPX;
+						//y = a.y - tocheck.y
+						float fy = aY.fPY - bY.fPY;
+						// pythagoras x,y gets the distance							
+						float fDistance = (fx * fx) + (fy * fy);
+						if (fDistance <= ((aC.fCollisionRadius + bC.fCollisionRadius) * (aC.fCollisionRadius + bC.fCollisionRadius)) * 0.9f) { // the constant keeps it from check collisions overlapping by round errors							
+							number++;			
+							scene.emplace_or_replace<Collided>(ii);
+							k.bCollision = true;
+							fDistance = sqrtf(fDistance);
+							float fOverlap = fDistance - (aC.fCollisionRadius + bC.fCollisionRadius);
+							f2d resolver;
+							resolver.fX = fOverlap * (bX.fPX - aX.fPX) / fDistance;
+							resolver.fY = fOverlap * (bY.fPY - aY.fPY) / fDistance;
+							float fTotalmass = aM.fKilos + bM.fKilos;
+							float fNomalizedMassA = (aM.fKilos / fTotalmass);
+							float fNomalizedMassB = (bM.fKilos / fTotalmass);
+							aX.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+							aY.fPY += (resolver.fY * fNomalizedMassB);
+							bX.fPX -= (resolver.fX * fNomalizedMassA);
+							bY.fPY -= (resolver.fY * fNomalizedMassA);			
+						}
 						//}
 					}
 				}
@@ -180,25 +175,43 @@ namespace collision {
 				}
 			}
 		}
+		//if (testSquad.soldiers.size() != 0) {
+		//	for (auto i : testSquad.soldiers) {
+		//		std::cout << "checked:   " << i.assigned << std::endl;
+		//	}
+		//}
+		//std::cout << "resolved:  " << number << std::endl;
 	}
 
-	void resolveCollisons() {
-		auto view = scene.view<Position_X, Position_Y>();
+	void resolveCollisons() {	
+		auto view = scene.view<Position_X, Position_Y>();			
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			x.fX = x.fPX;
-			y.fY = y.fPY;
+			y.fY = y.fPY;		
 		}
-
 	}
+
+	void Update_Unit() { // updates positions of soldiers stored in units for collision box
+		auto view = scene.view<Position_X, Position_Y, Soldier>();
+		for (auto entity : view) {
+			auto& x = view.get<Position_X>(entity);
+			auto& y = view.get<Position_Y>(entity);
+			auto& sold = scene.get<Soldier>(entity);
+			if (Squads.size() > 1) {};
+			sold.SquadAssgnedTo->x[sold.index] = x.fX;
+			sold.SquadAssgnedTo->y[sold.index] = y.fY;
+		}
+	}
+	
 
 
 	void Collisions() {
-		collision::sort_Positions();
-		collision::collisionUpdate();
-		collision::resolveCollisons();
+		sort_Positions();
+		collisionUpdate();
+		resolveCollisons();
+		Update_Unit();
 	}
-
 
 }

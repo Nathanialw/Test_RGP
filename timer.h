@@ -23,4 +23,25 @@ namespace Timer {
 		startTime = frequency;		
 	}
 
+
+	class Frame_Timer {
+		float fTime_between;
+		float fCounter_MS;
+
+		public:
+		Frame_Timer(float frequency) {
+			fTime_between = frequency;
+			fCounter_MS = 0.0f;
+		}
+
+		bool Calc() { //controls how often collision calculates
+			fCounter_MS -= Timer::timeStep;
+			if (fCounter_MS <= 0) {
+				fCounter_MS = fTime_between; //every this many milliseconds
+				return true;
+			}
+			else return false;
+		}
+	};
+
 }

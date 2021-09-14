@@ -5,7 +5,7 @@
 #include "sstream"
 #include "timer.h"
 #include "mouse_control.h"
-
+#include <algorithm>
 using namespace Scene;
 
 
@@ -59,6 +59,12 @@ namespace Debug_System {
 				iFramePollRate = 500;
 				SDL_DestroyTexture(framerate.pTexture);
 				framerate = Load_Text_Texture(std::to_string(int(Timer::avgFPS)), { 133,255,133 });
+				//std::cout << "_______________________________________" << std::endl;
+				//for (int i = 0; i < Squads.size(); i++) {
+				//	for (int j = 0; j < Squads[i].units.size(); j++) {
+				//		std::cout << "Squad : " <<i << "  " << " Soldier: " << j << " x:  " << Squads[i].x[j] << std::endl;
+				//	}
+				//}
 			}
 			SDL_Rect c = { 0,0,50 / componentCamera.scale.fX,50 / componentCamera.scale.fY };
 			SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);

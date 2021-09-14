@@ -4,14 +4,17 @@
 #include <iostream>
 #include <vector>
 #include "debug_components.h"
+#include "classes.h"
 
 
+using namespace Mil_Struc;
 
 namespace Components {
 
-	struct handle {
-		std::string sName;
+	struct unique_ID {
+		Uint32 sdaf;
 	};
+
 
 	struct i2d {
 		int x;
@@ -23,6 +26,16 @@ namespace Components {
 		float fY;
 	};
 
+	struct handle {
+		std::string sName;
+	};
+
+	struct Soldier {
+		bool bActive;
+		int index;
+		Squad* SquadAssgnedTo;
+	};
+	
 	struct Health {
 		int iHealth;
 	};
@@ -36,6 +49,10 @@ namespace Components {
 		float fX;
 		float fPX;
 		float fSX;
+	};	
+	
+	struct Position_Z {
+		float* fX;	
 	};
 	
 	struct Position_Y {
@@ -154,6 +171,28 @@ namespace Components {
 		float fY_Destination;
 	};
 
+
+
+
+
+	struct Company {
+		int squad[100];
+		//SDL_FRect sCollider;
+	};
+	
+
+	struct Battalion {
+		//Company l;
+		int company[100];
+		//SDL_FRect sCollider;
+
+	};
+
+	struct Test_V {
+		std::vector<Position_X>test_V;
+		//SDL_FRect sCollider;
+
+	};
 }
 
 
