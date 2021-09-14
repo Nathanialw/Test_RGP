@@ -70,21 +70,45 @@ namespace Interface {
 	void Run_Interface() {
 		Debug_System::Debugger();
 		Update_Mouse_And_Camera();
-		Display_Selected();
-		SDL_Color a = {235, 201, 100, 255};
-		auto view = scene.view<Position_X, Position_Y, Soldier>();
-		for (auto entity : view) {	
-			SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
-			SDL_FRect o = { x.fSX - 15, y.fSY - 15, 30, 30 };
-			SDL_RenderDrawRectF(Graphics::renderer, &o);
-		}
+		//Display_Selected();
+		//SDL_Color a = {235, 201, 100, 255};
+		//auto view = scene.view<Position_X, Position_Y, Soldier>();
+		//auto view2 = scene.view<Squad>();
+		//for (auto entity2 : view2) {
+		//	auto& x = view2.get<Squad>(entity2);			
+		//	for (auto i : x.fSquadX) {
+		//		std::cout << x.fSquadX[i] << std::endl;
+		//	}
+		//}
+		//std::cout << "-----------------------" << std::endl;
+
+		//for (auto entity : view) {	
+		//	//SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
+		//	//auto& x = view.get<Position_X>(entity);
+		//	//auto& y = view.get<Position_Y>(entity);
+		//	////std::cout << x.fPX << std::endl;
+		//	//SDL_FRect o = { x.fSX - 15, y.fSY - 15, 30, 30 };
+		//	//SDL_RenderDrawRectF(Graphics::renderer, &o);
+		//}
 		if (Mouse::bLeft_Mouse_Pressed) {
 			SDL_SetRenderDrawColor(renderer, 55, 255, 55, 255);
 			SDL_Rect p = { Mouse::Mouse_Selection_Box_x_Display, Mouse::Mouse_Selection_Box_y_Display, Mouse::iXMouse - Mouse::Mouse_Selection_Box_x_Display, Mouse::iYMouse - Mouse::Mouse_Selection_Box_y_Display };
 			SDL_RenderDrawRect(Graphics::renderer, &p);
 		}
+	}
+
+	void Unit_Arrive_UI() {
+		//auto view = scene.view<Commanded_Move>();
+		//auto view2 = scene.view<Camera>();
+		//for (auto camera : view2) {
+		//	auto& cam = view2.get<Camera>(camera);
+		//	for (auto entity : view) {
+		//		//auto& mov = view.get<Commanded_Move>(entity);				
+		//		//SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
+		//		//SDL_SetRenderDrawColor(renderer, 155, 155, 255, 255);				
+		//		//SDL_RenderFillRect(renderer, &o);
+		//	}
+		//}
 	}
 
 

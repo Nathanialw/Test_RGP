@@ -94,7 +94,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.dll" />
     <None Include="SDL2.dll" />
     <None Include="SDL2_gpu.dll" />
   </ItemGroup>

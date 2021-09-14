@@ -18,7 +18,7 @@ namespace Scene {
 	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
 	//
 	void Init_Mil_Struc() {
-		Squads.reserve(100);
+		//Squads.reserve(100);
 	}
 
 	void Load_Entities() {		
@@ -114,8 +114,8 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 100; ++j) {
+			for (auto i = 0; i < 100 ; ++i) {
 				auto skeleton0 = scene.create();
 				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector

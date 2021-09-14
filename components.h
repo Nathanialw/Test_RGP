@@ -31,9 +31,8 @@ namespace Components {
 	};
 
 	struct Soldier {
-		bool bActive;
-		int index;
-		Squad* SquadAssgnedTo;
+		int iIndex;
+		entt::entity SquadAssgnedTo;
 	};
 	
 	struct Health {
@@ -158,40 +157,21 @@ namespace Components {
 	};
 
 	struct Collided {
-		bool bCollision;
+
 	};
 
 	struct Moving {
 
 	};
 
-
 	struct Mouse_Move {
 		float fX_Destination;
 		float fY_Destination;
 	};
 
-
-
-
-
-	struct Company {
-		int squad[100];
-		//SDL_FRect sCollider;
-	};
-	
-
-	struct Battalion {
-		//Company l;
-		int company[100];
-		//SDL_FRect sCollider;
-
-	};
-
 	struct Test_V {
 		std::vector<Position_X>test_V;
 		//SDL_FRect sCollider;
-
 	};
 }
 

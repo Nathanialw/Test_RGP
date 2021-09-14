@@ -69,7 +69,7 @@ namespace Event_Handler {
 				case SDLK_1: User_Mouse_Input::Create_Squad();  break;
 				case SDLK_2: User_Mouse_Input::Delete_Squad(); break;
 				case SDLK_3: Death_Spells::Summon_Skeleton(); break;
-				case SDLK_4: break;
+				case SDLK_4: User_Mouse_Input::Create_Mass_Squads(); break;
 				case SDLK_5: break;
 				case SDLK_6: break;
 				case SDLK_7: break;

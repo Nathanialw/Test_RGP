@@ -21,7 +21,7 @@ namespace AI {
 				auto& x = view.get<Position_X>(entity);
 				auto& y = view.get<Position_Y>(entity);
 				auto& mov = view.get<Commanded_Move>(entity);			
-				v.speed = 0.175;
+				v.speed = 0.175f;
 				v.magnitude.fX = v.speed * (mov.fX_Destination - x.fPX);
 				v.magnitude.fY = v.speed * (mov.fY_Destination - y.fPY);
 			}
@@ -32,7 +32,7 @@ namespace AI {
 	void AI_Move_Arrive() {
 		auto view = scene.view<Position_X, Position_Y, Velocity, Actions, Commanded_Move>();
 		for (auto entity : view) {
-			auto& act = view.get<Actions>(entity);			
+			auto& act = view.get<Actions>(entity);
 			auto& v = scene.get<Velocity>(entity);
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -46,6 +46,7 @@ namespace AI {
 			}
 		}
 	}
+
 
 
 	void Run_AI() {
