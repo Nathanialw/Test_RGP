@@ -11,6 +11,27 @@ namespace Movement {
 	int Update_Position_Poll;
 	int number = 0;
 
+
+	void Move_Order(entt::entity& entity, float& x, float& y) {
+		scene.emplace_or_replace<Mouse_Move>(entity);
+		auto& mov = scene.get<Mouse_Move>(entity);
+		mov.fX_Destination = x;
+		mov.fY_Destination = y;
+	}
+
+	void Mouse_Order_Move() {
+		if (scene.empty<Selected>()) {
+			if (Mouse::bRight_Mouse_Pressed) {
+				auto view = scene.view<Input>();
+				for (auto entity : view) {
+					Move_Order(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+				}
+			}
+		}
+	}
+	
+
+
 	void Update_Position() {
 		auto group = Scene::scene.view<Position_X, Position_Y, Velocity>();
 		Update_Position_Poll  -= Timer::timeStep;
@@ -23,7 +44,6 @@ namespace Movement {
 				auto& pY = group.get<Position_Y>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
 					number++;
-					Scene::scene.emplace_or_replace<Moving>(entity); // turns on collision searching
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
 					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
 					float angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
@@ -35,7 +55,7 @@ namespace Movement {
 					pX.fPX += velocityX * Timer::timeStep;
 					pY.fPY += velocityY * Timer::timeStep;
 				}
-			};
+			}
 		}
 		//std::cout << "moves:  " << number << std::endl;
 	};
@@ -61,17 +81,17 @@ namespace Movement {
 			if (c.action == walk) {
 				if (vel.magnitude.fX == 0 && vel.magnitude.fY == 0) {
 					c.action = idle;
-					Scene::scene.remove<Moving>(entity);
 				};
 			}
 		}
 	}
 
 
-	void Mouse_Move_To() {
+	void Mouse_Move_To() { //calculates unit direction after you give them a "Mouse_Move" component with destination coordinates
 		Player_Move_Poll -= Timer::timeStep;
 		if (Player_Move_Poll <= 0) {
 			Player_Move_Poll = 200;
+			std::cout << scene.size<Mouse_Move>() << std::endl;
 			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);
@@ -93,7 +113,7 @@ namespace Movement {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			auto& mov = view.get<Mouse_Move>(entity);
-			if (Mouse::Inside_Cursor(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, 15.0f)) {
+			if (Mouse::Inside_Cursor(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, Mouse::Cursor_Size)) {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;
@@ -103,26 +123,15 @@ namespace Movement {
 		}
 	}
 
-	void Mouse_Moving() {
-		if (scene.empty<Selected>()) {
-			if (Mouse::bRight_Mouse_Pressed) {
-				auto view = scene.view<Input>();
-				for (auto entity : view) {
-					scene.emplace_or_replace<Mouse_Move>(entity);
-					auto& mov = scene.get<Mouse_Move>(entity);
-					mov.fX_Destination = Mouse::iXWorld_Mouse;
-					mov.fY_Destination = Mouse::iYWorld_Mouse;
-				}
-			}
-		}
-	}
 
 	void Movement_Handler() {
-		Mouse_Moving();
+		Mouse_Order_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location
 		Mouse_Move_To();
 		Mouse_Move_Arrived();
 		Update_Position();
 		Update_Direction();
+		
+
 	}
 
 }

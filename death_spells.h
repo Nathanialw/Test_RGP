@@ -26,7 +26,7 @@ namespace Death_Spells {
 
 		scene.emplace<Position_X>(skeleton0, 0.0f, float(Mouse::iXWorld_Mouse), 0.0f);
 		scene.emplace<Position_Y>(skeleton0, 0.0f, float(Mouse::iYWorld_Mouse), 0.0f);
-		scene.emplace<Collision_Radius>(skeleton0, 15.0f);
+		scene.emplace<Radius>(skeleton0, 15.0f);
 
 		scene.emplace<Direction>(skeleton0, SE);
 		scene.emplace<Alive>(skeleton0, true);

@@ -11,30 +11,21 @@ using namespace Mil_Struc;
 
 namespace Components {
 
-	struct unique_ID {
-		Uint32 sdaf;
-	};
 
-
-	struct i2d {
-		int x;
-		int y;
-	};
-
-	struct f2d {
-		float fX;
-		float fY;
-	};
 
 	struct handle {
 		std::string sName;
 	};
 
-	struct Soldier {
+	struct Assigned {
 		int iIndex;
-		entt::entity SquadAssgnedTo;
+		entt::entity iUnit_Assigned_To;
 	};
 	
+	struct Soldier {
+
+	};
+
 	struct Health {
 		int iHealth;
 	};
@@ -50,10 +41,6 @@ namespace Components {
 		float fSX;
 	};	
 	
-	struct Position_Z {
-		float* fX;	
-	};
-	
 	struct Position_Y {
 		float fY;
 		float fPY;
@@ -61,9 +48,8 @@ namespace Components {
 	};
 	////////////
 
-
-	struct Collision_Radius {
-		float fCollisionRadius;
+	struct Radius {
+		float fRadius;
 	};
 
 	struct Velocity {
@@ -149,7 +135,6 @@ namespace Components {
 	};
 
 	struct Commanding {
-		bool bSelected;
 	};
 
 	struct Selected {

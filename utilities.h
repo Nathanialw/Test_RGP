@@ -14,7 +14,7 @@ namespace Utilities {
 
 
 
-	bool Inside_Mousebox(SDL_FRect entity, SDL_FRect target) {
+	bool bRect_Intersect(SDL_FRect &entity, SDL_FRect &target) {
 		if ((entity.y <= target.y + target.h) &&
 			(entity.x <= target.x + target.w) &&
 			(entity.y + entity.h >= target.y) &&
@@ -22,7 +22,9 @@ namespace Utilities {
 			return true;
 		}
 		return false;
-	};
+	};	
+	
+
 
 
 

@@ -1,87 +1,191 @@
-#pragma once
 #include <vector>
-#include <array>
-
 
 namespace Mil_Struc {
 
-	struct Unit {
-		int name;
-		SDL_FRect collide_Box;
-
-		std::vector<entt::entity>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
+	struct i2d {
+		int x;
+		int y;
 	};
 
+	struct f2d {
+		float fX;
+		float fY;
+	};
+	
+	//wil have Regiments and Companies as administrative units
 
-	struct Squad : Unit {
+	struct Squad {
 		int size;
-		SDL_FRect collide_Box;
+		std::string name;
+		SDL_FRect sCollide_Box;
 
-		std::vector<entt::entity>sSub_Units;
+		std::vector<entt::entity>iSub_Units;
 		std::vector<float>fPX;
 		std::vector<float>fPY;
 		std::vector<float>fMass;
 		std::vector<float>fRadius;
 
-		Squad() {			
-			size = 12;
-			collide_Box = { 0,0,0,0 };
-			sSub_Units.reserve(size);
+		std::vector<f2d>vPosition; //
+
+
+		Squad() {
+			name = "Default";
+			size = 8;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
 			fPX.reserve(size);
 			fPY.reserve(size);
 			fMass.reserve(size);
 			fRadius.reserve(size);
+			vPosition.reserve(size);
 		}
 	};
 
+	struct Platoon {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
 
-	struct Company : Unit {
-		int name;
-		SDL_FRect collide_Box;
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
 
-		std::array<entt::entity, 12>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
+
+		Platoon() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
 	};
 
-	struct Battalion : Unit {
-		int name;
-		SDL_FRect collide_Box;
+	struct Company {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
 
-		std::array<entt::entity, 12>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+
+		Company() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Battalion {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+		Battalion() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
 	};	
-	
-	struct Brigade : Unit {
-		int name;
-		SDL_FRect collide_Box;
 
-		std::array<entt::entity, 12>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
-	};	
-	
-	
-	struct Division : Unit {
-		int name;
-		SDL_FRect collide_Box;
+	struct Regiment {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
 
-		std::array<entt::entity, 12>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
-	};	
-	
-	
-	struct Army : Unit {
-		int name;
-		SDL_FRect collide_Box;
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
 
-		std::array<entt::entity, 12>sSub_Units;
-		std::array<float, 12>fX;
-		std::array<float, 12>fY;
+		Regiment() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+	
+	struct Brigade {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Brigade() {
+			name = "Default";
+			size = 2;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};		
+	
+	struct Division {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Division() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};		
+	
+	struct Army {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Army() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
 	};
 
 

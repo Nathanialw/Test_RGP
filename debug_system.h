@@ -12,10 +12,8 @@ using namespace Scene;
 namespace Debug_System {
 
 	int iFramePollRate;
-	int iMousePollRate;
 	Surface_Data framerate;
-	Surface_Data mouseX;
-	Surface_Data mouseY;
+
 
 	void Entity_Data_Debug(float x, float y, float sx, float sy) {
 		displays :
@@ -59,50 +57,16 @@ namespace Debug_System {
 				iFramePollRate = 500;
 				SDL_DestroyTexture(framerate.pTexture);
 				framerate = Load_Text_Texture(std::to_string(int(Timer::avgFPS)), { 133,255,133 });
-				//std::cout << "_______________________________________" << std::endl;
-				//for (int i = 0; i < Squads.size(); i++) {
-				//	for (int j = 0; j < Squads[i].units.size(); j++) {
-				//		std::cout << "Squad : " <<i << "  " << " Soldier: " << j << " x:  " << Squads[i].x[j] << std::endl;
-				//	}
-				//}
 			}
 			SDL_Rect c = { 0,0,50 / componentCamera.scale.fX,50 / componentCamera.scale.fY };
 			SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
 		}
 	}
-//
-	void Debug_Mouse() {
-		auto view = scene.view<Camera, Position_X, Position_Y>();
-		for (auto focus : view) {
-			auto& componentCamera = view.get<Camera>(focus);
-			auto& x = view.get<Position_X>(focus);
-			auto& y = view.get<Position_Y>(focus);
-			SDL_Color b = { 255, 255, 255, 255 };
 
-			Debug_System::iMousePollRate -= Timer::timeStep;
-			if (iMousePollRate <= 0) {
-				iMousePollRate = 500;
-				SDL_DestroyTexture(mouseX.pTexture);
-				SDL_DestroyTexture(mouseY.pTexture);
-				mouseX = Load_Text_Texture(std::to_string(Mouse::iXWorld_Mouse), { 133,255,133 });
-				mouseY = Load_Text_Texture(std::to_string(Mouse::iYWorld_Mouse), { 133,255,133 });
-			}
-			SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
-			//GPU_Rect c = { Mouse::iXMouse, Mouse::iYMouse, 50, 50 };
-			SDL_Rect d = {Mouse::iXMouse, Mouse::iYMouse, 50 / componentCamera.scale.fX, 50 / componentCamera.scale.fY };
-			SDL_RenderDrawRect(Graphics::renderer, &d);
 
-			//GPU_Rect v = Mouse::mouse_cursor;
-			//v.y = v.y + 50;
-
-			//SDL_RenderCopy(Graphics::renderer, mouseX.pTexture, &mouseX.k, &d);
-			//SDL_RenderCopy(Graphics::renderer, mouseY.pTexture, &mouseY.k, &d);
-		}
-	}
+	
 
 		void Debugger() {
-			
-		Debug_Mouse();
 		Framerate();
 		}
 }

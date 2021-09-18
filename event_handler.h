@@ -66,10 +66,10 @@ namespace Event_Handler {
 				//case SDLK_6: act.action = dead; break;
 				//case SDLK_7: act.action = xbow; break;
 
-				case SDLK_1: User_Mouse_Input::Create_Squad();  break;
-				case SDLK_2: User_Mouse_Input::Delete_Squad(); break;
-				case SDLK_3: Death_Spells::Summon_Skeleton(); break;
-				case SDLK_4: User_Mouse_Input::Create_Mass_Squads(); break;
+				case SDLK_1: User_Mouse_Input::Create_Squads(); break;
+				case SDLK_2: User_Mouse_Input::Create_Platoons();    break;
+				case SDLK_3: User_Mouse_Input::Create_Companies();   break;
+				case SDLK_4: break;
 				case SDLK_5: break;
 				case SDLK_6: break;
 				case SDLK_7: break;
@@ -112,10 +112,11 @@ namespace Event_Handler {
 
 		if (event.key.type == SDL_MOUSEBUTTONUP) {
 			if (event.button.button == SDL_BUTTON_LEFT) {
-				User_Mouse_Input::Select();
+				User_Mouse_Input::Select_Units();
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {				
 				Mouse::bRight_Mouse_Pressed = false;
+				User_Mouse_Input::Command_Squad();
 				User_Mouse_Input::Command_Unit();				
 			}
 		}
