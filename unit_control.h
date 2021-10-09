@@ -9,7 +9,68 @@ using namespace Scene;
 
 namespace User_Mouse_Input {
 
+	enum Unit_Selection {
+		soldiers,
+		squads,
+		platoons,
+		companies,
+		battalions
 
+	};
+
+	Unit_Selection eUnit_Selection;
+
+	void Selection_Soldiers () {
+		eUnit_Selection = soldiers;
+	}
+	
+	void Selection_Squads () {
+		eUnit_Selection = squads;
+	}
+	
+	void Selection_Platoons () {
+		eUnit_Selection = platoons;
+	}
+		
+	void Selection_Companies () {
+		eUnit_Selection = companies;
+	}
+		
+	void Selection_Battalions () {
+		eUnit_Selection = battalions;
+	}
+
+	bool Select_Battalion() {
+		bool bSelected = false;
+		auto platoon_view = scene.view<Platoon>();
+		for (auto platoons : platoon_view) {
+			auto& platoon = platoon_view.get<Platoon>(platoons);
+			if (Mouse::Mouse_Selection_Box(platoon.sCollide_Box)) {
+				scene.emplace_or_replace<Selected>(platoons);
+				bSelected = true;
+			}
+		}
+		if (bSelected == false) {
+			scene.clear<Selected>();
+		}
+		return bSelected;
+	}
+
+	bool Select_Company() {
+		bool bSelected = false;
+		auto platoon_view = scene.view<Platoon>();
+		for (auto platoons : platoon_view) {
+			auto& platoon = platoon_view.get<Platoon>(platoons);
+			if (Mouse::Mouse_Selection_Box(platoon.sCollide_Box)) {
+				scene.emplace_or_replace<Selected>(platoons);
+				bSelected = true;
+			}
+		}
+		if (bSelected == false) {
+			scene.clear<Selected>();
+		}
+		return bSelected;
+	}
 
 	bool Select_Platoon() {
 		bool bSelected = false;
@@ -48,7 +109,7 @@ namespace User_Mouse_Input {
 
 	bool Select_Soldier() {
 		bool bSelected = false;
-		auto soldier_view = scene.view<Position_X, Position_Y, Radius>();				
+		auto soldier_view = scene.view<Position_X, Position_Y, Radius, Soldier>();				
 		for (auto soldiers : soldier_view) {
 			auto& x = soldier_view.get<Position_X>(soldiers);
 			auto& y = soldier_view.get<Position_Y>(soldiers);
@@ -65,29 +126,6 @@ namespace User_Mouse_Input {
 	}
 
 
-	void Select_Unit() {
-		bool bSelected = false;
-		auto view = scene.view<Position_X, Position_Y, Radius>();
-		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
-			auto& r = view.get<Radius>(entity);
-			if (Mouse::Mouse_Selection_Box({ x.fPX, y.fPY, r.fRadius, r.fRadius})) {
-				scene.emplace_or_replace<Selected>(entity);
-				bSelected = true;
-			}
-			if (Mouse::Inside_Cursor(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, x.fX, y.fY, Mouse::Cursor_Size)) { //input w, h into this function on release
-				scene.clear<Selected>();
-				scene.emplace_or_replace<Selected>(entity);
-				bSelected = true;
-			}
-		}
-		if (bSelected == false) {
-			scene.clear<Selected>();
-		}
-	}
-
-
 	void Select() {
 		Select_Platoon();
 		Select_Squad();
@@ -97,11 +135,13 @@ namespace User_Mouse_Input {
 
 	void Select_Units() {
 		//if unit.Soldier then select all in his squad
-		if (scene.empty<Selected>()) {	
-			if (!Select_Platoon()) { 
-				if(!Select_Squad()) {
-					Select_Soldier();
-				}
+		if (scene.empty<Selected>()) {				
+			switch (eUnit_Selection) {
+				case soldiers: Select_Soldier(); break;
+				case squads: Select_Squad(); break;
+				case platoons: Select_Platoon(); break;
+				case companies: Select_Company(); break;
+				case battalions: Select_Battalion(); break;
 			}
 			Mouse::bLeft_Mouse_Pressed = false;
 		}

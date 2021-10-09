@@ -73,6 +73,9 @@ namespace Event_Handler {
 				case SDLK_5: break;
 				case SDLK_6: break;
 				case SDLK_7: break;
+				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
+				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
+				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
 
 				}
 			}

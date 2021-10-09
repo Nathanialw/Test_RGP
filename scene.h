@@ -113,8 +113,8 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 12; ++i) {
+		for (auto j = 0; j < 96; ++j) {
+			for (auto i = 0; i < 96; ++i) {
 				auto skeleton0 = scene.create();
 				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector
@@ -213,7 +213,7 @@ namespace Scene {
 
 				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
 				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
-				scene.emplace<Radius>(house, 30.0f);//needs to be made of lines ->  circle vs line collision
+				scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
 
 				scene.emplace<Actions>(house, isStatic);
 				scene.get<Actions>(house).frameCount = { { 0, 0} };

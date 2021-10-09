@@ -144,7 +144,7 @@ namespace Interface {
 	void Run_Interface() {
 		Debug_System::Debugger();
 		Update_Mouse_And_Camera();
-		Display_Selected();
+		//Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();
 	}

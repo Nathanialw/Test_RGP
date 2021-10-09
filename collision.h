@@ -18,7 +18,6 @@ namespace collision {
 	Timer::Frame_Timer Collision_Calc_Rate(16.0f); // collision update rate
 	Timer::Frame_Timer Print_calcs(500.0f);
 	void sort_Positions () {
-		//auto entity1 = scene.group<Potential_Position_X, Potential_Position_Y>();
 		scene.sort<Position_X>([](const auto& lhs, const auto& rhs) { return lhs.fPX < rhs.fPX; }); //sorts position least to ighest
 		scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) { return lhs.fPY < rhs.fPY; }); //sorts position least to	
 	}
@@ -393,7 +392,6 @@ namespace collision {
 
 		sort_Positions();
 
-
 		Update_Unit();
 		Update_Platoons();
 		Update_Company();
@@ -404,6 +402,6 @@ namespace collision {
 		Update_Collided_Unit();
 		resolveCollisons();
 
-	//	CollisionsT();
+		CollisionsT();
 	}
 }

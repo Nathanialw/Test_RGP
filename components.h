@@ -56,8 +56,12 @@ namespace Components {
 		float dX, dY;
 		f2d magnitude;
 		float speed;
+		float angle1, angle2;
 	};
 
+	struct Building_Collider {
+		std::vector<i2d>walls;
+	};
 	
 	enum Action_States {
 		isStatic,

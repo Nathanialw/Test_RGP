@@ -30,8 +30,6 @@ namespace Movement {
 		}
 	}
 	
-
-
 	void Update_Position() {
 		auto group = Scene::scene.view<Position_X, Position_Y, Velocity>();
 		Update_Position_Poll  -= Timer::timeStep;
@@ -46,10 +44,10 @@ namespace Movement {
 					number++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
 					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
-					float angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
-					float angle = atan2f(vel.magnitude.fX, vel.magnitude.fY);
-					float velocityX = sinf(angle) * vel.speed;
-					float velocityY = sinf(angle2) * vel.speed;
+					vel.angle1 = atan2f(vel.magnitude.fX, vel.magnitude.fY);
+					vel.angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
+					float velocityX = sinf(vel.angle1) * vel.speed;
+					float velocityY = sinf(vel.angle2) * vel.speed;
 					vel.dX = velocityX;
 					vel.dY = velocityY;
 					pX.fPX += velocityX * Timer::timeStep;
@@ -57,10 +55,7 @@ namespace Movement {
 				}
 			}
 		}
-		//std::cout << "moves:  " << number << std::endl;
 	};
-
-
 
 	void Update_Direction() {
 		auto view = Scene::scene.view<Direction, Actions, Velocity>();
@@ -68,15 +63,16 @@ namespace Movement {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
 			auto& c = view.get<Actions>(entity);
-			if (vel.magnitude.fX > 0) { b.eDirection = E; c.action = walk; };
-			if (vel.magnitude.fX < 0) { b.eDirection = W; c.action = walk; };
-			if (vel.magnitude.fY > 0) { b.eDirection = S; c.action = walk; };
-			if (vel.magnitude.fY < 0) { b.eDirection = N; c.action = walk; };
 
-			if (vel.magnitude.fX > 0 && vel.magnitude.fY > 0) { b.eDirection = SE; c.action = walk; };
-			if (vel.magnitude.fX < 0 && vel.magnitude.fY > 0) { b.eDirection = SW; c.action = walk; };
-			if (vel.magnitude.fY < 0 && vel.magnitude.fX < 0) { b.eDirection = NW; c.action = walk; };
-			if (vel.magnitude.fY < 0 && vel.magnitude.fX > 0) { b.eDirection = NE; c.action = walk; };
+			if (vel.angle1 > 2.74889 || vel.angle1 <= (-2.74889)) { b.eDirection = N; c.action = walk; }
+			else if (vel.angle1 > 1.96349 && vel.angle1 <= (2.74889)) { b.eDirection = NE; c.action = walk; }
+			else if (vel.angle1 > 1.17809 && vel.angle1 <= (1.96349)) { b.eDirection = E; c.action = walk; }
+			else if (vel.angle1 > 0.39269 && vel.angle1 <= (1.17809)) { b.eDirection = SE; c.action = walk; }
+
+			else if (vel.angle1 > (-0.39269) && vel.angle1 <= (0.39269)) { b.eDirection = S; c.action = walk; }
+			else if (vel.angle1 > (-1.17811) && vel.angle1 <= (-0.39269)) { b.eDirection = SW; c.action = walk; }
+			else if (vel.angle1 > (-1.96351) && vel.angle1 <= (-1.17811)) { b.eDirection = W; c.action = walk; }
+			else if (vel.angle1 > (-2.74889) && vel.angle1 <= (-1.96351)) { b.eDirection = NW; c.action = walk; }
 
 			if (c.action == walk) {
 				if (vel.magnitude.fX == 0 && vel.magnitude.fY == 0) {
@@ -91,7 +87,6 @@ namespace Movement {
 		Player_Move_Poll -= Timer::timeStep;
 		if (Player_Move_Poll <= 0) {
 			Player_Move_Poll = 200;
-			std::cout << scene.size<Mouse_Move>() << std::endl;
 			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);
@@ -130,8 +125,6 @@ namespace Movement {
 		Mouse_Move_Arrived();
 		Update_Position();
 		Update_Direction();
-		
-
 	}
 
 }

@@ -131,7 +131,7 @@ namespace Rendering {
 		SDL_SetRenderDrawColor(Graphics::renderer, 12, 20, 20, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(Graphics::renderer);
 		SDL_SetRenderDrawColor(Graphics::renderer, 255, 100, 50, SDL_ALPHA_OPAQUE);
-		//Draw_Tiles();
+		Draw_Tiles();
 	}
 
 
