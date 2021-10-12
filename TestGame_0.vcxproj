@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -218,10 +218,15 @@
   <ItemGroup>
     <None Include="SDL2.dll" />
     <None Include="SDL2_gpu.dll" />
+    <None Include="sounds\battle_sound_effects_0.zip" />
+    <None Include="sounds\RPGsounds_Kenney.zip" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.lib" />
     <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2main.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\FreeSans.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
