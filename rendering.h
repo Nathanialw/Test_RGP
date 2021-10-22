@@ -101,6 +101,7 @@ namespace Rendering {
 				y.fSY = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
 				anim.renderPosition.y = y.fSY - anim.sheet[act.action].posOffset.y;
+			//	std::cout << anim.pTexture << std::endl;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);				
 			}
 		}

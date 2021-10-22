@@ -78,7 +78,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release</LibraryPath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -88,7 +88,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_ttf\include;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(LibraryPath);C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release</LibraryPath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2_gpu\SDL_gpu-VS\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,11 +131,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;SDL2_gpu.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>"C:\Workspace\Libraries\SDL2\VisualC\x64\Release\SDL2.lib";SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;SDL2_gpu.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -180,10 +181,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;SDL2_gpu.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\workspace\Libraries\SDL2_image\lib\x64;C:\workspace\Libraries\SDL2\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\lib\x64</AdditionalLibraryDirectories>
+      <ShowProgress>NotSet</ShowProgress>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -218,10 +221,11 @@
   <ItemGroup>
     <None Include="SDL2.dll" />
     <None Include="SDL2_gpu.dll" />
+    <None Include="SDL2_image.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.lib" />
-    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2main.lib" />
+    <Library Include="SDL2.lib" />
+    <Library Include="SDL2main.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
