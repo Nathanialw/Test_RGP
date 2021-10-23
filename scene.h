@@ -113,8 +113,8 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 1; ++i) {
+		for (auto j = 0; j < 96; ++j) {
+			for (auto i = 0; i < 96; ++i) {
 				auto skeleton0 = scene.create();
 				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector
