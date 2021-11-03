@@ -337,9 +337,6 @@
     <Image Include="sprites\buildings\watchtower_lvl2-exp_full_size.png" />
     <Image Include="sprites\buildings\well_dude.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Object Include="sprites\buildings\house.obj" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

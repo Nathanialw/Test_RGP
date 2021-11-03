@@ -49,14 +49,14 @@ namespace Event_Handler {
 						poisition = potential position
 					*/
 				{
-				case SDLK_w: vel.magnitude.fY -= vel.speed; break;
-				case SDLK_s: vel.magnitude.fY += vel.speed; break;
-				case SDLK_a: vel.magnitude.fX -= vel.speed; break;
-				case SDLK_d: vel.magnitude.fX += vel.speed; break;
-				case SDLK_q: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; break;
-				case SDLK_e: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; break;
-				case SDLK_c: vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; break;
-				case SDLK_z: vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; break;
+				case SDLK_e: vel.magnitude.fY -= vel.speed; break;
+				case SDLK_d: vel.magnitude.fY += vel.speed; break;
+				case SDLK_s: vel.magnitude.fX -= vel.speed; break;
+				case SDLK_f: vel.magnitude.fX += vel.speed; break;
+				case SDLK_w: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; break;
+				case SDLK_r: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; break;
+				case SDLK_v: vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; break;
+				case SDLK_x: vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; break;
 
 
 					//push to front of the array when key down, read from front, remove when kep released
@@ -82,14 +82,14 @@ namespace Event_Handler {
 			if (event.type == SDL_KEYUP) {
 				switch (event.key.keysym.sym)
 				{
-				case SDLK_w: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; break;
-				case SDLK_s: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; break;
-				case SDLK_a: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed; break;
-				case SDLK_d: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed; break;
-				case SDLK_q: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
-				case SDLK_e: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_c: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_z: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
+				case SDLK_e: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; break;
+				case SDLK_d: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; break;
+				case SDLK_s: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed; break;
+				case SDLK_f: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed; break;
+				case SDLK_w: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
+				case SDLK_r: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_v: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_x: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
 
 				case SDLK_3: act.action = idle; break;
 				case SDLK_4: act.action = idle; break;

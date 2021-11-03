@@ -140,28 +140,29 @@ namespace Interface {
 		
 
 
+	void Unit_Arrive_UI() {
+		auto view = scene.view<Commanded_Move>();
+		auto view2 = scene.view<Camera>();
+		for (auto camera : view2) {
+			auto& cam = view2.get<Camera>(camera);
+			for (auto entity : view) {
+				auto& mov = view.get<Commanded_Move>(entity);				
+				SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
+				SDL_SetRenderDrawColor(renderer, 155, 155, 255, 255);				
+				SDL_RenderFillRect(renderer, &o);
+			}
+		}
+	}
 
 	void Run_Interface() {
 		Debug_System::Debugger();
+		Unit_Arrive_UI();
 		Update_Mouse_And_Camera();
-		//Display_Selected();
+		Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();
 	}
 
-	void Unit_Arrive_UI() {
-		//auto view = scene.view<Commanded_Move>();
-		//auto view2 = scene.view<Camera>();
-		//for (auto camera : view2) {
-		//	auto& cam = view2.get<Camera>(camera);
-		//	for (auto entity : view) {
-		//		//auto& mov = view.get<Commanded_Move>(entity);				
-		//		//SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
-		//		//SDL_SetRenderDrawColor(renderer, 155, 155, 255, 255);				
-		//		//SDL_RenderFillRect(renderer, &o);
-		//	}
-		//}
-	}
 
 
 }
