@@ -138,8 +138,6 @@ namespace Event_Handler {
 						vel.magnitude.fY = 0;
 					}
 					Keyboard_Input(vel, act);
-
-
 				}
 				if (event.key.type == SDL_MOUSEWHEEL) {
 					Interface::Update_Zoom(event);
