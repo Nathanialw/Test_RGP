@@ -157,6 +157,10 @@ namespace Components {
 		float fY_Destination;
 	};
 
+	enum Casting {
+		fireball
+	};
+
 	struct Test_V {
 		std::vector<Position_X>test_V;
 		//SDL_FRect sCollider;

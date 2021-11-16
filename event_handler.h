@@ -19,7 +19,7 @@ namespace Event_Handler {
 
 	SDL_Event event;
 
-	void Keyboard_Input(Velocity& vel, Actions& act) { //can return bools for x and y dir, and 2 enums for direction and state
+	void Keyboard_Input(Velocity& vel, Actions& act, entt::entity entity) { //can return bools for x and y dir, and 2 enums for direction and state
 		if (event.key.repeat == 0) {
 			if (event.type == SDL_KEYDOWN) {
 				switch (event.key.keysym.sym)
@@ -72,7 +72,7 @@ namespace Event_Handler {
 				case SDLK_4: act.action = slash; break;
 				case SDLK_5: act.action = stab; break;
 				case SDLK_6: act.action = block; break;
-				case SDLK_7: act.action = xbow; break;
+				case SDLK_7: scene.emplace<Casting>(entity, fireball);
 				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
@@ -137,7 +137,7 @@ namespace Event_Handler {
 						vel.magnitude.fX = 0;
 						vel.magnitude.fY = 0;
 					}
-					Keyboard_Input(vel, act);
+					Keyboard_Input(vel, act, entity);
 
 
 				}

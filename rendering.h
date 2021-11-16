@@ -90,8 +90,8 @@ namespace Rendering {
 				auto& x = view1.get<Position_X>(entity);
 				auto& y = view1.get<Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
-				if (act.action == slash) {
-					std::cout << "slashing" << std::endl;
+				if (act.action == walk) {
+					std::cout << "fireball" << std::endl;
 				}
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].timeBetweenFrames -= Timer::timeStep;

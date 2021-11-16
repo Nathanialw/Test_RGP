@@ -7,6 +7,7 @@
 #include "ai_control.h"
 #include "interface.h"
 #include "movement.h"
+#include "spells.h"
 int main(int argc, char* argv[]) {
 	
 	//initialization
@@ -18,6 +19,7 @@ int main(int argc, char* argv[]) {
 
 		Event_Handler::Player_Input();
 		AI::Run_AI();
+		Spells::add_spells_to_scene();
 		Movement::Movement_Handler();
 		collision::Collisions();		
 

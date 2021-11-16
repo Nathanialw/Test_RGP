@@ -22,6 +22,7 @@ namespace Graphics {
 	SDL_Texture* archer_0;
 	SDL_Texture* house_0;
 	SDL_Texture* grass_0;
+	SDL_Texture* fireball_0;
 
 
 
@@ -71,6 +72,7 @@ namespace Graphics {
 		house_0 = createTexture("sprites/buildings/building_04.png");
 		archer_0 = createTexture("sprites/units/archer/archer_00.png");
 		grass_0 = createTexture("sprites/environment/grass/grass.png");
+		fireball_0 = createTexture("sprites/environment/grass/grass.png");
 	}
 
 
