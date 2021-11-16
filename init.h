@@ -3,7 +3,7 @@
 //#include "Joystick.h"
 
 namespace Init {
-
+	std::string batch = "1";
 
 	void init() {
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -12,7 +12,7 @@ namespace Init {
 	//	Joystick::JoystickInit();
 		TTF_Init();
 		
-
+	
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 }

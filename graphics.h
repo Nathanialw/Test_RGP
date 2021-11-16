@@ -85,6 +85,7 @@ namespace Graphics {
 
 
 		SDL_CreateWindowAndRenderer(resolution.w, resolution.h, NULL, &window, &renderer);
+		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 		Load_Textures();
 	}
 
