@@ -92,10 +92,15 @@
     <ClInclude Include="death_spells.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="base_structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
-    <None Include="SDL2_gpu.dll" />
     <None Include="sounds\battle_sound_effects_0.zip" />
     <None Include="sounds\RPGsounds_Kenney.zip" />
     <None Include="sprites\environment\even more tiles\Small 128x64\Interior\Tiled Tsx\1 Floor - Tiled 128x64.tsx" />
@@ -174,10 +179,8 @@
     <None Include="sprites\buildings\Well.zip" />
     <None Include="sprites\buildings\wooden_floor.blend" />
     <None Include="sprites\buildings\wooden_walls.blend" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2.lib" />
-    <Library Include="..\..\Libraries\SDL2\VisualC\x64\Release\SDL2main.lib" />
+    <None Include="libfreetype-6.dll" />
+    <None Include="SDL2_ttf.dll" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\FreeSans.ttf" />

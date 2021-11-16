@@ -67,8 +67,8 @@ namespace Rendering {
 		auto view = scene.view<Camera>();
 		for (auto e : view){
 			auto& a = view.get<Camera>(e);
-			for (int i = -100; i < 200; i++) {			
-				for (int j = -100; j < 200; j++) {
+			for (int i = 0; i < 640; i++) {			
+				for (int j = 0; j < 640; j++) {
 					cell.x = i * 64.0f - a.screen.x;
 					cell.y = j * 64.0f - a.screen.y;
 					SDL_RenderCopy(Graphics::renderer, Graphics::grass_0, &grass, &cell);
