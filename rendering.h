@@ -12,7 +12,8 @@ namespace Rendering {
 	SDL_Rect grass = { 1,1,235,235 };
 	SDL_Rect cell = { 0,0,64,64 };
 
-	void Frame_Update(spriteframes& a, Direction& b, Actions& act) { // bug :: cuts off first frame of when it starts		
+	void Frame_Update(spriteframes& a, Direction& b, Actions& act) { // bug :: cuts off first frame of when it starts	
+		
 		a.clip.y = a.clip.h * b.eDirection; //check which directioon is facing then change clip.y to sprite height x direction enum
 		if (act.action != isStatic) {
 			if (act.action != dead) {
@@ -89,6 +90,9 @@ namespace Rendering {
 				auto& x = view1.get<Position_X>(entity);
 				auto& y = view1.get<Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
+				if (act.action == slash) {
+					std::cout << "slashing" << std::endl;
+				}
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].timeBetweenFrames -= Timer::timeStep;
 				if (anim.sheet[act.action].timeBetweenFrames <= 0) {

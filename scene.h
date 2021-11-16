@@ -113,8 +113,8 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 12; ++i) {
+		for (auto j = 0; j < 0; ++j) {
+			for (auto i = 0; i < 0; ++i) {
 				auto skeleton0 = scene.create();
 				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector
@@ -151,8 +151,8 @@ namespace Scene {
 			
 		
 		//trees
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 0; ++j) {
+			for (auto i = 0; i < 0; ++i) {
 				auto tree = scene.create();
 				scene.emplace<animation>(tree, tree_0); /// need to load hetexture	 only once and pass the pointer into this function
 				scene.get<animation>(tree).sheet = {
@@ -170,8 +170,8 @@ namespace Scene {
 		}
 
 		//archers
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 0; ++j) {
+			for (auto i = 0; i < 0; ++i) {
 				auto archer = scene.create();			//creates a unique handle for an entity
 				scene.emplace<animation>(archer, archer_0); /// need to load the texture only onceand pass the pointer into this function
 				scene.get<animation>(archer).sheet = { //populate the vector
@@ -204,8 +204,8 @@ namespace Scene {
 
 
 		//buildings
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 0; ++j) {
+			for (auto i = 0; i < 0; ++i) {
 				auto house = scene.create();
 				scene.emplace<animation>(house, house_0);
 				scene.get<animation>(house).sheet = {

@@ -63,16 +63,15 @@ namespace Movement {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
 			auto& c = view.get<Actions>(entity);
+			if (vel.angle1 > 2.74889 || vel.angle1 <= (-2.74889)) { b.eDirection = N;}
+			else if (vel.angle1 > 1.96349 && vel.angle1 <= (2.74889)) { b.eDirection = NE; }
+			else if (vel.angle1 > 1.17809 && vel.angle1 <= (1.96349)) { b.eDirection = E;}
+			else if (vel.angle1 > 0.39269 && vel.angle1 <= (1.17809)) { b.eDirection = SE; }
 
-			if (vel.angle1 > 2.74889 || vel.angle1 <= (-2.74889)) { b.eDirection = N; c.action = walk; }
-			else if (vel.angle1 > 1.96349 && vel.angle1 <= (2.74889)) { b.eDirection = NE; c.action = walk; }
-			else if (vel.angle1 > 1.17809 && vel.angle1 <= (1.96349)) { b.eDirection = E; c.action = walk; }
-			else if (vel.angle1 > 0.39269 && vel.angle1 <= (1.17809)) { b.eDirection = SE; c.action = walk; }
-
-			else if (vel.angle1 > (-0.39269) && vel.angle1 <= (0.39269)) { b.eDirection = S; c.action = walk; }
-			else if (vel.angle1 > (-1.17811) && vel.angle1 <= (-0.39269)) { b.eDirection = SW; c.action = walk; }
-			else if (vel.angle1 > (-1.96351) && vel.angle1 <= (-1.17811)) { b.eDirection = W; c.action = walk; }
-			else if (vel.angle1 > (-2.74889) && vel.angle1 <= (-1.96351)) { b.eDirection = NW; c.action = walk; }
+			else if (vel.angle1 > (-0.39269) && vel.angle1 <= (0.39269)) { b.eDirection = S; }
+			else if (vel.angle1 > (-1.17811) && vel.angle1 <= (-0.39269)) { b.eDirection = SW; }
+			else if (vel.angle1 > (-1.96351) && vel.angle1 <= (-1.17811)) { b.eDirection = W; }
+			else if (vel.angle1 > (-2.74889) && vel.angle1 <= (-1.96351)) { b.eDirection = NW; }
 
 			if (c.action == walk) {
 				if (vel.magnitude.fX == 0 && vel.magnitude.fY == 0) {
@@ -87,12 +86,14 @@ namespace Movement {
 		Player_Move_Poll -= Timer::timeStep;
 		if (Player_Move_Poll <= 0) {
 			Player_Move_Poll = 200;
-			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move>();
+			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);
 				auto& y = view.get<Position_Y>(entity);
+				auto& act = view.get<Actions>(entity);
 				auto& v = view.get<Velocity>(entity);
 				auto& mov = view.get<Mouse_Move>(entity);				
+				act.action = walk;
 				v.magnitude.fX = v.speed * (mov.fX_Destination - x.fPX);
 				v.magnitude.fY = v.speed * (mov.fY_Destination - y.fPY);
 			}

@@ -19,7 +19,7 @@ namespace Event_Handler {
 
 	SDL_Event event;
 
-	void Keyboard_Input(Velocity&vel, Actions& act) { //can return bools for x and y dir, and 2 enums for direction and state
+	void Keyboard_Input(Velocity& vel, Actions& act) { //can return bools for x and y dir, and 2 enums for direction and state
 		if (event.key.repeat == 0) {
 			if (event.type == SDL_KEYDOWN) {
 				switch (event.key.keysym.sym)
@@ -49,14 +49,14 @@ namespace Event_Handler {
 						poisition = potential position
 					*/
 				{
-				case SDLK_e: vel.magnitude.fY -= vel.speed; break;
-				case SDLK_d: vel.magnitude.fY += vel.speed; break;
-				case SDLK_s: vel.magnitude.fX -= vel.speed; break;
-				case SDLK_f: vel.magnitude.fX += vel.speed; break;
-				case SDLK_w: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; break;
-				case SDLK_r: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; break;
-				case SDLK_v: vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; break;
-				case SDLK_x: vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; break;
+				case SDLK_e: vel.magnitude.fY -= vel.speed;  act.action = walk; break;
+				case SDLK_d: vel.magnitude.fY += vel.speed; act.action = walk; break;
+				case SDLK_s: vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_f: vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_w: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_r: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_v: vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_x: vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
 
 					//push to front of the array when key down, read from front, remove when kep released
@@ -69,10 +69,10 @@ namespace Event_Handler {
 				case SDLK_1: User_Mouse_Input::Create_Squads(); break;
 				case SDLK_2: User_Mouse_Input::Create_Platoons();    break;
 				case SDLK_3: User_Mouse_Input::Create_Companies();   break;
-				case SDLK_4: break;
-				case SDLK_5: break;
-				case SDLK_6: break;
-				case SDLK_7: break;
+				case SDLK_4: act.action = slash; break;
+				case SDLK_5: act.action = stab; break;
+				case SDLK_6: act.action = block; break;
+				case SDLK_7: act.action = xbow; break;
 				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
@@ -138,6 +138,8 @@ namespace Event_Handler {
 						vel.magnitude.fY = 0;
 					}
 					Keyboard_Input(vel, act);
+
+
 				}
 				if (event.key.type == SDL_MOUSEWHEEL) {
 					Interface::Update_Zoom(event);
