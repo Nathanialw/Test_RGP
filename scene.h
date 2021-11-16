@@ -41,8 +41,8 @@ namespace Scene {
 		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 0.0f, 100.0f, 0.0f);
-		scene.emplace<Position_Y>(skeleton, 0.0f, 100.0f, 0.0f);
+		scene.emplace<Position_X>(skeleton, 0.0f, 1000.0f, 0.0f);
+		scene.emplace<Position_Y>(skeleton, 0.0f, 1000.0f, 0.0f);
 				
 		scene.emplace<Radius>(skeleton, 15.0f );
 
@@ -158,8 +158,8 @@ namespace Scene {
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 0.0f, -2000.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(tree, 0.0f, -2000.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(tree, 0.0f, 0.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(tree, 0.0f, 0.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Radius>(tree, 30.0f);
 
 				scene.emplace<Actions>(tree, isStatic);
@@ -211,8 +211,8 @@ namespace Scene {
 				scene.get<animation>(house).sheet = {
 					{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(house, 0.0f, 200.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(house, 0.0f, 200.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
 
 				scene.emplace<Actions>(house, isStatic);

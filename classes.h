@@ -1,16 +1,27 @@
 #include <vector>
+#include "base_structs.h"
+
+using namespace base;
+
+namespace map_objects {
+
+	struct cell {
+		SDL_FRect bounding_box;
+		std::vector<i2d>objects;
+	};
+
+	struct region {
+		std::vector<cell>cells;
+	};
+
+}
+
+
+
+
 
 namespace Mil_Struc {
 
-	struct i2d {
-		int x;
-		int y;
-	};
-
-	struct f2d {
-		float fX;
-		float fY;
-	};
 	
 	//wil have Regiments and Companies as administrative units
 

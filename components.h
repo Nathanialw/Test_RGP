@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL.h>
-#include "SDL_gpu.h"
 #include <iostream>
 #include <vector>
 #include "debug_components.h"
