@@ -95,7 +95,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
-    <None Include="SDL2_gpu.dll" />
     <None Include="sounds\battle_sound_effects_0.zip" />
     <None Include="sounds\RPGsounds_Kenney.zip" />
     <None Include="sprites\environment\even more tiles\Small 128x64\Interior\Tiled Tsx\1 Floor - Tiled 128x64.tsx" />
