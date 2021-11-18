@@ -14,6 +14,7 @@ namespace Movement {
 
 	void Move_Order(entt::entity& entity, float& x, float& y) {
 		scene.emplace_or_replace<Mouse_Move>(entity);
+		scene.emplace_or_replace<Moving>(entity);
 		auto& mov = scene.get<Mouse_Move>(entity);
 		mov.fX_Destination = x;
 		mov.fY_Destination = y;
@@ -58,7 +59,7 @@ namespace Movement {
 	};
 
 	void Update_Direction() {
-		auto view = Scene::scene.view<Direction, Actions, Velocity>();
+		auto view = Scene::scene.view<Direction, Actions, Velocity, Moving>();
 		for (auto entity : view) {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
@@ -76,6 +77,7 @@ namespace Movement {
 			if (c.action == walk) {
 				if (vel.magnitude.fX == 0 && vel.magnitude.fY == 0) {
 					c.action = idle;
+				//	scene.remove<Moving>(entity);
 				};
 			}
 		}
@@ -86,7 +88,7 @@ namespace Movement {
 		Player_Move_Poll -= Timer::timeStep;
 		if (Player_Move_Poll <= 0) {
 			Player_Move_Poll = 200;
-			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions>();
+			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions, Moving>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);
 				auto& y = view.get<Position_Y>(entity);

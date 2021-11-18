@@ -72,7 +72,7 @@ namespace Graphics {
 		house_0 = createTexture("sprites/buildings/building_04.png");
 		archer_0 = createTexture("sprites/units/archer/archer_00.png");
 		grass_0 = createTexture("sprites/environment/grass/grass.png");
-		fireball_0 = createTexture("sprites/environment/grass/grass.png");
+		fireball_0 = createTexture("sprites/spells/fireball_0.png");
 	}
 
 
@@ -95,7 +95,7 @@ namespace Graphics {
 
 			
 	void closeContext() {
-		//SDL_DestroyWindow(window);
+		SDL_DestroyWindow(window);
 	}
 	
 }

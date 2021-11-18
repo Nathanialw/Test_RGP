@@ -366,6 +366,58 @@ namespace collision {
 		}
 	}
 
+	void Spell_Collision() { //seems to work and pushes the units
+		if (1) {
+			auto spells = scene.view<Spell, Radius, Position_X, Position_Y, Mass>();
+			for (auto spell : spells) {
+				auto& radius = spells.get<Radius>(spell);
+				auto& x = spells.get<Position_X>(spell);
+				auto& y = spells.get<Position_Y>(spell);
+				auto& mass = spells.get<Mass>(spell);
+				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+
+				auto company_view = scene.view<Company>();
+				for (auto companies : company_view) {
+					auto& company = company_view.get<Company>(companies);
+					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
+						for (int c = 0; c < company.iSub_Units.size(); c++) {
+							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
+								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
+								auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
+										for (int i = 0; i < squad.iSub_Units.size(); i++) {											
+											float fx = squad.fPX.at(i) - x.fPX;
+											float fy = squad.fPY.at(i) - y.fPY;
+											float fDistance = (fx * fx) + (fy * fy);
+											if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+												fDistance = sqrtf(fDistance);
+												float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
+												f2d resolver = {};
+												resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
+												resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
+												float fTotalmass = squad.fMass.at(i) + mass.fKilos;
+												float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
+												float fNomalizedMassB = (mass.fKilos / fTotalmass);
+												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+												x.fPX -= (resolver.fX * fNomalizedMassA);
+												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+												y.fPY -= (resolver.fY * fNomalizedMassA); SDL_version
+												//scene.release(spell);
+												//break;
+											//	std::cout << "spell hit" << std::endl;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	void CollisionsT() {
 		if (Print_calcs.Calc()) {
 			std::cout << "Company:      " << scene.size<Company>() << "   checks:   " << iCompany_Check << std::endl;
@@ -399,6 +451,7 @@ namespace collision {
 		Update_Unit_Boxes();
 
 		Unit_Collision(); 
+		Spell_Collision();
 		Update_Collided_Unit();
 		resolveCollisons();
 

@@ -51,6 +51,7 @@ namespace Components {
 		float fRadius;
 	};
 
+
 	struct Velocity {
 		float dX, dY;
 		f2d magnitude;
@@ -159,6 +160,14 @@ namespace Components {
 
 	enum Casting {
 		fireball
+	};
+
+	struct Spell {
+
+	};
+
+	struct Casted {
+
 	};
 
 	struct Test_V {

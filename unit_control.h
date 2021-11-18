@@ -152,6 +152,17 @@ namespace User_Mouse_Input {
 
 	}
 
+	void Order_Move() {
+		auto view = scene.view<Selected, Soldier>();
+		for (auto entity : view) {
+			auto& mov = scene.emplace_or_replace<Mouse_Move>(entity);
+			scene.emplace_or_replace<Moving>(entity);
+			scene.emplace_or_replace<Mouse_Move>(entity);
+			mov.fX_Destination = Mouse::iXWorld_Mouse;
+			mov.fY_Destination = Mouse::iYWorld_Mouse;
+		}
+	}
+
 	void Command_Unit() {
 		if (!scene.empty<Selected>()) {
 			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
@@ -172,19 +183,14 @@ namespace User_Mouse_Input {
 					i++;
 					spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
 
+					scene.emplace_or_replace<Moving>(entity);					
 					auto& mov = scene.emplace_or_replace<Mouse_Move>(entity);					
 					mov.fX_Destination = x;
 					mov.fY_Destination = y;
 				}
 			}
 			else { //moves all the units onto a single point, I want to have the spread out in some kind of formation
-				auto view = scene.view<Selected, Soldier>();
-				for (auto entity : view) {
-					auto& mov = scene.emplace_or_replace<Mouse_Move>(entity);
-					scene.emplace_or_replace<Mouse_Move>(entity);
-					mov.fX_Destination = Mouse::iXWorld_Mouse;
-					mov.fY_Destination = Mouse::iYWorld_Mouse;
-				}
+				Order_Move();
 			}
 			Mouse::bRight_Mouse_Pressed = false;
 		}
@@ -213,6 +219,7 @@ namespace User_Mouse_Input {
 						i++;
 						spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
 
+						scene.emplace_or_replace<Moving>(squad.iSub_Units[j]);
 						auto& mov = scene.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j]);
 						mov.fX_Destination = x;
 						mov.fY_Destination = y;						
@@ -224,6 +231,7 @@ namespace User_Mouse_Input {
 				for (auto squads : squads_view) {
 					auto& squad = scene.get<Squad>(squads);
 					for (int j = 0; j < squad.iSub_Units.size(); j++) {
+						scene.emplace_or_replace<Moving>(squad.iSub_Units[j]);
 						auto& mov = scene.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j]);
 						mov.fX_Destination = Mouse::iXWorld_Mouse;
 						mov.fY_Destination = Mouse::iYWorld_Mouse;
