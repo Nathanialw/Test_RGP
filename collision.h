@@ -402,7 +402,7 @@ namespace collision {
 												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
 												x.fPX -= (resolver.fX * fNomalizedMassA);
 												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-												y.fPY -= (resolver.fY * fNomalizedMassA); SDL_version
+												y.fPY -= (resolver.fY * fNomalizedMassA); 
 												//scene.release(spell);
 												//break;
 											//	std::cout << "spell hit" << std::endl;

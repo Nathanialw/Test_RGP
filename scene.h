@@ -41,8 +41,8 @@ namespace Scene {
 		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 0.0f, 1000.0f, 0.0f);
-		scene.emplace<Position_Y>(skeleton, 0.0f, 1000.0f, 0.0f);
+		scene.emplace<Position_X>(skeleton, 0.0f, 100.0f, 0.0f);
+		scene.emplace<Position_Y>(skeleton, 0.0f, 100.0f, 0.0f);
 				
 		scene.emplace<Radius>(skeleton, 15.0f );
 
@@ -113,8 +113,8 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 12; ++j) {
+			for (auto i = 0; i < 12; ++i) {
 				auto skeleton0 = scene.create();
 				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 				scene.get<animation>(skeleton0).sheet = { //populate the vector
@@ -151,15 +151,15 @@ namespace Scene {
 			
 		
 		//trees
-		for (auto j = 0; j < 0; ++j) {
-			for (auto i = 0; i < 0; ++i) {
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
 				auto tree = scene.create();
 				scene.emplace<animation>(tree, tree_0); /// need to load hetexture	 only once and pass the pointer into this function
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 0.0f, 0.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(tree, 0.0f, 0.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(tree, 0.0f, -2000.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(tree, 0.0f, -2000.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Radius>(tree, 30.0f);
 
 				scene.emplace<Actions>(tree, isStatic);
@@ -170,8 +170,8 @@ namespace Scene {
 		}
 
 		//archers
-		for (auto j = 0; j < 0; ++j) {
-			for (auto i = 0; i < 0; ++i) {
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
 				auto archer = scene.create();			//creates a unique handle for an entity
 				scene.emplace<animation>(archer, archer_0); /// need to load the texture only onceand pass the pointer into this function
 				scene.get<animation>(archer).sheet = { //populate the vector
@@ -204,15 +204,15 @@ namespace Scene {
 
 
 		//buildings
-		for (auto j = 0; j < 0; ++j) {
-			for (auto i = 0; i < 0; ++i) {
+		for (auto j = 0; j < 5; ++j) {
+			for (auto i = 0; i < 5; ++i) {
 				auto house = scene.create();
 				scene.emplace<animation>(house, house_0);
 				scene.get<animation>(house).sheet = {
 					{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(house, 0.0f, 200.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(house, 0.0f, 200.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
 
 				scene.emplace<Actions>(house, isStatic);
