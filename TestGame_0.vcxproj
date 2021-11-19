@@ -90,8 +90,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(Path);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\lib\64;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -188,7 +188,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(Path);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2\lib\x64;$(Path);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -221,6 +221,7 @@
     <ClInclude Include="spells.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="ui_elements.h" />
     <ClInclude Include="unit_control.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />
@@ -228,6 +229,7 @@
   <ItemGroup>
     <None Include="libfreetype-6.dll" />
     <None Include="SDL2.dll" />
+    <None Include="SDL2_image.dll" />
     <None Include="SDL2_ttf.dll" />
     <None Include="sounds\battle_sound_effects_0.zip" />
     <None Include="sounds\RPGsounds_Kenney.zip" />

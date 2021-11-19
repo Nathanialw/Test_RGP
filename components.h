@@ -16,6 +16,11 @@ namespace Components {
 		std::string sName;
 	};
 
+	struct Cell_Assigned {
+		int iIndex;
+		entt::entity iCell_Assigned_To;
+	};
+
 	struct Assigned {
 		int iIndex;
 		entt::entity iUnit_Assigned_To;

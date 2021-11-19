@@ -114,7 +114,7 @@ namespace User_Mouse_Input {
 			auto& x = soldier_view.get<Position_X>(soldiers);
 			auto& y = soldier_view.get<Position_Y>(soldiers);
 			auto& r = soldier_view.get<Radius>(soldiers);
-			if (Mouse::Mouse_Selection_Box({ x.fPX, y.fPY, r.fRadius, r.fRadius })) {
+			if (Mouse::Mouse_Selection_Box({ x.fPX - r.fRadius, y.fPY - r.fRadius, r.fRadius * 2, r.fRadius * 2 })) {
 				scene.emplace_or_replace<Selected>(soldiers);
 				bSelected = true;					
 			}
