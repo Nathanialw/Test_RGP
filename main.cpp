@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 	Init_Game();
   
 	while (1) {			
-
+		update_scene();
 		Event_Handler::Player_Input();
 		AI::Run_AI();
 		Spells::add_spells_to_scene();

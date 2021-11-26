@@ -5,14 +5,54 @@ using namespace base;
 
 namespace map_objects {
 
-	struct cell {
-		SDL_FRect bounding_box;
-		std::vector<i2d>objects;
+	struct Cell {
+		SDL_FRect sCollide_Box; 
+		//they hsould be al the same size at the given node level so this value only needs to be
+		//saved once and calculated on the fly - less memory and maybe cache friendlier
+		std::vector<entt::entity> entities;
 	};
 
-	struct region {
-		std::vector<cell>cells;
-	};
+	/*struct Node {
+		SDL_FRect sCollide_Box;
+		std::vector<Cell>nodes;
+
+		Node() {
+			sCollide_Box = { 0,0,0,0 };
+			nodes.reserve(4);
+		};
+	};*/
+
+	// h = 235, w = 235
+
+	void Build_Map() {
+		//create the map tree
+
+		//need to know the siza and location for the collide box
+
+		//add each Recgion to the map
+		//Add each cell to eah region
+		
+		for (int i = 0; i < 3; i++) {
+			Cell zone;
+			//Map.emplace_back(zone);
+		}
+
+
+
+	}
+
+	//void Add_Entity_To_Map(entt::entity entity) {
+	//	//Add entities to the tree
+
+	//	// define iIndex and iCell_Assigned_To
+	//	int cell;
+	//	entt::entity index;
+
+	//	scene.emplace<iCell_Assigned>(entity, cell, index); 
+
+	//}
+
+
 
 }
 

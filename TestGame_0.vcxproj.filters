@@ -98,6 +98,9 @@
     <ClInclude Include="map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ui_elements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
@@ -181,6 +184,7 @@
     <None Include="sprites\buildings\wooden_walls.blend" />
     <None Include="libfreetype-6.dll" />
     <None Include="SDL2_ttf.dll" />
+    <None Include="SDL2_image.dll" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\FreeSans.ttf" />

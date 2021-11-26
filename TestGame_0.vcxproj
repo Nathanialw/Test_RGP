@@ -221,6 +221,7 @@
     <ClInclude Include="spells.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="ui_elements.h" />
     <ClInclude Include="unit_control.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />
@@ -228,6 +229,7 @@
   <ItemGroup>
     <None Include="libfreetype-6.dll" />
     <None Include="SDL2.dll" />
+    <None Include="SDL2_image.dll" />
     <None Include="SDL2_ttf.dll" />
     <None Include="sounds\battle_sound_effects_0.zip" />
     <None Include="sounds\RPGsounds_Kenney.zip" />
