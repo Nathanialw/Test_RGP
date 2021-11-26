@@ -41,8 +41,8 @@ namespace Scene {
 		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 0.0f, 1000.0f, 0.0f);
-		scene.emplace<Position_Y>(skeleton, 0.0f, 1000.0f, 0.0f);
+		scene.emplace<Position_X>(skeleton, 0.0f, 100.0f, 0.0f);
+		scene.emplace<Position_Y>(skeleton, 0.0f, 100.0f, 0.0f);
 				
 		scene.emplace<Radius>(skeleton, 15.0f );
 
