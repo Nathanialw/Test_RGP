@@ -158,14 +158,15 @@ namespace Scene {
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 0.0f, -2000.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(tree, 0.0f, -2000.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Radius>(tree, 30.0f);
 
 				scene.emplace<Actions>(tree, isStatic);
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
 				scene.emplace<Direction>(tree, W);
 				scene.emplace<Mass>(tree, 4000000.0f);
+
 			}
 		}
 
@@ -204,23 +205,23 @@ namespace Scene {
 
 
 		//buildings
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
-				auto house = scene.create();
-				scene.emplace<animation>(house, house_0);
-				scene.get<animation>(house).sheet = {
-					{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
+		//for (auto j = 0; j < 0; ++j) {
+		//	for (auto i = 0; i < 0; ++i) {
+		//		auto house = scene.create();
+		//		scene.emplace<animation>(house, house_0);
+		//		scene.get<animation>(house).sheet = {
+		//			{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(house, 0.0f, -1200.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(house, 0.0f, -1200.0f + (j * 1165.0f), 0.0f);
-				scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
+		//		scene.emplace<Position_X>(house, 0.0f, 200.0f + (i * 952.0f), 0.0f);
+		//		scene.emplace<Position_Y>(house, 0.0f, 200.0f + (j * 1165.0f), 0.0f);
+		//		scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
 
-				scene.emplace<Actions>(house, isStatic);
-				scene.get<Actions>(house).frameCount = { { 0, 0} };
-				scene.emplace<Direction>(house, W);
-				scene.emplace<Mass>(house, 4000000.0f);
-			}
-		}
+		//		scene.emplace<Actions>(house, isStatic);
+		//		scene.get<Actions>(house).frameCount = { { 0, 0} };
+		//		scene.emplace<Direction>(house, W);
+		//		scene.emplace<Mass>(house, 4000000.0f);
+		//	}
+		//}
 
 		//set positions
 		auto view = scene.view<Position_X, Position_Y>();
@@ -233,7 +234,15 @@ namespace Scene {
 
 	}
 
-
+	void update_scene() {
+		auto view = scene.view<Alive>();
+		for (auto entity : view) {
+			auto& x = view.get<Alive>(entity);
+			if (x.bIsAlive == false) {
+				scene.destroy(entity);
+			}
+		}
+	}
 
 	void Init_Game() {
 		Init_Mil_Struc();

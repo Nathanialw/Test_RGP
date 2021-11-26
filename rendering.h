@@ -10,7 +10,7 @@ using namespace Scene;
 namespace Rendering {
 
 	SDL_Rect grass = { 1,1,235,235 };
-	SDL_Rect cell = { 0,0,64,64 };
+	SDL_Rect cell = { 0,0,50,50 };
 
 	void Frame_Update(spriteframes& a, Direction& b, Actions& act) { // bug :: cuts off first frame of when it starts	
 		
@@ -67,10 +67,10 @@ namespace Rendering {
 		auto view = scene.view<Camera>();
 		for (auto e : view){
 			auto& a = view.get<Camera>(e);
-			for (int i = 0; i < 640; i++) {			
-				for (int j = 0; j < 640; j++) {
-					cell.x = i * 64.0f - a.screen.x;
-					cell.y = j * 64.0f - a.screen.y;
+			for (int i = 0; i < 2; i++) {			
+				for (int j = 0; j < 2; j++) {
+					cell.x = i * cell.w - a.screen.x;
+					cell.y = j * cell.h - a.screen.y;
 					SDL_RenderCopy(Graphics::renderer, Graphics::grass_0, &grass, &cell);
 				}
 			}
@@ -125,6 +125,7 @@ namespace Rendering {
 	}
 
 	void Rendering() {
+		Draw_Tiles();
 		Animation_Frame();
 		Interface::Run_Interface();
 		Interface::Unit_Arrive_UI();
@@ -132,7 +133,6 @@ namespace Rendering {
 		SDL_SetRenderDrawColor(Graphics::renderer, 12, 20, 20, SDL_ALPHA_OPAQUE);
 		SDL_RenderClear(Graphics::renderer);
 		SDL_SetRenderDrawColor(Graphics::renderer, 255, 100, 50, SDL_ALPHA_OPAQUE);
-		Draw_Tiles();
 	}
 
 
