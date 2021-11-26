@@ -6,33 +6,23 @@ using namespace base;
 namespace map_objects {
 
 	struct Cell {
-		SDL_FRect sCollide_Box;
+		SDL_FRect sCollide_Box; 
+		//they hsould be al the same size at the given node level so this value only needs to be
+		//saved once and calculated on the fly - less memory and maybe cache friendlier
 		std::vector<entt::entity> entities;
 	};
 
-	struct Region {
+	/*struct Node {
 		SDL_FRect sCollide_Box;
-		std::vector<Cell>cells;
+		std::vector<Cell>nodes;
 
-		Region() {
+		Node() {
 			sCollide_Box = { 0,0,0,0 };
-			cells.reserve(4);
+			nodes.reserve(4);
 		};
-	};
-
-	struct Zone {
-		SDL_FRect sCollide_Box;
-		std::vector<Region>regions;
-
-		Zone() {
-			sCollide_Box = { 0,0,0,0 };
-			regions.reserve(4);
-		};
-	};
+	};*/
 
 	// h = 235, w = 235
-
-	std::vector<Zone> Map;
 
 	void Build_Map() {
 		//create the map tree
@@ -43,8 +33,8 @@ namespace map_objects {
 		//Add each cell to eah region
 		
 		for (int i = 0; i < 3; i++) {
-			Zone zone;
-			Map.emplace_back(zone);
+			Cell zone;
+			//Map.emplace_back(zone);
 		}
 
 

@@ -158,8 +158,8 @@ namespace Scene {
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 0.0f, 50.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(tree, 0.0f, 50.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 0.0f);
+				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 0.0f);
 				scene.emplace<Radius>(tree, 30.0f);
 
 				scene.emplace<Actions>(tree, isStatic);
