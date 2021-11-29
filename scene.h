@@ -3,6 +3,7 @@
 #include <iostream>
 #include "components.h"
 #include "graphics.h"
+#include "entity_loader.h"
 
 using namespace Components;
 using namespace Graphics;
@@ -21,8 +22,55 @@ namespace Scene {
 		//Squads.reserve(100);
 	}
 
+
+
+	void create_skeleton() {
+		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
+		for (auto j = 0; j < 12; ++j) {
+			for (auto i = 0; i < 12; ++i) {
+				auto skeleton0 = scene.create();
+				//unit data
+				scene.emplace<Radius>(skeleton0, data.radius);
+				scene.emplace<Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
+				scene.emplace<Mass>(skeleton0, data.mass);
+				
+				
+				
+				//rendering data
+				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
+				scene.get<animation>(skeleton0).sheet = { //populate the vector
+					{ NULL },
+					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
+					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f},//walk
+					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f},//atack
+					{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f},
+					{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f},
+					{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f}, //reverse to summon
+					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f},
+				};
+				scene.emplace<Actions>(skeleton0, idle);
+				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
+
+				//map data
+				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 40.0f), 0.0f);
+				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 40.0f), 0.0f);
+				scene.emplace<Direction>(skeleton0, SE);
+
+				//default data
+				scene.emplace<Alive>(skeleton0, true);
+				scene.emplace<handle>(skeleton0, "Skeleton");
+				scene.emplace<Soldier>(skeleton0);
+
+
+
+
+			}
+		}
+	}
+
 	void Load_Entities() {		
 		
+
 		//player
 		auto skeleton = scene.create();			//creates a unique handle for an entity
 		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
@@ -113,41 +161,7 @@ namespace Scene {
 		
 		
 		//Skeletons
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 12; ++i) {
-				auto skeleton0 = scene.create();
-				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
-				scene.get<animation>(skeleton0).sheet = { //populate the vector
-					{ NULL },
-					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
-					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f},//walk
-					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f},//atack
-					{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f},
-					{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f},
-					{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f}, //reverse to summon
-					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f},
-				};
-		
-				scene.emplace<Actions>(skeleton0, idle);
-				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
-		
-				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 40.0f), 0.0f);
-				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 40.0f), 0.0f);
-				scene.emplace<Radius>(skeleton0, 15.0f);
-				scene.emplace<Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
-				
-		
-				scene.emplace<Direction>(skeleton0, SE);
-				scene.emplace<Alive>(skeleton0, true);
-				scene.emplace<handle>(skeleton0, "Skeleton");
-				scene.emplace<Mass>(skeleton0, 200.0f);
-				scene.emplace<Soldier>(skeleton0);
-
-
-
-
-			}
-		}
+		create_skeleton();
 			
 		
 		//trees
@@ -234,6 +248,9 @@ namespace Scene {
 
 	}
 
+
+	
+
 	void update_scene() {
 		auto view = scene.view<Alive>();
 		for (auto entity : view) {
@@ -246,6 +263,7 @@ namespace Scene {
 
 	void Init_Game() {
 		Init_Mil_Struc();
+		Entity_Loader::init_db();
 		Load_Entities();
 	}
 }

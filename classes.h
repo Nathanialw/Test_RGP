@@ -7,7 +7,7 @@ namespace map_objects {
 
 	struct Cell {
 		SDL_FRect sCollide_Box; 
-		//they hsould be al the same size at the given node level so this value only needs to be
+		//they hsould be all the same size at the given node level so this value only needs to be
 		//saved once and calculated on the fly - less memory and maybe cache friendlier
 		std::vector<entt::entity> entities;
 	};

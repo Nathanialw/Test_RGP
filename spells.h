@@ -25,29 +25,36 @@ namespace Spells {
 
 
 	void create_spell(entt::entity& spell, f2d& pos, Compass& direction) {
+		Entity_Loader::Data data = Entity_Loader::parse_data("'fireball'");
+
+		//rendering data
 		scene.emplace<animation>(spell, fireball_0); /// need to load the texture /only /once and pass the pointer into this function
 		scene.get<animation>(spell).sheet = { //populate the vector
 			{ NULL },
-			/*{ NULL }, */ { {0, 0, 64, 64 }, 0, 512, 0, 0, { 32, 32 }, 16.0f }, //idle
+			{ {0, 0, 64, 64 }, 0, 512, 0, 0, { 32, 32 }, 16.0f }, //idle
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, { 32, 32 }, 16.0f } //walk
 		};
-
 		scene.emplace<Actions>(spell, walk);
 		scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
+		
 
-		//positon components
+		//positon data
 		scene.emplace<Position_X>(spell, pos.fX, pos.fX, 0.0f); //needs to be set to an offset position of the unit creating the spell
 		scene.emplace<Position_Y>(spell, pos.fY, pos.fY, 0.0f); //needs to be set to an offset position of the unit creating the spell
 
-		scene.emplace<Radius>(spell, 5.0f);
-		scene.emplace<Spell>(spell);
-		scene.emplace<Casted>(spell);
 
-		scene.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, 0.35f);
+		//spell data
+		scene.emplace<Radius>(spell, data.radius);
+		scene.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
+		scene.emplace<Mass>(spell, data.mass);
+
+
+		//default data
+		scene.emplace<Casted>(spell);
+		scene.emplace<Spell>(spell);
 		scene.emplace<Direction>(spell, direction); //match Direction of the caster
 		scene.emplace<Alive>(spell, true);
 		scene.emplace<handle>(spell, "fireball");
-		scene.emplace<Mass>(spell, 200.0f);
 		Spell_Move_Target();
 	}
 
