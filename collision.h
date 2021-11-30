@@ -417,6 +417,96 @@ namespace collision {
 		}
 	}
 
+	bool check_grid_intersect(SDL_FRect box1, SDL_FRect box2) {
+		for (int i = 0; i < 16; i++) {
+			if (Utilities::bRect_Intersect(box1, box2)) {
+				return true;
+			}
+		}
+	}
+
+	std::vector<std::vector<entt::entity>> grid_collision(SDL_FRect &unit_box, Map::Node3 &map) {
+		std::vector<std::vector<entt::entity>>vec;
+	//	std::cout << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x << "--------" << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y << std::endl;
+		auto camera = scene.view<Camera>();
+		for (auto entities : camera) {
+			auto& offset = camera.get<Camera>(entities);
+			SDL_FRect port;
+			if (Utilities::bRect_Intersect(unit_box, map.sCollide_Box)) {
+				for (int i = 0; i < 16; i++) {
+					if (Utilities::bRect_Intersect(unit_box, map.nodes[i].sCollide_Box)) {
+						for (int j = 0; j < 16; j++) {
+							if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].sCollide_Box)) {
+								for (int k = 0; k < 16; k++) {
+									if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+										for (int l = 0; l < 16; l++) {
+											if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+												port.x = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - offset.screen.x;
+												port.y = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - offset.screen.y;
+												port.w = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
+												port.h = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
+												SDL_RenderDrawRectF(Graphics::renderer, &port);
+
+												vec.push_back(map.nodes[i].nodes[j].nodes[k].cells[l].entities);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return vec;
+	}
+
+	void static_collision() {
+
+		if (1) { // for the player
+			auto spells = scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
+			for (auto spell : spells) {
+				auto& radius = spells.get<Radius>(spell);
+				auto& x = spells.get<Position_X>(spell);
+				auto& y = spells.get<Position_Y>(spell);
+				auto& mass = spells.get<Mass>(spell);
+				SDL_FRect unit_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+			
+				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, Map::map);
+
+				for (int j = 0; j < cell.size(); j++) {
+					for (int i = 0; i < cell[j].size(); i++) {
+						auto& map_x = scene.get<Position_X>(cell[j].at(i));
+						auto& map_y = scene.get<Position_Y>(cell[j].at(i));
+						auto& map_mass = scene.get<Mass>(cell[j].at(i));
+						auto& map_radius = scene.get<Radius>(cell[j].at(i));
+						float fx = map_x.fPX - x.fPX;
+						float fy = map_y.fPY - y.fPY;
+						float fDistance = (fx * fx) + (fy * fy);
+						if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+							fDistance = sqrtf(fDistance);
+							float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
+							f2d resolver = {};
+							resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
+							resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
+							float fTotalmass = map_mass.fKilos + mass.fKilos;
+							float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
+							float fNomalizedMassB = (mass.fKilos / fTotalmass);
+							map_x.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+							x.fPX -= (resolver.fX * fNomalizedMassA);
+							map_y.fPY += (resolver.fY * fNomalizedMassB);
+							y.fPY -= (resolver.fY * fNomalizedMassA);
+						}
+					}
+				}
+			};
+			
+			
+		}
+
+
+	}
+
 	void player_Collision() { //seems to work and pushes the units
 		if (1) {
 			auto spells = scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
@@ -500,6 +590,7 @@ namespace collision {
 		Update_Unit_Boxes();
 
 		player_Collision();
+		static_collision();
 		Unit_Collision(); 
 		Spell_Collision();
 

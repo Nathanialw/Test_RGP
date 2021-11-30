@@ -262,6 +262,7 @@ namespace Scene {
 	}
 
 	void Init_Game() {
+		Map::Build_Map();
 		Init_Mil_Struc();
 		Entity_Loader::init_db();
 		Load_Entities();

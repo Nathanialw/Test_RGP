@@ -3,40 +3,99 @@
 
 using namespace base;
 
-namespace map_objects {
+namespace Map {
+
+
 
 	struct Cell {
-		SDL_FRect sCollide_Box; 
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
 		//they hsould be all the same size at the given node level so this value only needs to be
 		//saved once and calculated on the fly - less memory and maybe cache friendlier
 		std::vector<entt::entity> entities;
+		//Cell(float x, float y, float w, float h) {
+		//	sCollide_Box = { x, y, w, h };
+		//}
 	};
 
-	/*struct Node {
-		SDL_FRect sCollide_Box;
-		std::vector<Cell>nodes;
 
-		Node() {
-			sCollide_Box = { 0,0,0,0 };
-			nodes.reserve(4);
-		};
-	};*/
+	struct Node0 {
+		SDL_FRect sCollide_Box = {0,0,0,0};
+		Cell cells[16];
+	};
+	struct Node1 {
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
+		Node0 nodes[16];
+	};
+	struct Node2 {
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
+		Node1 nodes[16];
+	};
+	struct Node3 {
+		SDL_FRect sCollide_Box = { 0.0f,0.0f,0.0f,0.0f };
+		Node2 nodes[16];
+	};
 
-	// h = 235, w = 235
+
+	Node3 map;
+	
+	void Create_Cell(Node0 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.cells[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				k++;
+			//	std::cout << h << std::endl;
+			}
+		}
+	}
+
+	void Create_Node0(Node1 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Cell(node.nodes[k]);
+				k++;
+			}
+		}
+	}			
+
+	void Create_Node1(Node2 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Node0(node.nodes[k]);
+				k++;
+			}
+		}
+	}
+
+	void Create_Node2(Node3 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Node1(node.nodes[k]);
+				k++;
+			}
+		}
+	}
+
+
+	// h = 235, w = eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 	void Build_Map() {
-		//create the map tree
-
-		//need to know the siza and location for the collide box
-
-		//add each Recgion to the map
-		//Add each cell to eah region
-		
-		for (int i = 0; i < 3; i++) {
-			Cell zone;
-			//Map.emplace_back(zone);
-		}
-
+		map.sCollide_Box = { 0.0f, 0.0f, 25600.0f, 25600.0f };
+		Create_Node2(map);
 
 
 	}
