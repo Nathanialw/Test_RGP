@@ -1,5 +1,7 @@
 #include <vector>
 #include "base_structs.h"
+#include "Utilities.h"
+
 
 using namespace base;
 
@@ -100,16 +102,52 @@ namespace Map {
 
 	}
 
-	//void Add_Entity_To_Map(entt::entity entity) {
-	//	//Add entities to the tree
+	void Place_Point_on_Grid(SDL_FPoint& point, Map::Node3& map, entt::entity& entity) { //inserts unit into a sigle node
+		if (Utilities::bPoint_RectIntersect(point, map.sCollide_Box)) {
+			for (int i = 0; i < 16; i++) {
+				if (Utilities::bPoint_RectIntersect(point, map.nodes[i].sCollide_Box)) {
+					for (int j = 0; j < 16; j++) {
+						if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+							for (int k = 0; k < 16; k++) {
+								if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+									for (int l = 0; l < 16; l++) {
+										if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-	//	// define iIndex and iCell_Assigned_To
-	//	int cell;
-	//	entt::entity index;
 
-	//	scene.emplace<iCell_Assigned>(entity, cell, index); 
+	void Place_Rect_On_Grid(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
+		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
+			for (int i = 0; i < 16; i++) {
+				if (Utilities::bRect_Intersect(point, map.nodes[i].sCollide_Box)) {
+					for (int j = 0; j < 16; j++) {
+						if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+							for (int k = 0; k < 16; k++) {
+								if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+									for (int l = 0; l < 16; l++) {
+										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-	//}
 
 
 
@@ -301,4 +339,215 @@ namespace Mil_Struc {
 
 
 
+}
+
+namespace Military {
+	struct Squad {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>soldiers;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fMass;
+		std::vector<float>fRadius;
+
+		std::vector<f2d>vPosition; //
+
+
+		Squad() {
+			name = "Default";
+			size = 8;
+			sCollide_Box = { 0,0,0,0 };
+			soldiers.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fMass.reserve(size);
+			fRadius.reserve(size);
+			vPosition.reserve(size);
+		}
+	};
+
+	struct Platoon {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Squad>squads;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+
+		Platoon() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			squads.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Company {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Platoon>platoons;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+
+		Company() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			platoons.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Battalion {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Company>companies;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+		Battalion() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			companies.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Regiment {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Battalion>battalions;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Regiment() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			battalions.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Brigade {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Regiment>regiments;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Brigade() {
+			name = "Default";
+			size = 2;
+			sCollide_Box = { 0,0,0,0 };
+			regiments.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Division {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Brigade>brigades;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Division() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			brigades.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Army {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Division>divisions;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Army() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			divisions.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+
+	Military::Army Create_Army() {
+		Military::Army army;
+
+		for (int i = 0; i < army.size; i++) {
+			Military::Division division;
+			army.divisions.emplace_back(division);
+			for (int j = 0; j < army.divisions[j].size; j++) {
+				Military::Brigade brigade;
+				army.divisions[i].brigades.emplace_back(brigade);
+				for (int k = 0; k < army.divisions[i].brigades[j].size; k++) {
+					Military::Regiment regiment;
+					army.divisions[i].brigades[j].regiments.emplace_back(regiment);
+					for (int l = 0; l < army.divisions[i].brigades[j].regiments[k].size; l++) {
+						Military::Battalion battalion;
+						army.divisions[i].brigades[j].regiments[l].battalions.emplace_back(battalion);
+						for (int m = 0; m < army.divisions[i].brigades[j].regiments[k].battalions[l].size; m++) {
+							Military::Company company;
+							army.divisions[i].brigades[j].regiments[k].battalions[l].companies.emplace_back(company);
+							for (int n = 0; n < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; n++) {
+								Military::Platoon platoon;
+								army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons.emplace_back(platoon);
+								for (int o = 0; o < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; o++) {
+									Military::Squad squad;
+									army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons[n].squads.emplace_back(squad);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return army;
+	}
 }

@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include "entity_loader.h"
 
+
 using namespace Components;
 using namespace Graphics;
 
@@ -18,8 +19,19 @@ namespace Scene {
 	//create templates of a "type" of entity, like a skeleton
 	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
 	//
-	void Init_Mil_Struc() {
-		//Squads.reserve(100);
+	void add_unit_to_grid(Map::Node3& map) {
+		auto view = scene.view<Position_X, Position_Y, Radius>(entt::exclude<Assigned, Camera>);
+		for (auto entity : view) {
+			auto& x = view.get<Position_X>(entity);
+			auto& y = view.get<Position_Y>(entity);
+			auto& r = view.get<Radius>(entity).fRadius;
+			SDL_FRect rect = { x.fX - r, y.fY - r, r * 2, r * 2 };
+			//SDL_FPoint point = { x.fX, y.fY };
+
+
+			Map::Place_Rect_On_Grid(rect, Map::map, entity);
+			//Place_Point_on_Grid(point, Map::map, entity);
+		}
 	}
 
 
@@ -52,8 +64,8 @@ namespace Scene {
 				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 				//map data
-				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 40.0f), 0.0f);
-				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 40.0f), 0.0f);
+				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 40.0f), 100.0f + (i * 40.0f));
+				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 40.0f), 100.0f + (j * 40.0f));
 				scene.emplace<Direction>(skeleton0, SE);
 
 				//default data
@@ -89,8 +101,8 @@ namespace Scene {
 		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 0.0f, 100.0f, 0.0f);
-		scene.emplace<Position_Y>(skeleton, 0.0f, 100.0f, 0.0f);
+		scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f, 0.0f);
+		scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f, 0.0f);
 				
 		scene.emplace<Radius>(skeleton, 15.0f );
 
@@ -161,7 +173,7 @@ namespace Scene {
 		
 		
 		//Skeletons
-		create_skeleton();
+		//create_skeleton();
 			
 		
 		//trees
@@ -172,14 +184,17 @@ namespace Scene {
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 0.0f);
-				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 0.0f);
+				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 100.0f + (i * 952.0f));
+				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 100.0f + (j * 1165.0f));
 				scene.emplace<Radius>(tree, 30.0f);
 
+
+				scene.emplace<Environment>(tree);
 				scene.emplace<Actions>(tree, isStatic);
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
 				scene.emplace<Direction>(tree, W);
-				scene.emplace<Mass>(tree, 4000000.0f);
+				scene.emplace<Mass>(tree, 40000.0f);
+
 
 			}
 		}
@@ -209,7 +224,7 @@ namespace Scene {
 				scene.emplace<Radius>(archer, 15.0f);
 
 				scene.emplace<Direction>(archer, SE);
-				scene.emplace<Mass>(archer, 1000.0f);
+				scene.emplace<Mass>(archer, 200.0f);
 				scene.emplace<Soldier>(archer);
 
 			}
@@ -263,8 +278,8 @@ namespace Scene {
 
 	void Init_Game() {
 		Map::Build_Map();
-		Init_Mil_Struc();
 		Entity_Loader::init_db();
 		Load_Entities();
+		add_unit_to_grid(Map::map);
 	}
 }

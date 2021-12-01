@@ -120,6 +120,10 @@ namespace Components {
 		SDL_Rect renderPosition;
 		std::vector<spriteframes>sheet;
 	};
+
+	struct Renderable {
+
+	};
 	
 	struct Input {
 		//std::vector<bool>keysPressed;
@@ -158,6 +162,10 @@ namespace Components {
 
 	};
 
+	struct Environment {
+
+	};
+
 	struct Mouse_Move {
 		float fX_Destination;
 		float fY_Destination;
@@ -174,6 +182,7 @@ namespace Components {
 	struct Casted {
 
 	};
+
 
 	struct Test_V {
 		std::vector<Position_X>test_V;
