@@ -1,56 +1,147 @@
 #include <vector>
 #include "base_structs.h"
+#include "Utilities.h"
+
 
 using namespace base;
 
-namespace map_objects {
+namespace Map {
+
+
 
 	struct Cell {
-		SDL_FRect sCollide_Box; 
-		//they hsould be al the same size at the given node level so this value only needs to be
-		//saved once and calculated on the fly - less memory and maybe cache friendlier
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
 		std::vector<entt::entity> entities;
 	};
 
-	/*struct Node {
-		SDL_FRect sCollide_Box;
-		std::vector<Cell>nodes;
 
-		Node() {
-			sCollide_Box = { 0,0,0,0 };
-			nodes.reserve(4);
-		};
-	};*/
+	struct Node0 {
+		SDL_FRect sCollide_Box = {0,0,0,0};
+		Cell cells[16];
+	};
+	struct Node1 {
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
+		Node0 nodes[16];
+	};
+	struct Node2 {
+		SDL_FRect sCollide_Box = { 0,0,0,0 };
+		Node1 nodes[16];
+	};
+	struct Node3 {
+		SDL_FRect sCollide_Box = { 0.0f,0.0f,0.0f,0.0f };
+		Node2 nodes[16];
+	};
 
-	// h = 235, w = 235
 
-	void Build_Map() {
-		//create the map tree
-
-		//need to know the siza and location for the collide box
-
-		//add each Recgion to the map
-		//Add each cell to eah region
-		
-		for (int i = 0; i < 3; i++) {
-			Cell zone;
-			//Map.emplace_back(zone);
+	Node3 map;
+	Node3 terrain;
+	
+	void Create_Cell(Node0 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.cells[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				k++;
+			//	std::cout << h << std::endl;
+			}
 		}
-
-
-
 	}
 
-	//void Add_Entity_To_Map(entt::entity entity) {
-	//	//Add entities to the tree
+	void Create_Node0(Node1 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Cell(node.nodes[k]);
+				k++;
+			}
+		}
+	}			
 
-	//	// define iIndex and iCell_Assigned_To
-	//	int cell;
-	//	entt::entity index;
+	void Create_Node1(Node2 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Node0(node.nodes[k]);
+				k++;
+			}
+		}
+	}
 
-	//	scene.emplace<iCell_Assigned>(entity, cell, index); 
+	void Create_Node2(Node3 &node) {
+		float w = node.sCollide_Box.w / 4;
+		float h = node.sCollide_Box.h / 4;
+		int k = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
+				Create_Node1(node.nodes[k]);
+				k++;
+			}
+		}
+	}
 
-	//}
+
+	// h = 235, w = eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+
+	void Build_Map(Node3& zone) {
+		zone.sCollide_Box = { 0.0f, 0.0f, 25600.0f, 25600.0f };
+		Create_Node2(zone);
+	}
+
+	void Place_Point_on_Grid(SDL_FPoint& point, Map::Node3& map, entt::entity& entity) { //inserts unit into a sigle node
+		if (Utilities::bPoint_RectIntersect(point, map.sCollide_Box)) {
+			for (int i = 0; i < 16; i++) {
+				if (Utilities::bPoint_RectIntersect(point, map.nodes[i].sCollide_Box)) {
+					for (int j = 0; j < 16; j++) {
+						if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+							for (int k = 0; k < 16; k++) {
+								if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+									for (int l = 0; l < 16; l++) {
+										if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	void Place_Rect_On_Grid(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
+		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
+			for (int i = 0; i < 16; i++) {
+				if (Utilities::bRect_Intersect(point, map.nodes[i].sCollide_Box)) {
+					for (int j = 0; j < 16; j++) {
+						if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+							for (int k = 0; k < 16; k++) {
+								if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+									for (int l = 0; l < 16; l++) {
+										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 
 
@@ -240,6 +331,236 @@ namespace Mil_Struc {
 	};
 
 
+}
+
+namespace Military {
+
+	struct Squad {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>soldiers;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fMass;
+		std::vector<float>fRadius;
+
+		std::vector<f2d>vPosition; //
 
 
+		Squad() {
+			name = "Default";
+			size = 8;
+			sCollide_Box = { 0,0,0,0 };
+			soldiers.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fMass.reserve(size);
+			fRadius.reserve(size);
+			vPosition.reserve(size);
+		}
+	};
+
+	struct Platoon {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Squad>squads;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+
+		Platoon() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			squads.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Company {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Platoon>platoons;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+
+		Company() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			platoons.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Battalion {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Company>companies;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+		std::vector<float>fPW;
+		std::vector<float>fPH;
+
+		Battalion() {
+			name = "Default";
+			size = 6;
+			sCollide_Box = { 0,0,0,0 };
+			companies.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+			fPW.reserve(size);
+			fPH.reserve(size);
+		}
+	};
+
+	struct Regiment {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Battalion>battalions;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Regiment() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			battalions.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Brigade {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Regiment>regiments;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Brigade() {
+			name = "Default";
+			size = 2;
+			sCollide_Box = { 0,0,0,0 };
+			regiments.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Division {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Brigade>brigades;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Division() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			brigades.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+	struct Army {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<Division>divisions;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Army() {
+			name = "Default";
+			size = 4;
+			sCollide_Box = { 0,0,0,0 };
+			divisions.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+
+
+	Army Initialize_Army() {
+		Military::Army army;
+
+		for (int i = 0; i < army.size; i++) {
+			Division division;
+			army.divisions.emplace_back(division);
+			for (int j = 0; j < army.divisions[j].size; j++) {
+				Brigade brigade;
+				army.divisions[i].brigades.emplace_back(brigade);
+				for (int k = 0; k < army.divisions[i].brigades[j].size; k++) {
+					Regiment regiment;
+					army.divisions[i].brigades[j].regiments.emplace_back(regiment);
+					for (int l = 0; l < army.divisions[i].brigades[j].regiments[k].size; l++) {
+						Battalion battalion;
+						army.divisions[i].brigades[j].regiments[l].battalions.emplace_back(battalion);
+						for (int m = 0; m < army.divisions[i].brigades[j].regiments[k].battalions[l].size; m++) {
+							Company company;
+							army.divisions[i].brigades[j].regiments[k].battalions[l].companies.emplace_back(company);
+							for (int n = 0; n < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; n++) {
+								Platoon platoon;
+								army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons.emplace_back(platoon);
+								for (int o = 0; o < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; o++) {
+									Squad squad;
+									army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons[n].squads.emplace_back(squad);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return army;
+	}
+
+
+
+	class Military_Structure {
+	private:
+		std::vector<Army>armies;
+
+
+
+	public:
+	void Create_Army() { 
+		armies.emplace_back(Military::Initialize_Army());
+	}
+
+	void Destroy_Army(int index) {
+		armies.erase(armies.begin() + index); //deletes the Army at the index element of the array
+	}
+
+
+	};
 }

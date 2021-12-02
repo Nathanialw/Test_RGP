@@ -120,13 +120,17 @@ namespace Components {
 		SDL_Rect renderPosition;
 		std::vector<spriteframes>sheet;
 	};
+
+	struct Renderable {
+
+	};
 	
 	struct Input {
 		//std::vector<bool>keysPressed;
 	};
-
+		
 	struct Camera {
-		SDL_Rect screen;
+		SDL_FRect screen;
 		f2d scale;
 	};
 
@@ -158,6 +162,14 @@ namespace Components {
 
 	};
 
+	struct Environment {
+
+	};
+
+	struct Terrain {
+
+	};
+
 	struct Mouse_Move {
 		float fX_Destination;
 		float fY_Destination;
@@ -175,10 +187,21 @@ namespace Components {
 
 	};
 
-	struct Test_V {
-		std::vector<Position_X>test_V;
-		//SDL_FRect sCollider;
-	};
 }
 
 
+namespace Component_Camera { //unused yet
+
+	struct Viewport {
+		SDL_FRect viewport;
+	};
+
+	struct Resolution {
+		SDL_FRect resolution;
+	};
+
+	struct Screen {
+		SDL_FRect screen;
+	};
+
+}
