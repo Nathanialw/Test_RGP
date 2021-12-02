@@ -331,11 +331,10 @@ namespace Mil_Struc {
 	};
 
 
-
-
 }
 
 namespace Military {
+
 	struct Squad {
 		int size;
 		std::string name;
@@ -511,29 +510,29 @@ namespace Military {
 	};
 
 
-	Military::Army Create_Army() {
+	Army Initialize_Army() {
 		Military::Army army;
 
 		for (int i = 0; i < army.size; i++) {
-			Military::Division division;
+			Division division;
 			army.divisions.emplace_back(division);
 			for (int j = 0; j < army.divisions[j].size; j++) {
-				Military::Brigade brigade;
+				Brigade brigade;
 				army.divisions[i].brigades.emplace_back(brigade);
 				for (int k = 0; k < army.divisions[i].brigades[j].size; k++) {
-					Military::Regiment regiment;
+					Regiment regiment;
 					army.divisions[i].brigades[j].regiments.emplace_back(regiment);
 					for (int l = 0; l < army.divisions[i].brigades[j].regiments[k].size; l++) {
-						Military::Battalion battalion;
+						Battalion battalion;
 						army.divisions[i].brigades[j].regiments[l].battalions.emplace_back(battalion);
 						for (int m = 0; m < army.divisions[i].brigades[j].regiments[k].battalions[l].size; m++) {
-							Military::Company company;
+							Company company;
 							army.divisions[i].brigades[j].regiments[k].battalions[l].companies.emplace_back(company);
 							for (int n = 0; n < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; n++) {
-								Military::Platoon platoon;
+								Platoon platoon;
 								army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons.emplace_back(platoon);
 								for (int o = 0; o < army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].size; o++) {
-									Military::Squad squad;
+									Squad squad;
 									army.divisions[i].brigades[j].regiments[k].battalions[l].companies[m].platoons[n].squads.emplace_back(squad);
 								}
 							}
@@ -544,4 +543,24 @@ namespace Military {
 		}
 		return army;
 	}
+
+
+
+	class Military_Structure {
+	private:
+		std::vector<Army>armies;
+
+
+
+	public:
+	void Create_Army() { 
+		armies.emplace_back(Military::Initialize_Army());
+	}
+
+	void Destroy_Army(int index) {
+		armies.erase(armies.begin() + index); //deletes the Army at the index element of the array
+	}
+
+
+	};
 }

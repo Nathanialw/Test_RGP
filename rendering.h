@@ -15,9 +15,6 @@ namespace Camera_Control {
 			auto& y = view.get<Position_Y>(focus);
 			auto& componentCamera = view.get<Camera>(focus);
 			//center camera on the entity with the component
-			//scales the x, y position for the source of camera amd scales the screen after the offset is applied
-			//componentCamera.screen.x = (x.fX * componentCamera.scale.fX - (componentCamera.screen.w / 2)) / componentCamera.scale.fX;
-			//componentCamera.screen.y = (y.fY * componentCamera.scale.fY - (componentCamera.screen.h / 2)) / componentCamera.scale.fY;
 			componentCamera.screen.w = Graphics::resolution.w / componentCamera.scale.fX;
 			componentCamera.screen.h = Graphics::resolution.h / componentCamera.scale.fY;
 			componentCamera.screen.x = ((x.fX) - (componentCamera.screen.w / 2));
@@ -99,23 +96,7 @@ namespace Rendering {
 		};
 	}
 
-
-	//void Draw_Tiles() {
-	//	//2d array of tiles that are 100px by 100px
-	//	//start the array -10000px, -100000px and end it at 10000px, 10000px
-	//	auto view = scene.view<Camera>();
-	//	for (auto e : view){
-	//		auto& a = view.get<Camera>(e);
-	//		for (int i = 0; i < 2; i++) {			
-	//			for (int j = 0; j < 2; j++) {
-	//				cell.x = i * cell.w - a.screen.x;
-	//				cell.y = j * cell.h - a.screen.y;
-	//				SDL_RenderCopy(Graphics::renderer, Graphics::grass_0, &grass, &cell);
-	//			}
-	//		}
-	//	}
-
-	//}
+	
 	void Render_Terrain() { //state
 		auto view1 = scene.view<Position_Y, Position_X, animation, Actions, Terrain, Renderable>();
 		auto view2 = scene.view<Camera>();
@@ -192,7 +173,7 @@ namespace Rendering {
 		// check: grid, military structure, player (maybe a seperate grid for terrain?)
 		// NEED to update grid position every frame to maake this work for mobile units
 		fRenderable += Timer::timeStep;
-		if (fRenderable > 1000) {
+		if (fRenderable > 1) {
 			fRenderable = 0.0f;
 			scene.clear<Renderable>();
 			auto view = scene.view<Camera>();
@@ -203,8 +184,7 @@ namespace Rendering {
 				SDL_FRect screen = camera.screen;
 				SDL_FRect debug;
 
-				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {
-				
+				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such				
 					for (int i = 0; i < 16; i++) {	
 						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < 16; j++) {
@@ -215,11 +195,6 @@ namespace Rendering {
 												if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
 														scene.emplace_or_replace<Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
-														//debug.x = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - screen.x;
-														//debug.y = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - screen.y;
-														//debug.w = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
-														//debug.h = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
-														//SDL_RenderDrawRectF(Graphics::renderer, &debug);
 													}
 												}
 											}
@@ -232,7 +207,7 @@ namespace Rendering {
 				}
 
 
-				if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {
+				if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
 					for (int i = 0; i < 16; i++) {
 						if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < 16; j++) {
@@ -270,6 +245,31 @@ namespace Rendering {
 
 					}
 				}
+
+					
+				
+
+				auto company_view = scene.view<Company>();
+				
+				for (auto companies : company_view) {
+					auto& company = company_view.get<Company>(companies);
+					if (Utilities::bRect_Intersect(company.sCollide_Box, screen)) {
+						for (int c = 0; c < company.iSub_Units.size(); c++) {
+							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							if (Utilities::bRect_Intersect(platoon.sCollide_Box, screen)) {
+								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
+									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+									if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
+										for (int i = 0; i < squad.iSub_Units.size(); i++) {
+											scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
 
 			}
 		}

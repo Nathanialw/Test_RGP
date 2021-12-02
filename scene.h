@@ -20,7 +20,7 @@ namespace Scene {
 	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
 	//
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = scene.view<Position_X, Position_Y, Radius>(entt::exclude<Assigned>);
+		auto view = scene.view<Position_X, Position_Y, Radius, Environment>(entt::exclude<Assigned>);
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -50,8 +50,8 @@ namespace Scene {
 
 	void create_skeleton() {
 		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
-		for (auto j = 0; j < 24; ++j) {
-			for (auto i = 0; i < 24; ++i) {
+		for (auto j = 0; j < 12; ++j) {
+			for (auto i = 0; i < 12; ++i) {
 				auto skeleton0 = scene.create();
 				//unit data
 				scene.emplace<Radius>(skeleton0, data.radius);
