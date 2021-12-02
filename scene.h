@@ -20,7 +20,7 @@ namespace Scene {
 	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
 	//
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = scene.view<Position_X, Position_Y, Radius>(entt::exclude<Assigned, Camera>);
+		auto view = scene.view<Position_X, Position_Y, Radius>(entt::exclude<Assigned>);
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -34,12 +34,24 @@ namespace Scene {
 		}
 	}
 
+	void add_terrain_to_grid(Map::Node3& map) {
+		auto view = scene.view<Position_X, Position_Y>(entt::exclude<Assigned, Radius>);
+		for (auto entity : view) {
+			auto& x = view.get<Position_X>(entity);
+			auto& y = view.get<Position_Y>(entity);
+			SDL_FRect rect = { x.fX, y.fY, 100, 100 };
+
+
+			Map::Place_Rect_On_Grid(rect, map, entity);
+		}
+	}
+
 
 
 	void create_skeleton() {
 		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 12; ++i) {
+		for (auto j = 0; j < 24; ++j) {
+			for (auto i = 0; i < 24; ++i) {
 				auto skeleton0 = scene.create();
 				//unit data
 				scene.emplace<Radius>(skeleton0, data.radius);
@@ -111,69 +123,33 @@ namespace Scene {
 		scene.emplace<Direction>(skeleton, SE);
 		scene.emplace<Alive>(skeleton, true);
 		scene.emplace<handle>(skeleton, "Skeleton");
-		scene.emplace<Camera>(skeleton, 0, 0, resolution.w/2, resolution.h/2, 1.0f, 1.0f );
 		scene.emplace<Mass>(skeleton, 200.0f);
 
+		scene.emplace<Camera>(skeleton, 0.0f, 0.0f, resolution.w, resolution.h, 1.0f, 1.0f );
+		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
 
-		
-		//scene.emplace<IsInSquad>(skeleton, testSquad);
 
-		//testSquad.assigned = scene.get<Position_X>(skeleton).assigned;
+		//grass
+		for (auto j = 0; j < 256; j++) {
+			for (auto i = 0; i < 256; i++) {
+				auto grass = scene.create();
 
-		//auto soldier = scene.create();			//creates an entity
-		//scene.emplace<Soldier>(soldier);
-		//
-		//auto testing_entity = scene.create();
-		//scene.emplace<Test_V>(testing_entity);
-		//scene.get<Test_V>(testing_entity).test_V.emplace_back(scene.get<Position_X>(skeleton));
-		//
-		//
-		//auto squad = scene.create();			//creates an entity
-		//scene.emplace<Squad>(squad);
-		//scene.get<Squad>(squad).soldier.emplace_back(scene.get<Soldier>(skeleton));//.Unit.emplace_back(scene.get<Soldier>(skeleton));
-		//
-		//auto company = scene.create();			//creates an entity
-		//scene.emplace<Company>(company);
-		//scene.get<Company>(company).squad.emplace_back(scene.get<Squad>(squad));
-		
-		//create a battalion entity with a battalion component that holds a reference to each entitty in the Battalion vector
-		//auto 1sBattalion = scene.create();			//creates an entity
-		//scene.emplace<Battalion>(1stBattalion);
-		//scene.get<Battalion>(1stBattalion).company.emplace_back(scene.get<Company>(company));
-		
-		
-		
-		//for (auto Battalion_ : scene.get<Battalion>(battalion).company) {
-		//	for (auto Company_ : Battalion_.squad) {
-		//		for (auto Soldier_ : Company_.soldier) {
-		//			Soldier_.bCantAssignEmptyComponents;
-		//			
-		//		}
-		//	}
-		//}
+				scene.emplace<animation>(grass, grass_0, 0, 0, 100, 100, 0, 0, 100, 100); /// need to load hetexture	 only once and pass the pointer into this function
+				scene.get<animation>(grass).sheet = {
+					{{ 1, 1, 235, 235}, 0, 234, 0, 0, {0, 0}, 16.0f } }; //populate the vector
+				scene.emplace<Actions>(grass, isStatic);
+				scene.get<Actions>(grass).frameCount = { { 0, 0} };
 
-		//Position, radius, mass
-		//attack
-		// 
-		// //check moving units against battalions(including his own), if they overlap? ->  else break
-				//check moving units against companies(including his own), if they overlap -> else break
-					//check moving units agaisnt sqauds(including his own), if they overlap -> else break
-						//check soldiers againts each other soldiers
-		// 
-		// 
-		// 
-		// 
-		//check battalions against each other, if they overlap? ->  else break
-			//check comapanies against each other , if they overlap -> else break
-				//check sqauds agaisnt each oter, if they overlap -> else break
-					//check soldiers against each other
-
-
-		
+				scene.emplace<Position_X>(grass, 0.0f, i * 100.0f, i * 100.0f);
+				scene.emplace<Position_Y>(grass, 0.0f, j * 100.0f, j * 100.0f);
+			
+				scene.emplace<Terrain>(grass);
+			}
+		}		
 		
 		//Skeletons
-		//create_skeleton();
+		create_skeleton();
 			
 		
 		//trees
@@ -186,13 +162,13 @@ namespace Scene {
 
 				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 100.0f + (i * 952.0f));
 				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 100.0f + (j * 1165.0f));
-				scene.emplace<Radius>(tree, 30.0f);
-
-
-				scene.emplace<Environment>(tree);
 				scene.emplace<Actions>(tree, isStatic);
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
 				scene.emplace<Direction>(tree, W);
+
+
+				scene.emplace<Radius>(tree, 30.0f);
+				scene.emplace<Environment>(tree);
 				scene.emplace<Mass>(tree, 40000.0f);
 
 
@@ -277,9 +253,11 @@ namespace Scene {
 	}
 
 	void Init_Game() {
-		Map::Build_Map();
+		Map::Build_Map(Map::map);
+		Map::Build_Map(Map::terrain);
 		Entity_Loader::init_db();
 		Load_Entities();
 		add_unit_to_grid(Map::map);
+		add_terrain_to_grid(Map::terrain);
 	}
 }

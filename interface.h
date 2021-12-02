@@ -29,27 +29,6 @@ namespace Interface {
 		}
 	}
 
-	void Update_Mouse_And_Camera() {
-		auto view = scene.view<Camera, Position_X, Position_Y>();
-		for (auto focus : view) {
-			auto& x = view.get<Position_X>(focus);
-			auto& y = view.get<Position_Y>(focus);
-			auto& componentCamera = view.get<Camera>(focus);
-			//center camera on the entity with the component
-			//scales the x, y position for the source of camera amd scales the screen after the offset is applied
-			componentCamera.screen.x = (x.fX * componentCamera.scale.fX - componentCamera.screen.w) / componentCamera.scale.fX;
-			componentCamera.screen.y = (y.fY * componentCamera.scale.fY - componentCamera.screen.h) / componentCamera.scale.fY;
-			//updates the global variable that may be useful for getting scrren/world positions
-			Graphics::Screen = componentCamera.screen;
-			//update mouse
-			SDL_GetMouseState(&Mouse::iXMouse, &Mouse::iYMouse);
-			Mouse::iXWorld_Mouse = (Mouse::iXMouse / componentCamera.scale.fX) + componentCamera.screen.x;//getting mouse world Position corrected for scale
-			Mouse::iYWorld_Mouse = (Mouse::iYMouse / componentCamera.scale.fY) + componentCamera.screen.y;//getting mouse world Position corrected for scale
-			Mouse::iXMouse = Mouse::iXMouse / componentCamera.scale.fX;  // getting the screen mouse position corrected for scale
-			Mouse::iYMouse = Mouse::iYMouse / componentCamera.scale.fY;  // getting the screen mouse position corrected for scale	
-		}
-	}
-
 	void Display_Selected() {
 		auto camera_view = scene.view<Camera>();
 		for (auto cameras : camera_view) {
@@ -157,7 +136,6 @@ namespace Interface {
 	void Run_Interface() {
 		Debug_System::Debugger();
 		Unit_Arrive_UI();
-		Update_Mouse_And_Camera();
 		Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();

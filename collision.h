@@ -12,15 +12,11 @@ namespace collision {
 	int iSquad_Check = 0;
 	int iPlatoon_Check = 0;
 	int iCompany_Check = 0;
-
+	int stat = 0;
 
 
 	Timer::Frame_Timer Collision_Calc_Rate(16.0f); // collision update rate
 	Timer::Frame_Timer Print_calcs(500.0f);
-	void sort_Positions () {
-		scene.sort<Position_X>([](const auto& lhs, const auto& rhs) { return lhs.fPX < rhs.fPX; }); //sorts position least to ighest
-		scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) { return lhs.fPY < rhs.fPY; }); //sorts position least to	
-	}
 
 	void resolveCollisons() {	
 		auto view = scene.view<Position_X, Position_Y>();			
@@ -246,12 +242,13 @@ namespace collision {
 
 
 	std::vector<std::vector<entt::entity>> grid_collision(SDL_FRect &unit_box, Map::Node3 &map) {
+		int p = 0;
 		std::vector<std::vector<entt::entity>>vec;
 	//	std::cout << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x << "--------" << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y << std::endl;
 		auto camera = scene.view<Camera>();
 		for (auto entities : camera) {
 			auto& offset = camera.get<Camera>(entities);
-			SDL_FRect port;
+		//	SDL_FRect port;
 			if (Utilities::bRect_Intersect(unit_box, map.sCollide_Box)) {
 				for (int i = 0; i < 16; i++) {
 					if (Utilities::bRect_Intersect(unit_box, map.nodes[i].sCollide_Box)) {
@@ -261,14 +258,16 @@ namespace collision {
 									if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 										for (int l = 0; l < 16; l++) {
 											if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-												port.x = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - offset.screen.x;
-												port.y = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - offset.screen.y;
-												port.w = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
-												port.h = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
-												SDL_RenderDrawRectF(Graphics::renderer, &port);
-
+												//port.x = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - offset.screen.x;
+												//port.y = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - offset.screen.y;
+												//port.w = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
+												//port.h = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
+												//SDL_RenderDrawRectF(Graphics::renderer, &port);
+												
 												vec.push_back(map.nodes[i].nodes[j].nodes[k].cells[l].entities);
+																								
 											}
+											p = i + j + k + l;
 										}
 									}
 								}
@@ -278,6 +277,8 @@ namespace collision {
 				}
 			}
 		}
+		stat += p;
+		//std::cout << p << std::endl;
 		return vec;
 
 	}	
@@ -285,9 +286,9 @@ namespace collision {
 	
 
 	void static_collision() {
-
+		int p = 0;
 		if (1) { // for the player
-			auto spells = scene.view<Radius, Position_X, Position_Y, Mass>();
+			auto spells = scene.view<Radius, Position_X, Position_Y, Mass>(entt::exclude<Assigned>);
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -301,33 +302,38 @@ namespace collision {
 				for (int j = 0; j < cell.size(); j++) {
 					for (int i = 0; i < cell[j].size(); i++) {
 						if (spell != cell[j].at(i)) {
-							//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-							auto& map_x = scene.get<Position_X>(cell[j].at(i));
-							auto& map_y = scene.get<Position_Y>(cell[j].at(i));
-							auto& map_mass = scene.get<Mass>(cell[j].at(i));
-							auto& map_radius = scene.get<Radius>(cell[j].at(i));
-							float fx = map_x.fPX - x.fPX;
-							float fy = map_y.fPY - y.fPY;
-							float fDistance = (fx * fx) + (fy * fy);
-							if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-								fDistance = sqrtf(fDistance);
-								float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
-								f2d resolver = {};
-								resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
-								resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
-								float fTotalmass = map_mass.fKilos + mass.fKilos;
-								float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
-								float fNomalizedMassB = (mass.fKilos / fTotalmass);
-								map_x.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
-								x.fPX -= (resolver.fX * fNomalizedMassA);
-								map_y.fPY += (resolver.fY * fNomalizedMassB);
-								y.fPY -= (resolver.fY * fNomalizedMassA);
-							}
+							p++;
+							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
+								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
+								auto& map_x = scene.get<Position_X>(cell[j].at(i));
+								auto& map_y = scene.get<Position_Y>(cell[j].at(i));
+								auto& map_mass = scene.get<Mass>(cell[j].at(i));
+								auto& map_radius = scene.get<Radius>(cell[j].at(i));
+								float fx = map_x.fPX - x.fPX;
+								float fy = map_y.fPY - y.fPY;
+								float fDistance = (fx * fx) + (fy * fy);
+								if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+									fDistance = sqrtf(fDistance);
+									float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
+									f2d resolver = {};
+									resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
+									resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
+									float fTotalmass = map_mass.fKilos + mass.fKilos;
+									float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
+									float fNomalizedMassB = (mass.fKilos / fTotalmass);
+									map_x.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+									x.fPX -= (resolver.fX * fNomalizedMassA);
+									map_y.fPY += (resolver.fY * fNomalizedMassB);
+									y.fPY -= (resolver.fY * fNomalizedMassA);
+								}
+						//	}
 						}
 					}
 				}
 			}			
 		}
+		std::cout << stat << std::endl;
+		stat = 0;
 	}
 
 	void player_Collision() { //seems to work and pushes the units
@@ -404,7 +410,6 @@ namespace collision {
 		iPlatoon_Check = 0;
 		iCompany_Check = 0;
 
-		sort_Positions();
 
 		Update_Unit();
 		Update_Platoons();

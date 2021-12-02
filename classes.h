@@ -11,12 +11,7 @@ namespace Map {
 
 	struct Cell {
 		SDL_FRect sCollide_Box = { 0,0,0,0 };
-		//they hsould be all the same size at the given node level so this value only needs to be
-		//saved once and calculated on the fly - less memory and maybe cache friendlier
 		std::vector<entt::entity> entities;
-		//Cell(float x, float y, float w, float h) {
-		//	sCollide_Box = { x, y, w, h };
-		//}
 	};
 
 
@@ -39,6 +34,7 @@ namespace Map {
 
 
 	Node3 map;
+	Node3 terrain;
 	
 	void Create_Cell(Node0 &node) {
 		float w = node.sCollide_Box.w / 4;
@@ -95,11 +91,9 @@ namespace Map {
 
 	// h = 235, w = eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
-	void Build_Map() {
-		map.sCollide_Box = { 0.0f, 0.0f, 25600.0f, 25600.0f };
-		Create_Node2(map);
-
-
+	void Build_Map(Node3& zone) {
+		zone.sCollide_Box = { 0.0f, 0.0f, 25600.0f, 25600.0f };
+		Create_Node2(zone);
 	}
 
 	void Place_Point_on_Grid(SDL_FPoint& point, Map::Node3& map, entt::entity& entity) { //inserts unit into a sigle node

@@ -11,8 +11,8 @@ namespace Graphics {
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 
-	SDL_Rect resolution = { 0, 0, 1920, 1200 };
-	SDL_Rect Screen;
+	SDL_FRect resolution = { 0, 0, 1920, 1200 };
+	SDL_FRect Screen;
 	
 	TTF_Font* font;
 	
@@ -99,4 +99,3 @@ namespace Graphics {
 	}
 	
 }
-
