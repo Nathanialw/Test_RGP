@@ -29,7 +29,7 @@ namespace Interface {
 		}
 	}
 
-	void Display_Selected() {
+	void Display_Military_Groups() {
 		auto camera_view = scene.view<Camera>();
 		for (auto cameras : camera_view) {
 			auto& cam = camera_view.get<Camera>(cameras);
@@ -64,6 +64,10 @@ namespace Interface {
 				SDL_RenderDrawRectF(renderer, &o);
 			}
 		}
+	}
+
+	void Display_Selected() {
+
 		auto view = scene.view<Position_X, Position_Y, Mass, Radius, Selected>();
 		SDL_Color a = { 155, 255, 50, 255 };
 		for (auto entity : view) {
@@ -74,7 +78,7 @@ namespace Interface {
 			SDL_SetRenderDrawColor(renderer, 55,255,55,255);
 			SDL_Rect p = {x.fSX - 15, y.fSY - 15, 30, 30};
 			SDL_RenderDrawRect(Graphics::renderer, &p);		
-			//Debug_System::Entity_Data_Debug(x.fX, y.fY, x.fSX, y.fSY);
+			Debug_System::Entity_Data_Debug(x.fX, y.fY, x.fSX, y.fSY);
 		}
 	}
 
@@ -96,9 +100,9 @@ namespace Interface {
 			auto& y = view.get<Position_Y>(focus);
 			SDL_Color b = { 255, 255, 255, 255 };
 
-			iMousePollRate -= Timer::timeStep;
-			if (iMousePollRate <= 0) {
-				iMousePollRate = 500;
+			iMousePollRate += Timer::timeStep;
+			if (iMousePollRate >= 500) {
+				iMousePollRate = 0;
 				SDL_DestroyTexture(mouseX.pTexture);
 				SDL_DestroyTexture(mouseY.pTexture);
 				mouseX = Load_Text_Texture(std::to_string(Mouse::iXWorld_Mouse), { 133,255,133 });
@@ -116,16 +120,69 @@ namespace Interface {
 			//SDL_RenderCopy(Graphics::renderer, mouseY.pTexture, &mouseY.k, &d);
 		}
 	}
-		
+	
+	void Show_Grid(Map::Node3& terrain) {
+		SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
 
+		auto view = scene.view<Camera>();
+
+		for (auto id : view) {
+			auto& camera = view.get<Camera>(id);
+			SDL_FRect offset = camera.screen;
+			SDL_FRect screen = { camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2 };
+			SDL_FRect debug;
+
+			if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
+				for (int i = 0; i < 16; i++) {
+					if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
+						for (int j = 0; j < 16; j++) {
+							if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
+								for (int k = 0; k < 16; k++) {
+									if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+										for (int l = 0; l < 16; l++) {
+											if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+												for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+													SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box);
+													o.x -= offset.x;
+													o.y -= offset.y;
+													SDL_RenderDrawRect(renderer, &o);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void Show_Attacks() {
+		SDL_SetRenderDrawColor(renderer, 155, 155, 55, 255);
+		auto weapon_view = scene.view<Weapon_Size>();
+		auto camera_view = scene.view<Camera>();
+		for (auto camera : camera_view) {
+			auto& cam = camera_view.get<Camera>(camera);
+			SDL_FRect offset = cam.screen;
+			for (auto entity : weapon_view) {
+				auto& o = weapon_view.get<Weapon_Size>(entity).attackArea;
+				SDL_Rect c = Utilities::SDL_Rect_To_SDL_FRect(o);
+				c.x -= offset.x;
+				c.y -= offset.y;
+				SDL_RenderDrawRect(renderer, &c);
+			}
+		}
+	}
 
 	void Unit_Arrive_UI() {
-		auto view = scene.view<Commanded_Move>();
+		auto view = scene.view<Mouse_Move>();
 		auto view2 = scene.view<Camera>();
 		for (auto camera : view2) {
 			auto& cam = view2.get<Camera>(camera);
 			for (auto entity : view) {
-				auto& mov = view.get<Commanded_Move>(entity);				
+				auto& mov = view.get<Mouse_Move>(entity);
 				SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
 				SDL_SetRenderDrawColor(renderer, 155, 155, 255, 255);				
 				SDL_RenderFillRect(renderer, &o);
@@ -134,11 +191,14 @@ namespace Interface {
 	}
 
 	void Run_Interface() {
+		//Show_Grid(Map::terrain);
+		//Display_Military_Groups();
 		Debug_System::Debugger();
 		Unit_Arrive_UI();
 		Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();
+		Show_Attacks();
 	}
 
 

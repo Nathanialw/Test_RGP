@@ -110,6 +110,12 @@
     <ClInclude Include="sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scenes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="weapons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />
@@ -199,7 +205,7 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="data.db" />
-    <None Include="packages.config" />
+    <None Include=".vs\packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\FreeSans.ttf" />

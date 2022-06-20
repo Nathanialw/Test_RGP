@@ -1,3 +1,4 @@
+#pragma once
 #include "movement.h"
 
 using namespace Scene;
@@ -52,10 +53,12 @@ namespace Spells {
 		//default data
 		scene.emplace<Casted>(spell);
 		scene.emplace<Spell>(spell);
+		scene.emplace<Renderable>(spell);
 		scene.emplace<Direction>(spell, direction); //match Direction of the caster
 		scene.emplace<Alive>(spell, true);
 		scene.emplace<handle>(spell, "fireball");
 		Spell_Move_Target();
+		//std::cout << "casted " << scene.get<handle>(spell).sName << std::endl;
 	}
 
 
@@ -73,28 +76,26 @@ namespace Spells {
 			auto& y = view.get<Position_Y>(entity);
 			auto& spell = view.get<Casting>(entity);
 			if (spell == fireball) {
-				create_fireball(x.fX, y.fY, dir.eDirection);
+			create_fireball(x.fX, y.fY, dir.eDirection);
 			}
 			scene.remove<Casting>(entity);
 		}
 	}
-
-	void remove_spells_from_scene() {
-		auto view = scene.view<Spell, Moving, Alive>();
-		for (auto spell : view) {
-			//auto 
-		}
-	}
-
-	void update_spell_collide_box() {
-		//
-	}
-
 
 
 	void add_spells_to_scene() {
 		cast_fireball();
 	}
 
-	 
+	void clear_nonMoving_spells() {
+		auto view = scene.view<Spell>(entt::exclude<Mouse_Move>);
+		for (auto entity : view) 	
+			scene.destroy(entity);		
+	}
+	
+
+	void Update_Spells() {
+		clear_nonMoving_spells();
+		add_spells_to_scene();
+	}
 }

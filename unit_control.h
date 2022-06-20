@@ -311,7 +311,7 @@ namespace User_Mouse_Input {
 	};
 
 	void Add_Soldiers_To_Squad() {			
-		auto view = scene.view<Position_X, Position_Y, Selected, Radius, Mass>(entt::exclude<Assigned>);
+		auto view = scene.view<Position_X, Position_Y, Selected, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		
 		int iUnit = 0;
 		
@@ -342,7 +342,7 @@ namespace User_Mouse_Input {
 	//assign squads to Platoons
 
 	void Create_Companies() {
-		auto platoons_view = scene.view<Platoon, Selected>(entt::exclude<Assigned>);
+		auto platoons_view = scene.view<Platoon>(entt::exclude<Assigned>);
 
 		for (auto view : platoons_view) {
 			int iUnit = 0;
@@ -370,7 +370,7 @@ namespace User_Mouse_Input {
 	};
 
 	void Create_Platoons() {
-		auto squads_view = scene.view<Squad, Selected>(entt::exclude<Assigned>);
+		auto squads_view = scene.view<Squad>(entt::exclude<Assigned>);
 
 		for (auto entity2 : squads_view) {
 			int iUnit = 0;
@@ -399,10 +399,13 @@ namespace User_Mouse_Input {
 
 
 	void Create_Squads() {
-		auto view = scene.view<Position_X, Position_Y, Radius, Mass, Selected>(entt::exclude<Assigned>);
+		auto view = scene.view<Position_X, Position_Y, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		for (auto entity2 : view) {
 			int iUnit = 0;
 			auto squad_ID = scene.create();
+
+			//currently creates a new one every time instead of searching for empty spots in one that already exists
+			//Needs to search current squads for an empty slot then make a new squad if needed
 			auto& squad = scene.emplace<Squad>(squad_ID);
 
 			for (auto entity : view) {
@@ -423,15 +426,17 @@ namespace User_Mouse_Input {
 					soldier.iIndex = squad.iSub_Units.size() - 1;
 					soldier.iUnit_Assigned_To = SQUAD_ID;
 					iUnit++;
+					//std::cout << "4" << std::endl;
 				}
 			}
 		}
 	};
 
-
-
-
-
+	void Assign_Soldiers_On_Spawn() {
+		Create_Squads(); 
+		Create_Platoons(); 
+		Create_Companies();
+	}
 
 
 }

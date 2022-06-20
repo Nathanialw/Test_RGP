@@ -222,6 +222,7 @@
     <ClInclude Include="movement.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="rendering.h" />
+    <ClInclude Include="scenes.h" />
     <ClInclude Include="spells.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="sqlite3.h" />
@@ -229,12 +230,13 @@
     <ClInclude Include="ui_elements.h" />
     <ClInclude Include="unit_control.h" />
     <ClInclude Include="utilities.h" />
+    <ClInclude Include="weapons.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data.db" />
     <None Include="libfreetype-6.dll" />
-    <None Include="packages.config" />
+    <None Include=".vs\packages.config" />
     <None Include="SDL2.dll" />
     <None Include="SDL2_image.dll" />
     <None Include="SDL2_ttf.dll" />

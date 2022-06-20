@@ -20,7 +20,7 @@ namespace Camera_Control {
 			componentCamera.screen.x = ((x.fX) - (componentCamera.screen.w / 2));
 			componentCamera.screen.y = ((y.fY) - (componentCamera.screen.h / 2));
 
-			//std::cout << componentCamera.screen.w << std::endl;
+			//std::cout << componentCamera.screen.x << std::endl;
 			//updates the global variable that may be useful for getting scrren/world positions
 			Graphics::Screen = componentCamera.screen;
 			//update mouse
@@ -37,16 +37,20 @@ namespace Camera_Control {
 	}
 }
 
-
 namespace Rendering {
 	float fRenderable = 0.0f;
 
 	void sort_Positions() {
 		//scene.sort<Position_X>([](const auto& lhs, const auto& rhs) { return lhs.fPX < rhs.fPX; }); //sorts position least to highest
-		scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) { return lhs.fPY < rhs.fPY; }); //sorts position least to	
+		
+		scene.sort<Renderable>([](const auto& lhs, const auto& rhs) { return lhs.y < rhs.y; }); //sorts position least to		
+		//scene.sort<Position_Y>([](const auto& lhs, const auto& rhs) {std::cout << rhs.fPY << std::endl; return lhs.fPY < rhs.fPY; }); //sorts position least to		
+		//auto view = scene.view<Renderable>();
+		//for (auto i : view) {			
+		//	std::cout << view.get<Renderable>(i).y << std::endl;
+		//}
+		//system("CLS");
 	}
-
-
 
 	void Frame_Update(spriteframes& a, Direction& b, Actions& act) { // bug :: cuts off first frame of when it starts	
 		
@@ -76,7 +80,6 @@ namespace Rendering {
 				}
 			}
 		}
-
 		else if (act.action == dead && act.frameCount[act.action].currentFrame <= act.frameCount[act.action].NumFrames) {
 			act.frameCount[act.action].currentFrame++;
 			a.clip.x = a.clip.x + a.clip.w;
@@ -86,7 +89,7 @@ namespace Rendering {
 	}
 
 	void showData() {
-		auto view = scene.view<Position_X, Position_Y>();
+		auto view = scene.view<Position_X, Position_Y, Renderable>(entt::exclude<Terrain>);
 		//render x, y position to screen within a a frame that follows the entity
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
@@ -95,17 +98,16 @@ namespace Rendering {
 			//print x,y  AT x,y
 		};
 	}
-
-	
+		
 	void Render_Terrain() { //state
-		auto view1 = scene.view<Position_Y, Position_X, animation, Actions, Terrain, Renderable>();
+		auto view1 = scene.view<Terrain_Position_Y, Terrain_Position_X, animation, Actions, Terrain_Renderable>();
 		auto view2 = scene.view<Camera>();
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id);
 			for (auto entity : view1) {
 				auto& anim = view1.get<animation>(entity);
-				auto& x = view1.get<Position_X>(entity);
-				auto& y = view1.get<Position_Y>(entity);
+				auto& x = view1.get<Terrain_Position_X>(entity);
+				auto& y = view1.get<Terrain_Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
 				//only fire this at 60 frames/sec
 				//anim.renderPosition = anim.sheet[act.action].clip;										//save sprite for vector
@@ -114,9 +116,7 @@ namespace Rendering {
 				y.fSY = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
 				anim.renderPosition.y = y.fSY - anim.sheet[act.action].posOffset.y;
-				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
-				
-				
+				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);				
 			}
 		}
 	}
@@ -134,9 +134,9 @@ namespace Rendering {
 				auto& y = view1.get<Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
 				//only fire this at 60 frames/sec
-				anim.sheet[act.action].timeBetweenFrames -= Timer::timeStep;
-				if (anim.sheet[act.action].timeBetweenFrames <= 0) {
-					anim.sheet[act.action].timeBetweenFrames = 75;
+				anim.sheet[act.action].timeBetweenFrames += Timer::timeStep;
+				if (anim.sheet[act.action].timeBetweenFrames >= 75) {
+					anim.sheet[act.action].timeBetweenFrames = 0;
 					Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
 				}
 				anim.renderPosition = anim.sheet[act.action].clip;										//save sprite for vector
@@ -146,15 +146,9 @@ namespace Rendering {
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
 				anim.renderPosition.y = y.fSY - anim.sheet[act.action].posOffset.y;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);	
-
 			}
 		}
 	}
-
-
-
-
-
 
 	void isDead() {
 		auto view = scene.view<Actions, Alive>();
@@ -169,23 +163,31 @@ namespace Rendering {
 	}
 
 
-	void Check_Renderable(Map::Node3& terrain) {
+	void Check_Renderable(Map::Node3& terrain) { //doesn't need to happen every frame
 		// check: grid, military structure, player (maybe a seperate grid for terrain?)
 		// NEED to update grid position every frame to maake this work for mobile units
 		fRenderable += Timer::timeStep;
-		if (fRenderable > 1) {
-			fRenderable = 0.0f;
+		int grassnum = 0;
+		int unitnum = 0;
+		int playernum = 0;
+		int armynum = 0;
+		int spellnum = 0;
+
+		if (fRenderable > 10) {
+			fRenderable = 0;
 			scene.clear<Renderable>();
+			scene.clear<Terrain_Renderable>();
 			auto view = scene.view<Camera>();
 
-			
+			SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
+									
 			for (auto id : view) {
 				auto& camera = view.get<Camera>(id);
-				SDL_FRect screen = camera.screen;
+				SDL_FRect screen = {camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2};
 				SDL_FRect debug;
 
-				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such				
-					for (int i = 0; i < 16; i++) {	
+				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
+					for (int i = 0; i < 16; i++) {
 						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < 16; j++) {
 								if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
@@ -194,7 +196,14 @@ namespace Rendering {
 											for (int l = 0; l < 16; l++) {
 												if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-														scene.emplace_or_replace<Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
+														scene.emplace_or_replace<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
+																												
+														/*debug.x = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - screen.x;
+														debug.y = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - screen.y;
+														debug.w = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
+														debug.h = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
+														SDL_RenderDrawRectF(Graphics::renderer, &debug);*/
+														grassnum++;
 													}
 												}
 											}
@@ -206,7 +215,6 @@ namespace Rendering {
 					}
 				}
 
-
 				if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
 					for (int i = 0; i < 16; i++) {
 						if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].sCollide_Box)) {
@@ -217,12 +225,14 @@ namespace Rendering {
 											for (int l = 0; l < 16; l++) {
 												if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-														scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
-														//debug.x = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - screen.x;
-														//debug.y = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - screen.y;
-														//debug.w = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
-														//debug.h = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
-														//SDL_RenderDrawRectF(Graphics::renderer, &debug);
+														Renderable& show = scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
+														show.y = scene.get<Position_Y>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a)).fY;
+														/*debug.x = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - screen.x;
+														debug.y = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - screen.y;
+														debug.w = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
+														debug.h = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.h;
+														SDL_RenderDrawRectF(Graphics::renderer, &debug);*/
+														unitnum++;
 													}
 												}
 											}
@@ -241,14 +251,25 @@ namespace Rendering {
 					auto& y = player_view.get<Position_Y>(player_id);
 					SDL_FPoint point = { x.fX, y.fY };
 					if (Utilities::bPoint_RectIntersect(point, screen)) {
-						scene.emplace_or_replace<Renderable>(player_id);
-
+						Renderable& show = scene.emplace_or_replace<Renderable>(player_id);
+						show.y = y.fY;
+						playernum++;
 					}
 				}
 
-					
-				
+				auto spell_view = scene.view<Spell, Position_X, Position_Y>();
 
+				for (auto spell_id : spell_view) {
+					auto& x = spell_view.get<Position_X>(spell_id);
+					auto& y = spell_view.get<Position_Y>(spell_id);
+					SDL_FPoint point = { x.fX, y.fY };
+					if (Utilities::bPoint_RectIntersect(point, screen)) {
+						Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
+						show.y = y.fY;
+						spellnum++;
+					}
+				}
+				
 				auto company_view = scene.view<Company>();
 				
 				for (auto companies : company_view) {
@@ -261,25 +282,33 @@ namespace Rendering {
 									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
+											Renderable& show = scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
+											show.y = scene.get<Position_Y>(squad.iSub_Units[i]).fY;
+											armynum++;
 										}
 									}
 								}
 							}
 						}
 					}
-				}
-				
-
+				}	
 			}
 		}
+
+		//std::cout << " in Rendering.h" << std::endl;
+		//std::cout << grassnum << std::endl;
+		//std::cout << unitnum << std::endl;
+		//std::cout << playernum << std::endl;
+		//std::cout << armynum << std::endl;
+		//std::cout << "----------------------------------" << std::endl;
+		//system("CLS");
 	};
 
 	void Rendering() {
 		Camera_Control::Update_Camera();
 		Check_Renderable(Map::terrain);
-		sort_Positions();
 		Render_Terrain();
+		sort_Positions();
 		Animation_Frame();
 		Interface::Run_Interface();
 		Interface::Unit_Arrive_UI();

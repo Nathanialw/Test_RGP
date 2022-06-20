@@ -35,10 +35,8 @@ namespace Entity_Loader {
 			values.radius = sqlite3_column_double(stmt, 0); //0 only increments up when calling more than one column
 			values.speed = sqlite3_column_double(stmt, 1); //0 only increments up when calling more than one column
 			values.mass= sqlite3_column_double(stmt, 2); //0 only increments up when calling more than one column
-			
-			std::cout << values.radius << values.speed << values.mass << std::endl;
 		}
-		
+
 		return values;
 	}
 }	

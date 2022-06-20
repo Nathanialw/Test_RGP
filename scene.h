@@ -4,21 +4,23 @@
 #include "components.h"
 #include "graphics.h"
 #include "entity_loader.h"
+#include "death_spells.h"
+#include "scenes.h"
 
 
 using namespace Components;
 using namespace Graphics;
+using namespace Scenes;
 
 
 namespace Scene {
-
-	entt::registry scene;
-
 
 
 	//create templates of a "type" of entity, like a skeleton
 	//import from SQLite with a for loop where it just graps all the template data from tables and the only data I need to set manually is the position with the "potential position" variable. Not sure where to keep the position data so it is editable, maybe a separate file with all the map "tile" data
 	//
+
+	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
 		auto view = scene.view<Position_X, Position_Y, Radius, Environment>(entt::exclude<Assigned>);
 		for (auto entity : view) {
@@ -26,75 +28,37 @@ namespace Scene {
 			auto& y = view.get<Position_Y>(entity);
 			auto& r = view.get<Radius>(entity).fRadius;
 			SDL_FRect rect = { x.fX - r, y.fY - r, r * 2, r * 2 };
-			//SDL_FPoint point = { x.fX, y.fY };
-
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
-			//Place_Point_on_Grid(point, Map::map, entity);
+			scene.emplace_or_replace<Assigned>(entity);
 		}
 	}
+
+	//adds Environment items to map grid
 
 	void add_terrain_to_grid(Map::Node3& map) {
-		auto view = scene.view<Position_X, Position_Y>(entt::exclude<Assigned, Radius>);
+		auto view = scene.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned>);
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Terrain_Position_X>(entity);
+			auto& y = view.get<Terrain_Position_Y>(entity);
+			auto& r = view.get<Radius>(entity);
 			SDL_FRect rect = { x.fX, y.fY, 100, 100 };
 
-
-			Map::Place_Rect_On_Grid(rect, map, entity);
+			Map::Place_Rect_On_Grid_Once(rect, map, entity);
+			scene.emplace_or_replace<Assigned>(entity);
 		}
 	}
 
-
-
-	void create_skeleton() {
+	void Spawn_Skeletons() {
 		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
-		for (auto j = 0; j < 12; ++j) {
-			for (auto i = 0; i < 12; ++i) {
-				auto skeleton0 = scene.create();
-				//unit data
-				scene.emplace<Radius>(skeleton0, data.radius);
-				scene.emplace<Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
-				scene.emplace<Mass>(skeleton0, data.mass);
-				
-				
-				
-				//rendering data
-				scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
-				scene.get<animation>(skeleton0).sheet = { //populate the vector
-					{ NULL },
-					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 16.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
-					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 16.0f},//walk
-					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 16.0f},//atack
-					{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 16.0f},
-					{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 16.0f},
-					{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 16.0f}, //reverse to summon
-					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 16.0f},
-				};
-				scene.emplace<Actions>(skeleton0, idle);
-				scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
-
-				//map data
-				scene.emplace<Position_X>(skeleton0, 0.0f, 100.0f + (i * 40.0f), 100.0f + (i * 40.0f));
-				scene.emplace<Position_Y>(skeleton0, 0.0f, 100.0f + (j * 40.0f), 100.0f + (j * 40.0f));
-				scene.emplace<Direction>(skeleton0, SE);
-
-				//default data
-				scene.emplace<Alive>(skeleton0, true);
-				scene.emplace<handle>(skeleton0, "Skeleton");
-				scene.emplace<Soldier>(skeleton0);
-
-
-
-
+		for (auto j = 0; j < 16; ++j) {
+			for (auto i = 0; i < 16; ++i) {
+				Death_Spells::Summon_Skeleton((100.0f + (i * 60.0f)), (100.0f + (j * 60.0f)));
 			}
 		}
 	}
 
 	void Load_Entities() {		
-		
-
 		//player
 		auto skeleton = scene.create();			//creates a unique handle for an entity
 		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
@@ -128,11 +92,9 @@ namespace Scene {
 		scene.emplace<Camera>(skeleton, 0.0f, 0.0f, resolution.w, resolution.h, 1.0f, 1.0f );
 		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
-
-
 		//grass
-		for (auto j = 0; j < 256; j++) {
-			for (auto i = 0; i < 256; i++) {
+		for (auto j = 0; j < 64; j++) {
+			for (auto i = 0; i < 64; i++) {
 				auto grass = scene.create();
 
 				scene.emplace<animation>(grass, grass_0, 0, 0, 100, 100, 0, 0, 100, 100); /// need to load hetexture	 only once and pass the pointer into this function
@@ -141,15 +103,16 @@ namespace Scene {
 				scene.emplace<Actions>(grass, isStatic);
 				scene.get<Actions>(grass).frameCount = { { 0, 0} };
 
-				scene.emplace<Position_X>(grass, 0.0f, i * 100.0f, i * 100.0f);
-				scene.emplace<Position_Y>(grass, 0.0f, j * 100.0f, j * 100.0f);
+				scene.emplace<Radius>(grass, 50.0f);
+				scene.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f, i * 100.0f);
+				scene.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f, j * 100.0f);
 			
 				scene.emplace<Terrain>(grass);
 			}
 		}		
 		
 		//Skeletons
-		create_skeleton();
+		Spawn_Skeletons();
 			
 		
 		//trees
@@ -176,8 +139,8 @@ namespace Scene {
 		}
 
 		//archers
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 0; ++j) {
+			for (auto i = 0; i < 0; ++i) {
 				auto archer = scene.create();			//creates a unique handle for an entity
 				scene.emplace<animation>(archer, archer_0); /// need to load the texture only onceand pass the pointer into this function
 				scene.get<animation>(archer).sheet = { //populate the vector
@@ -205,9 +168,6 @@ namespace Scene {
 
 			}
 		}
-
-
-
 
 		//buildings
 		//for (auto j = 0; j < 0; ++j) {
@@ -237,10 +197,15 @@ namespace Scene {
 			yy.fY = yy.fPY;
 		}
 
-	}
+		auto view2 = scene.view<Terrain_Position_X, Terrain_Position_Y>();
+		for (auto entity2 : view2) {
+			auto& xx = view2.get<Terrain_Position_X>(entity2);
+			auto& yy = view2.get<Terrain_Position_Y>(entity2);
+			xx.fX = xx.fPX;
+			yy.fY = yy.fPY;
+		}
 
-
-	
+	}	
 
 	void update_scene() {
 		auto view = scene.view<Alive>();
@@ -250,6 +215,8 @@ namespace Scene {
 				scene.destroy(entity);
 			}
 		}
+		add_unit_to_grid(Map::map);
+		add_terrain_to_grid(Map::terrain);
 	}
 
 	void Init_Game() {
@@ -257,7 +224,5 @@ namespace Scene {
 		Map::Build_Map(Map::terrain);
 		Entity_Loader::init_db();
 		Load_Entities();
-		add_unit_to_grid(Map::map);
-		add_terrain_to_grid(Map::terrain);
 	}
 }

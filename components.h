@@ -50,6 +50,18 @@ namespace Components {
 		float fPY;
 		float fSY;
 	};
+
+	struct Terrain_Position_X {
+		float fX;
+		float fPX;
+		float fSX;
+	};
+
+	struct Terrain_Position_Y {
+		float fY;
+		float fPY;
+		float fSY;
+	};
 	////////////
 
 	struct Radius {
@@ -122,7 +134,11 @@ namespace Components {
 	};
 
 	struct Renderable {
+		float y;
+	};
 
+	struct Terrain_Renderable {
+		float y;
 	};
 	
 	struct Input {
@@ -187,6 +203,31 @@ namespace Components {
 
 	};
 
+	struct Melee {
+
+	};
+
+	struct Attacking {
+		
+	};
+	
+	enum Weapon_Type {
+		sword
+	};
+
+	struct Damage {
+		int min;
+		int max;
+	};
+
+	struct Weapon_Size {
+		SDL_FRect attackArea;
+	};
+
+	struct Attack_Box_Duration {
+		int64_t lifeTime;
+		int64_t count;
+	};
 }
 
 

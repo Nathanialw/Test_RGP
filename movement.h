@@ -9,7 +9,7 @@
 namespace Movement {
 	int Player_Move_Poll;
 	int Update_Position_Poll;
-	int number = 0;
+	int number_of_units = 0;
 
 
 	void Move_Order(entt::entity& entity, float& x, float& y) {
@@ -32,17 +32,17 @@ namespace Movement {
 	}
 	
 	void Update_Position() {
-		auto group = Scene::scene.view<Position_X, Position_Y, Velocity>();
-		Update_Position_Poll  -= Timer::timeStep;
-		number = 0;
-		if (Update_Position_Poll <= 0) {
-			Update_Position_Poll = 0;
-			for (auto entity : group) {
-				auto& vel = group.get<Velocity>(entity);
-				auto& pX = group.get<Position_X>(entity);
-				auto& pY = group.get<Position_Y>(entity);
+		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity>();
+		Update_Position_Poll += Timer::timeStep;
+		number_of_units = 0;
+		//std::cout << Update_Position_Poll << std::endl;
+		if (Update_Position_Poll >= 20) {
+			for (auto entity : view) {
+				auto& vel = view.get<Velocity>(entity);
+				auto& pX = view.get<Position_X>(entity);
+				auto& pY = view.get<Position_Y>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
-					number++;
+					number_of_units++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
 					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
 					vel.angle1 = atan2f(vel.magnitude.fX, vel.magnitude.fY);
@@ -51,15 +51,16 @@ namespace Movement {
 					float velocityY = sinf(vel.angle2) * vel.speed;
 					vel.dX = velocityX;
 					vel.dY = velocityY;
-					pX.fPX += velocityX * Timer::timeStep;
-					pY.fPY += velocityY * Timer::timeStep;
+					pX.fPX += velocityX * Update_Position_Poll;
+					pY.fPY += velocityY * Update_Position_Poll;
 				}
 			}
+			Update_Position_Poll = 0;
 		}
 	};
 
 	void Update_Direction() {
-		auto view = Scene::scene.view<Direction, Actions, Velocity, Moving>();
+		auto view = Scenes::scene.view<Direction, Actions, Velocity, Moving>();
 		for (auto entity : view) {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
@@ -85,9 +86,9 @@ namespace Movement {
 
 
 	void Mouse_Move_To() { //calculates unit direction after you give them a "Mouse_Move" component with destination coordinates
-		Player_Move_Poll -= Timer::timeStep;
-		if (Player_Move_Poll <= 0) {
-			Player_Move_Poll = 200;
+		Player_Move_Poll += Timer::timeStep;
+		if (Player_Move_Poll >= 200) {
+			Player_Move_Poll = 0;
 			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions, Moving>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);

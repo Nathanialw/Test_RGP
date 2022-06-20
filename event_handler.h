@@ -7,6 +7,9 @@
 #include "interface.h"
 #include "movement.h"
 #include "death_spells.h"
+#include "spells.h"
+#include "weapons.h"
+
 
 
 using namespace Scene;
@@ -66,13 +69,13 @@ namespace Event_Handler {
 				//case SDLK_6: act.action = dead; break;
 				//case SDLK_7: act.action = xbow; break;
 
-				case SDLK_1: User_Mouse_Input::Create_Squads(); break;
-				case SDLK_2: User_Mouse_Input::Create_Platoons();    break;
-				case SDLK_3: User_Mouse_Input::Create_Companies();   break;
-				case SDLK_4: act.action = slash; break;
+				case SDLK_1: scene.emplace_or_replace<Casting>(entity, fireball); break;
+				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);  break;
+				case SDLK_3: Timer::Pause_Control();  break;
+				case SDLK_4: act.action = slash; scene.emplace_or_replace<Attacking>(entity); break;
 				case SDLK_5: act.action = stab; break;
 				case SDLK_6: act.action = block; break;
-				case SDLK_7: scene.emplace<Casting>(entity, fireball); act.action = stab; break;
+				case SDLK_7: act.action = stab; break;
 				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;

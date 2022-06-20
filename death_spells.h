@@ -1,13 +1,20 @@
 #pragma once
-#include "scene.h"
-#include "mouse_control.h"
+#include "entt.hpp"
+#include "components.h"
+#include "entity_loader.h"
+#include "graphics.h"
+#include "Scenes.h"
 
-using namespace Scene;
+
+using namespace Components;
+using namespace Graphics;
+using namespace Scenes;
 
 namespace Death_Spells {
 
 
-	void Summon_Skeleton() {
+	void Summon_Skeleton(float x, float y) {
+		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
 		auto skeleton0 = scene.create();
 		scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 		scene.get<animation>(skeleton0).sheet = { //populate the vector
@@ -24,16 +31,18 @@ namespace Death_Spells {
 		scene.emplace<Actions>(skeleton0, idle);
 		scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
 
-		scene.emplace<Position_X>(skeleton0, 0.0f, float(Mouse::iXWorld_Mouse), 0.0f);
-		scene.emplace<Position_Y>(skeleton0, 0.0f, float(Mouse::iYWorld_Mouse), 0.0f);
+		scene.emplace<Position_X>(skeleton0, 0.0f, x, 0.0f);
+		scene.emplace<Position_Y>(skeleton0, 0.0f, y, 0.0f);
 		scene.emplace<Radius>(skeleton0, 15.0f);
+		scene.emplace<Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
 
 		scene.emplace<Direction>(skeleton0, SE);
 		scene.emplace<Alive>(skeleton0, true);
 		scene.emplace<handle>(skeleton0, "Skeleton");
 		scene.emplace<Mass>(skeleton0, 200.0f);
-		scene.emplace<Commandable>(skeleton0);
-
+		
+		
+		scene.emplace<Soldier>(skeleton0);
 	}
 
 }

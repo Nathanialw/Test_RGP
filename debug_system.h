@@ -56,9 +56,9 @@ namespace Debug_System {
 			if (iFramePollRate <= 0) {
 				iFramePollRate = 500;
 				SDL_DestroyTexture(framerate.pTexture);
-				framerate = Load_Text_Texture(std::to_string(int(Timer::avgFPS)), { 133,255,133 });
+				framerate = Load_Text_Texture(std::to_string(float(Timer::avgFPS)), { 133,255,133 });
 			}
-			SDL_Rect c = { 0,0,50 / componentCamera.scale.fX,50 / componentCamera.scale.fY };
+			SDL_Rect c = { 0,0,200 / componentCamera.scale.fX,100 / componentCamera.scale.fY };
 			SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
 		}
 	}

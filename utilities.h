@@ -29,7 +29,14 @@ namespace Utilities {
 	};	
 	
 
-
+	SDL_Rect SDL_Rect_To_SDL_FRect(SDL_FRect a) {
+		SDL_Rect b;
+		b.x = (int)a.x;
+		b.y = (int)a.y;
+		b.w = (int)a.w;
+		b.h = (int)a.h;
+		return b;
+	}
 
 
 }

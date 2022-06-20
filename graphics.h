@@ -10,6 +10,7 @@ namespace Graphics {
 
 	SDL_Renderer* renderer;
 	SDL_Window* window;
+	bool running;
 
 	SDL_FRect resolution = { 0, 0, 1920, 1200 };
 	SDL_FRect Screen;
@@ -96,6 +97,7 @@ namespace Graphics {
 			
 	void closeContext() {
 		SDL_DestroyWindow(window);
+		running = false;
 	}
 	
 }

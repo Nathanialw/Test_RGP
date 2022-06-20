@@ -15,24 +15,21 @@ int main(int argc, char* argv[]) {
 	createGraphicsContext();
 	Init_Game();
   
-	while (1) {			
+	while (Graphics::running == true) {
 		update_scene();
+		Weapons::Update_Attacks();
+		Spells::Update_Spells();
+		User_Mouse_Input::Assign_Soldiers_On_Spawn();
 		Event_Handler::Player_Input();
-		AI::Run_AI();
-		Spells::add_spells_to_scene();
 		Movement::Movement_Handler();
 		collision::Collisions();		
-
-
-	
+			
 		Rendering::Rendering();
 		Interface::Run_Interface();
-		Timer::frameTime();
-	
+		Timer::frameTime();	
 	}
 	//close
 	closeContext();
-	
-	
+		
 	return 0;
 }

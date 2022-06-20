@@ -14,7 +14,6 @@ namespace Map {
 		std::vector<entt::entity> entities;
 	};
 
-
 	struct Node0 {
 		SDL_FRect sCollide_Box = {0,0,0,0};
 		Cell cells[16];
@@ -119,6 +118,28 @@ namespace Map {
 		}
 	}
 
+	void Place_Rect_On_Grid_Once(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
+		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
+			for (int i = 0; i < 16; i++) {
+				if (Utilities::bRect_Intersect(point, map.nodes[i].sCollide_Box)) {
+					for (int j = 0; j < 16; j++) {
+						if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+							for (int k = 0; k < 16; k++) {
+								if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+									for (int l = 0; l < 16; l++) {
+										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+											return; //ensures the entity is only placed in one square
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
 	void Place_Rect_On_Grid(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
 		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
@@ -131,6 +152,7 @@ namespace Map {
 									for (int l = 0; l < 16; l++) {
 										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
+											//return; //ensures the entity is only placed in one square
 										}
 									}
 								}

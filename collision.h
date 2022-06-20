@@ -29,7 +29,7 @@ namespace collision {
 	}
 
 	void Update_Unit() { // updates positions of soldiers stored in units for collision box
-		auto view = scene.view<Position_X, Position_Y, Assigned>();
+		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -75,7 +75,7 @@ namespace collision {
 
 
 	void Update_Collided_Unit() {
-		auto view = scene.view<Position_X, Position_Y, Assigned>();
+		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -131,7 +131,7 @@ namespace collision {
 		}
 	}
 
-	void Unit_Collision() {
+	void Unit_unit_Collision() {
 		if (1) {
 			auto company_view = scene.view<Company>();
 			for (auto companies : company_view) {
@@ -190,8 +190,8 @@ namespace collision {
 	}
 
 
-
-	void Spell_Collision() { //seems to work and pushes the units
+	//Use this for melee weapon collision as well
+	void Spell_unit_Collision() { //seems to work and pushes the units
 		if (1) {
 			auto spells = scene.view<Spell, Radius, Position_X, Position_Y, Mass, Alive>();
 			for (auto spell : spells) {
@@ -243,6 +243,61 @@ namespace collision {
 	}
 
 
+
+	//change to use weapon size instead of weapon radius
+	void MeleeAttack_unit_Collision() { //seems to work 
+		if (1) {
+			auto spells = scene.view<Melee, Radius, Position_X, Position_Y, Mass, Alive>();
+			for (auto spell : spells) {
+				auto& radius = spells.get<Radius>(spell);
+				auto& x = spells.get<Position_X>(spell);
+				auto& y = spells.get<Position_Y>(spell);
+				auto& mass = spells.get<Mass>(spell);
+				auto& alive = spells.get<Alive>(spell);
+				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+
+				auto company_view = scene.view<Company>();
+				for (auto companies : company_view) {
+					auto& company = company_view.get<Company>(companies);
+					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
+						for (int c = 0; c < company.iSub_Units.size(); c++) {
+							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
+								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
+									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
+										for (int i = 0; i < squad.iSub_Units.size(); i++) {
+											float fx = squad.fPX.at(i) - x.fPX;
+											float fy = squad.fPY.at(i) - y.fPY;
+											float fDistance = (fx * fx) + (fy * fy);
+											if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+												fDistance = sqrtf(fDistance);
+												float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
+												f2d resolver = {};
+												resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
+												resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
+												float fTotalmass = squad.fMass.at(i) + mass.fKilos;
+												float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
+												float fNomalizedMassB = (mass.fKilos / fTotalmass);
+												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+												x.fPX -= (resolver.fX * fNomalizedMassA);
+												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+												y.fPY -= (resolver.fY * fNomalizedMassA);
+												alive.bIsAlive = false;
+												//std::cout << "Hit!" << std::endl;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
 	std::vector<std::vector<entt::entity>> grid_collision(SDL_FRect &unit_box, Map::Node3 &map) {
 		int p = 0;
 		std::vector<std::vector<entt::entity>>vec;
@@ -280,13 +335,63 @@ namespace collision {
 		stat += p;
 		//std::cout << p << std::endl;
 		return vec;
-
 	}	
-	
-	void static_collision() {
+
+	void player_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = scene.view<Radius, Position_X, Position_Y, Mass>(entt::exclude<Assigned>);
+			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Input>();
+			for (auto spell : spells) {
+				auto& radius = spells.get<Radius>(spell);
+				auto& x = spells.get<Position_X>(spell);
+				auto& y = spells.get<Position_Y>(spell);
+				auto& mass = spells.get<Mass>(spell);
+				SDL_FRect unit_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+
+				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);
+
+				for (int j = 0; j < cell.size(); j++) {
+					for (int i = 0; i < cell[j].size(); i++) {
+						if (spell != cell[j].at(i)) {
+							p++;
+							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
+								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
+							auto& map_x = scene.get<Position_X>(cell[j].at(i));
+							auto& map_y = scene.get<Position_Y>(cell[j].at(i));
+							auto& map_mass = scene.get<Mass>(cell[j].at(i));
+							auto& map_radius = scene.get<Radius>(cell[j].at(i));
+							float fx = map_x.fPX - x.fPX;
+							float fy = map_y.fPY - y.fPY;
+							float fDistance = (fx * fx) + (fy * fy);
+							if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+								fDistance = sqrtf(fDistance);
+								float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
+								f2d resolver = {};
+								resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
+								resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
+								float fTotalmass = map_mass.fKilos + mass.fKilos;
+								float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
+								float fNomalizedMassB = (mass.fKilos / fTotalmass);
+								map_x.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+								x.fPX -= (resolver.fX * fNomalizedMassA);
+								map_y.fPY += (resolver.fY * fNomalizedMassB);
+								y.fPY -= (resolver.fY * fNomalizedMassA);
+							}
+							//	}
+						}
+					}
+				}
+			}
+		}
+		//std::cout << stat << std::endl;
+		stat = 0;
+	}
+
+	
+	void spell_grid_collision(Map::Node3& map) {
+		int p = 0;
+		if (1) { // for the player
+			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Spell>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -294,7 +399,7 @@ namespace collision {
 				auto& mass = spells.get<Mass>(spell);
 				SDL_FRect unit_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 			
-				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, Map::map);				
+				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);				
 
 				for (int j = 0; j < cell.size(); j++) {
 					for (int i = 0; i < cell[j].size(); i++) {
@@ -322,6 +427,7 @@ namespace collision {
 									x.fPX -= (resolver.fX * fNomalizedMassA);
 									map_y.fPY += (resolver.fY * fNomalizedMassB);
 									y.fPY -= (resolver.fY * fNomalizedMassA);
+
 								}
 						//	}
 						}
@@ -329,7 +435,7 @@ namespace collision {
 				}
 			}			
 		}
-		std::cout << stat << std::endl;
+		//std::cout << stat << std::endl;
 		stat = 0;
 	}
 
@@ -398,7 +504,7 @@ namespace collision {
 
 
 
-	void player_Collision() { //seems to work and pushes the units
+	void player_unit_Collision() { //seems to work and pushes the units
 		if (1) {
 			auto spells = scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
 			for (auto spell : spells) {
@@ -479,15 +585,19 @@ namespace collision {
 
 		Update_Unit_Boxes();
 
-		player_Collision();
-		static_collision();
+		player_grid_collision(Map::map);
+		spell_grid_collision(Map::map);
 		unit_grid_collision(Map::map);
-		Unit_Collision(); 
-		Spell_Collision();
+
+		player_unit_Collision();
+		Unit_unit_Collision(); 
+		
+		Spell_unit_Collision();		
+		MeleeAttack_unit_Collision();
 
 		Update_Collided_Unit();
 		resolveCollisons();
 
-	//	CollisionsT();
+		//CollisionsT();
 	}
 }
