@@ -64,7 +64,7 @@ namespace Event_Handler {
 				case SDLK_1: scene.emplace_or_replace<Casting>(entity, fireball); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);  break;
 				case SDLK_3: Timer::Pause_Control();  break;
-				case SDLK_4: act.action = slash; scene.emplace_or_replace<Attacking>(entity); break;
+				case SDLK_4: scene.emplace_or_replace<Attack>(entity); break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode();  break;
 				case SDLK_6: break;
 				case SDLK_7: break;

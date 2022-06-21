@@ -73,51 +73,62 @@ namespace Rendering {
 		//system("CLS");
 	}
 
-	void Frame_Update(spriteframes& a, Direction& b, Actions& act) { // bug :: cuts off first frame of when it starts	
-		
-		a.clip.y = a.clip.h * b.eDirection; //check which directioon is facing then change clip.y to sprite height x direction enum
+	SDL_Rect Frame_Update(spriteframes& a, Direction& b, Actions& act) {
+		SDL_Rect x = a.clip;
+
+		x.y = x.h * b.eDirection; //check which directioon is facing then change clip.y to sprite height x direction enum
 		if (act.action != isStatic) {
 			if (act.action != dead) {
 				if (a.bReversable) {
 					if (a.bReversing == true) {
-						a.clip.x = (a.clip.x + a.clip.w);
-						if (a.clip.x >= a.frameStart + a.sheetWidth - a.clip.w) { a.bReversing = false; };
+						x.x += (x.w * act.frameCount[act.action].currentFrame);
+						//std::cout << "forward :" << x.x << std::endl;
+						if (x.x >= a.frameStart + a.sheetWidth - x.w) { a.bReversing = false; };
+						act.frameCount[act.action].currentFrame++;
+						return x;
+
 					}
 					else if (a.bReversing == false) {
-						a.clip.x = (a.clip.x - a.clip.w);
-						if (a.clip.x <= a.frameStart) { a.bReversing = true; };
+						x.x = (x.x + (x.w * act.frameCount[act.action].currentFrame)) - x.w;
+						//std::cout << "reversing :" << x.x << std::endl;
+						if (x.x <= a.frameStart) { a.bReversing = true; };
+						act.frameCount[act.action].currentFrame--;
+						return x;
 					}
 				}
-				else {
-					a.clip.x = (a.clip.x + a.clip.w);
-					if (a.clip.x > a.frameStart + a.sheetWidth - a.clip.w) { a.clip.x = a.frameStart; };
-				}
+				
+				if (!a.bReversable) {
+					x.x += (x.w * act.frameCount[act.action].currentFrame);
+					//std::cout << "forward :" << x.x << std::endl;
+					if (x.x > a.frameStart + a.sheetWidth - x.w) {
+						x.x = a.frameStart;
+					};
 
-				if (act.frameCount[act.action].currentFrame >= act.frameCount[act.action].NumFrames) {
-					act.frameCount[act.action].currentFrame = 0;
-				}
-				else {
-					act.frameCount[act.action].currentFrame++;
+					if (act.frameCount[act.action].currentFrame >= act.frameCount[act.action].NumFrames) {
+						act.frameCount[act.action].currentFrame = 0;
+						return x;
+					}
+					else {
+						act.frameCount[act.action].currentFrame++;
+						return x;
+					}
 				}
 			}
 		}
 
 		if (act.action == dead){
-			if (/*act.frameCount[act.action].currentFrame <= act.frameCount[act.action].NumFrames*/1) {
-				if (act.frameCount[act.action].currentFrame < act.frameCount[act.action].NumFrames) {
-					if (act.frameCount[act.action].currentFrame != 0) {
-						a.clip.x += a.clip.w;
-					}
-					act.frameCount[act.action].currentFrame++;
-				}
-			}
+			if (act.frameCount[act.action].currentFrame < act.frameCount[act.action].NumFrames) {
+				act.frameCount[act.action].currentFrame++;
+			}	
+			x.x += (x.w * act.frameCount[act.action].currentFrame);
 		}
+		return x;
 		//std::cout << act.frameCount[act.action].currentFrame << std::endl;
 		//std::cout << act.action << std::endl;
 	}
 	
 	void Animation_Frame() { //state
-				
+		SDL_Rect xClipPos;
 		auto view1 = scene.view<Position_Y, Position_X, animation, Actions, Direction, Renderable>();
 		auto view2 = scene.view<Camera>();
 		for (auto id : view2) {
@@ -132,10 +143,10 @@ namespace Rendering {
 				anim.sheet[act.action].currentFrameTime += Timer::timeStep;
 				if (anim.sheet[act.action].currentFrameTime >= anim.sheet[act.action].timeBetweenFrames) {
 					anim.sheet[act.action].currentFrameTime = 0;
-					Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
+					xClipPos = Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
+					anim.renderPosition = xClipPos;										//save sprite for vector
+					anim.clipSprite = xClipPos;											//save position for renderer			
 				}
-				anim.renderPosition = anim.sheet[act.action].clip;										//save sprite for vector
-				anim.clipSprite = anim.sheet[act.action].clip;											//save position for renderer
 				x.fSX = x.fX - camera_offset.screen.x;
 				y.fSY = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = x.fSX - anim.sheet[act.action].posOffset.x;
@@ -370,27 +381,4 @@ namespace Rendering {
 
 
 
-//
-//	void _slash(action & act) {
-//		if numframes = 0
-//			act.action = slash;
-//	}
-//
-//	void _stab(action & act) {
-//		act.action = stab;
-//	}
-//
-//	void _block(action & act) {
-//		act.action = block;
-//	}
-//
-//	void _dead(action & act) {
-//		act.action = dead;
-//	}
-//
-//	void _xbow(action & act) {
-//		act.action = xbow;
-//	}
-//
-//}
 

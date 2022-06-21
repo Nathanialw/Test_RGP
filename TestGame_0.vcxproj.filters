@@ -116,6 +116,9 @@
     <ClInclude Include="weapons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="recruitable_units.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

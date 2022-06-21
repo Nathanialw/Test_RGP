@@ -212,6 +212,10 @@ namespace Components {
 	struct Attacking {
 		
 	};
+
+	struct Attack {
+
+	};
 	
 	enum Weapon_Type {
 		sword
@@ -230,6 +234,7 @@ namespace Components {
 		int64_t lifeTime;
 		int64_t count;
 	};
+
 }
 
 

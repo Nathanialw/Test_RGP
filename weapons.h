@@ -35,16 +35,20 @@ namespace Weapons {
 		Scenes::scene.emplace<Components::Alive>(weapon, true);
 	}
 
-	void Attack() {
-		auto view = scene.view<Direction, Position_X, Position_Y, Attacking>();
+	void Attack_cast() {
+		auto view = scene.view<Direction, Position_X, Position_Y, Actions, Attack>();
 		for (auto entity : view) {
+		//	act.action = slash;
+			auto& act = view.get<Actions>(entity);
+			act.action = slash;
+			act.frameCount[act.action].currentFrame = 0;
 			auto& dir = view.get<Direction>(entity);
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			f2d pos = { x.fX, y.fY };
-			create_attack(pos, dir.eDirection);
-			//std::cout << "attacking!" << std::endl;
-			scene.remove<Attacking>(entity);			
+			create_attack(pos, dir.eDirection);	
+			scene.emplace_or_replace<Attacking>(entity);
+			scene.remove<Attack>(entity);
 		}
 		//create SDL_FRect in front of unit, size from a size component on weapon
 	}
@@ -62,8 +66,22 @@ namespace Weapons {
 		}
 	}
 
+	void Attacking_Updater() {
+		auto view = scene.view<Attacking, Actions>();
+		for (auto entity : view) {
+			auto &act = view.get<Actions>(entity);
+			//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
+			if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
+				act.action = idle;
+				scene.remove<Attacking>(entity);
+			}
+		}
+
+	}
+
 	void Update_Attacks() {
 		Attack_Box_Manager();
-		Attack();
+		Attacking_Updater();
+		Attack_cast();
 	}
 }

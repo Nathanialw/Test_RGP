@@ -6,6 +6,7 @@
 #include "entity_loader.h"
 #include "death_spells.h"
 #include "scenes.h"
+#include "recruitable_units.h"
 
 
 using namespace Components;
@@ -66,15 +67,15 @@ namespace Scene {
 			{ NULL },
 			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 75.0f },//idle
 			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 75.0f },//walk
-			{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 75.0f, 75.0f },//attack
+			{ {1536, 0, 128, 128}, 1536, 512,  0, 0, {60, 95}, 150.0f, 150.0f },//attack
 			{ NULL }, //		unused
-			{ {2048, 0, 128, 128}, 2048, 256,  1, 0, {60, 95}, 75.0f, 75.0f },//struck
-			{ {2304, 0, 128, 128}, 2560, 768,  1, 0, {60, 95}, 75.0f, 75.0f }, //dead
+			{ {2048, 0, 128, 128}, 2048, 256,  0, 0, {60, 95}, 75.0f, 75.0f },//struck
+			{ {2304, 0, 128, 128}, 2560, 768,  0, 0, {60, 95}, 75.0f, 75.0f }, //dead
 			{ {3072, 0, 128, 128}, 2816, 512,  0, 0, {60, 95}, 75.0f, 75.0f }, //cheer
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 75.0f },//range
 		};
 		scene.emplace<Actions>(skeleton, idle);
-		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 4, 0}, {8, 0}, {4, 0}, {0, 0}, {2,0}, {6,0}, {4,0}, {4,0} };
+		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 3, 0}, {7, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
 		//positon components
 		scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f, 0.0f);
@@ -112,8 +113,10 @@ namespace Scene {
 		}		
 		
 		//Skeletons
-		Spawn_Skeletons(5, 5);
+		Spawn_Skeletons(8, 2);
 			
+		//archers
+		Units::Create_Archer(8, 2);
 		
 		//trees
 		for (auto j = 0; j < 5; ++j) {
@@ -129,7 +132,6 @@ namespace Scene {
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
 				scene.emplace<Direction>(tree, W);
 
-
 				scene.emplace<Radius>(tree, 30.0f);
 				scene.emplace<Environment>(tree);
 				scene.emplace<Mass>(tree, 40000.0f);
@@ -138,61 +140,6 @@ namespace Scene {
 			}
 		}
 
-		//archers
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
-				auto archer = scene.create();			//creates a unique handle for an entity
-				scene.emplace<animation>(archer, archer_0); /// need to load the texture only onceand pass the pointer into this function
-				scene.get<animation>(archer).sheet = { //populate the vector
-					{ NULL },
-					{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 75.0f },//idle
-					{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 75.0f },//walk
-					{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 75.0f, 75.0f },//attack
-					{ NULL }, //		unused
-					{ {2048, 0, 128, 128}, 2048, 256,  1, 0, {60, 95}, 75.0f, 75.0f },//struck
-					{ {2304, 0, 128, 128}, 2560, 768,  1, 0, {60, 95}, 75.0f, 75.0f }, //dead
-					{ {3072, 0, 128, 128}, 2816, 512,  0, 0, {60, 95}, 75.0f, 75.0f }, //cheer
-					{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 75.0f },//range
-				};
-				scene.emplace<Actions>(archer, idle);
-				scene.get<Actions>(archer).frameCount = { {0, 0}, { 4, 0}, {8, 0}, {4, 0}, {0, 0}, {2,0}, {6,0}, {4,0}, {4,0} };
-
-				scene.emplace<Position_X>(archer, 0.0f, 150.0f + (i * 144.0f), 0.0f);
-				scene.emplace<Position_Y>(archer, 0.0f, 200.0f + (j * 144.0f), 0.0f);				
-				scene.emplace<Radius>(archer, 15.0f);
-				scene.emplace<Velocity>(archer, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
-
-				scene.emplace<Direction>(archer, SE);
-				scene.emplace<handle>(archer, "archer");
-				scene.emplace<Mass>(archer, 200.0f);
-				
-				scene.emplace<Health>(archer, 5);
-				scene.emplace<Alive>(archer, true);
-				
-				scene.emplace<Soldier>(archer);
-				scene.emplace<Commandable>(archer);
-
-			}
-		}
-
-		//buildings
-		//for (auto j = 0; j < 0; ++j) {
-		//	for (auto i = 0; i < 0; ++i) {
-		//		auto house = scene.create();
-		//		scene.emplace<animation>(house, house_0);
-		//		scene.get<animation>(house).sheet = {
-		//			{{ 0, 0, 600, 509}, 0, 600, 0, 0, {313, 609}, 16.0f } }; //populate the vector
-
-		//		scene.emplace<Position_X>(house, 0.0f, 200.0f + (i * 952.0f), 0.0f);
-		//		scene.emplace<Position_Y>(house, 0.0f, 200.0f + (j * 1165.0f), 0.0f);
-		//		scene.emplace<Building_Collider>(house);//needs to be made of lines ->  circle vs line collision
-
-		//		scene.emplace<Actions>(house, isStatic);
-		//		scene.get<Actions>(house).frameCount = { { 0, 0} };
-		//		scene.emplace<Direction>(house, W);
-		//		scene.emplace<Mass>(house, 4000000.0f);
-		//	}
-		//}
 
 		//set positions
 		auto view = scene.view<Position_X, Position_Y>();
