@@ -129,7 +129,7 @@ namespace Rendering {
 	
 	void Animation_Frame() { //state
 		SDL_Rect xClipPos;
-		auto view1 = scene.view<Position_Y, Position_X, animation, Actions, Direction, Renderable>();
+		auto view1 = scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction>();
 		auto view2 = scene.view<Camera>();
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id);
@@ -208,13 +208,13 @@ namespace Rendering {
 				
 
 				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
-					for (int i = 0; i < 16; i++) {
+					for (int i = 0; i < Map::size; i++) {
 						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
-							for (int j = 0; j < 16; j++) {
+							for (int j = 0; j < Map::size; j++) {
 								if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
-									for (int k = 0; k < 16; k++) {
+									for (int k = 0; k < Map::size; k++) {
 										if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-											for (int l = 0; l < 16; l++) {
+											for (int l = 0; l < Map::size; l++) {
 												if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
 														scene.emplace_or_replace<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
@@ -235,13 +235,13 @@ namespace Rendering {
 				}
 
 				if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
-					for (int i = 0; i < 16; i++) {
+					for (int i = 0; i < Map::size; i++) {
 						if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].sCollide_Box)) {
-							for (int j = 0; j < 16; j++) {
+							for (int j = 0; j < Map::size; j++) {
 								if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].sCollide_Box)) {
-									for (int k = 0; k < 16; k++) {
+									for (int k = 0; k < Map::size; k++) {
 										if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-											for (int l = 0; l < 16; l++) {
+											for (int l = 0; l < Map::size; l++) {
 												if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
 														Renderable& show = scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));

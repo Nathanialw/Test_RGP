@@ -120,32 +120,63 @@ namespace Interface {
 			//SDL_RenderCopy(Graphics::renderer, mouseY.pTexture, &mouseY.k, &d);
 		}
 	}
+
+	int gridDepth = -1;
 	
 	void Show_Grid(Map::Node3& terrain) {
 		SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
+		
+		if (gridDepth > 3) {
+			gridDepth = 3;
+		}
+		if (gridDepth < -1) {
+			gridDepth = -1;
+		}
+		else {
+			auto view = scene.view<Camera>();
 
-		auto view = scene.view<Camera>();
+			for (auto id : view) {
+				auto& camera = view.get<Camera>(id);
+				SDL_FRect offset = camera.screen;
+				SDL_FRect screen = { camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2 };
+				SDL_FRect debug;
 
-		for (auto id : view) {
-			auto& camera = view.get<Camera>(id);
-			SDL_FRect offset = camera.screen;
-			SDL_FRect screen = { camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2 };
-			SDL_FRect debug;
-
-			if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
-				for (int i = 0; i < 16; i++) {
-					if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
-						for (int j = 0; j < 16; j++) {
-							if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
-								for (int k = 0; k < 16; k++) {
-									if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-										for (int l = 0; l < 16; l++) {
-											if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-												for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-													SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box);
+				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
+					for (int i = 0; i < Map::size; i++) {
+						if (gridDepth == 0) {
+							SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.sCollide_Box);
+							o.x -= offset.x;
+							o.y -= offset.y;
+							SDL_RenderDrawRect(renderer, &o);
+						}
+						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
+							for (int j = 0; j < Map::size; j++) {
+								if (gridDepth == 1) {
+									SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.nodes[i].sCollide_Box);
+									o.x -= offset.x;
+									o.y -= offset.y;
+									SDL_RenderDrawRect(renderer, &o);
+								}
+								if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
+									for (int k = 0; k < Map::size; k++) {
+										if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+											for (int l = 0; l < Map::size; l++) {
+												if (gridDepth == 2) {
+													SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.nodes[i].nodes[j].nodes[k].sCollide_Box);
 													o.x -= offset.x;
 													o.y -= offset.y;
 													SDL_RenderDrawRect(renderer, &o);
+												}
+												if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+														if (gridDepth == 3) {
+															SDL_Rect o = Utilities::SDL_Rect_To_SDL_FRect(terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box);
+															o.x -= offset.x;
+															o.y -= offset.y;
+															SDL_RenderDrawRect(renderer, &o);
+														}
+													}
+													//std::cout << terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size() << std::endl;
 												}
 											}
 										}
@@ -191,7 +222,7 @@ namespace Interface {
 	}
 
 	void Run_Interface() {
-		//Show_Grid(Map::terrain);
+		Show_Grid(Map::terrain);
 		//Display_Military_Groups();
 		Debug_System::Debugger();
 		//Unit_Arrive_UI();

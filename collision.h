@@ -319,6 +319,7 @@ namespace collision {
 	}
 
 
+
 	std::vector<std::vector<entt::entity>> grid_collision(SDL_FRect &unit_box, Map::Node3 &map) {
 		int p = 0;
 		std::vector<std::vector<entt::entity>>vec;
@@ -326,13 +327,13 @@ namespace collision {
 
 		//	SDL_FRect port;
 		if (Utilities::bRect_Intersect(unit_box, map.sCollide_Box)) {
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < Map::size; i++) {
 				if (Utilities::bRect_Intersect(unit_box, map.nodes[i].sCollide_Box)) {
-					for (int j = 0; j < 16; j++) {
+					for (int j = 0; j < Map::size; j++) {
 						if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].sCollide_Box)) {
-							for (int k = 0; k < 16; k++) {
+							for (int k = 0; k < Map::size; k++) {
 								if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-									for (int l = 0; l < 16; l++) {
+									for (int l = 0; l < Map::size; l++) {
 										if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											//port.x = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - offset.screen.x;
 											//port.y = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - offset.screen.y;
@@ -357,6 +358,8 @@ namespace collision {
 		//std::cout << p << std::endl;
 		return vec;
 	}	
+
+
 
 	void player_grid_collision(Map::Node3& map) {
 		int p = 0;
@@ -461,54 +464,58 @@ namespace collision {
 		stat = 0;
 	}
 
+
+
 	void unit_grid_collision(Map::Node3& map) { //waaaaay too slow		
 
 		auto company_view = scene.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (Utilities::bRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
-				for (int a = 0; a < 16; a++) {
-					for (int i = 0; i < company.iSub_Units.size(); i++) {
+				for (int i = 0; i < Map::size; i++) {
+					for (int a = 0; a < company.iSub_Units.size(); a++) {
+						
 						if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].sCollide_Box)) {
-							for (int j = 0; j < 16; j++) {
+							for (int j = 0; j < Map::size; j++) {
 								for (int b = 0; b < company.iSub_Units.size(); b++) {
+									
 									if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
 										auto& platoon = scene.get<Platoon>(company.iSub_Units[b]);
-										for (int k = 0; k < 16; k++) {
+										for (int k = 0; k < Map::size; k++) {
 											for (int c = 0; c < platoon.iSub_Units.size(); c++) {
+												
 												if (Utilities::bRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 													auto& squad = scene.get<Squad>(platoon.iSub_Units[c]);
-													for (int l = 0; l < 16; l++) {
+													for (int l = 0; l < Map::size; l++) {
 														for (int d = 0; d < squad.iSub_Units.size(); d++) {
 															if (squad.bAlive.at(d) != false) {
+																
 																if (Utilities::bRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-																	for (int l = 0; l < 16; l++) {
-																		for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
-																			auto& radius = scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																			auto& mass = scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																			auto& x = scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																			auto& y = scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																			for (int e = 0; e < squad.iSub_Units.size(); e++) {
-																				float fx = squad.fPX.at(e) - x.fPX;
-																				float fy = squad.fPY.at(e) - y.fPY;
-																				float fDistance = (fx * fx) + (fy * fy);
-																				if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-																					fDistance = sqrtf(fDistance);
-																					float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
-																					f2d resolver = {};
-																					resolver.fX = fOverlap * (x.fPX - squad.fPX.at(e)) / fDistance;
-																					resolver.fY = fOverlap * (y.fPY - squad.fPY.at(e)) / fDistance;
-																					float fTotalmass = squad.fMass.at(e) + mass.fKilos;
-																					float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
-																					float fNomalizedMassB = (mass.fKilos / fTotalmass);
-																					squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
-																					x.fPX -= (resolver.fX * fNomalizedMassA);
-																					squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
-																					y.fPY -= (resolver.fY * fNomalizedMassA);
-																					iunitGridCollisionCheck++;
-																				}
+																	for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
+																		auto& radius = scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																		auto& mass = scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																		auto& x = scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																		auto& y = scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																		for (int e = 0; e < squad.iSub_Units.size(); e++) {
+																			float fx = squad.fPX.at(e) - x.fPX;
+																			float fy = squad.fPY.at(e) - y.fPY;
+																			float fDistance = (fx * fx) + (fy * fy);
+																			if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+																				fDistance = sqrtf(fDistance);
+																				float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
+																				f2d resolver = {};
+																				resolver.fX = fOverlap * (x.fPX - squad.fPX.at(e)) / fDistance;
+																				resolver.fY = fOverlap * (y.fPY - squad.fPY.at(e)) / fDistance;
+																				float fTotalmass = squad.fMass.at(e) + mass.fKilos;
+																				float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
+																				float fNomalizedMassB = (mass.fKilos / fTotalmass);
+																				squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
+																				x.fPX -= (resolver.fX * fNomalizedMassA);
+																				squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
+																				y.fPY -= (resolver.fY * fNomalizedMassA);
+																				iunitGridCollisionCheck++;
 																			}
-																		}																	
+																		}
 																	}
 																}
 															}
@@ -617,7 +624,7 @@ namespace collision {
 
 		player_grid_collision(Map::map);
 		spell_grid_collision(Map::map);
-		//unit_grid_collision(Map::map); //waaaaay too slow
+		unit_grid_collision(Map::map); //waaaaay too slow
 
 		player_unit_Collision();
 		Unit_unit_Collision(); 

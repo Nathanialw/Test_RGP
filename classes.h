@@ -16,31 +16,32 @@ namespace Map {
 
 	struct Node0 {
 		SDL_FRect sCollide_Box = {0,0,0,0};
-		Cell cells[16];
+		Cell cells[4];
 	};
 	struct Node1 {
 		SDL_FRect sCollide_Box = { 0,0,0,0 };
-		Node0 nodes[16];
+		Node0 nodes[4];
 	};
 	struct Node2 {
 		SDL_FRect sCollide_Box = { 0,0,0,0 };
-		Node1 nodes[16];
+		Node1 nodes[4];
 	};
 	struct Node3 {
 		SDL_FRect sCollide_Box = { 0.0f,0.0f,0.0f,0.0f };
-		Node2 nodes[16];
+		Node2 nodes[4];
 	};
 
+	int quad = 2;
 
 	Node3 map;
 	Node3 terrain;
-	
+
 	void Create_Cell(Node0 &node) {
-		float w = node.sCollide_Box.w / 4;
-		float h = node.sCollide_Box.h / 4;
+		float w = node.sCollide_Box.w / quad;
+		float h = node.sCollide_Box.h / quad;
 		int k = 0;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < quad; i++) {
+			for (int j = 0; j < quad; j++) {
 				node.cells[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
 				k++;
 			//	std::cout << h << std::endl;
@@ -49,11 +50,11 @@ namespace Map {
 	}
 
 	void Create_Node0(Node1 &node) {
-		float w = node.sCollide_Box.w / 4;
-		float h = node.sCollide_Box.h / 4;
+		float w = node.sCollide_Box.w / quad;
+		float h = node.sCollide_Box.h / quad;
 		int k = 0;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < quad; i++) {
+			for (int j = 0; j < quad; j++) {
 				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
 				Create_Cell(node.nodes[k]);
 				k++;
@@ -62,11 +63,11 @@ namespace Map {
 	}			
 
 	void Create_Node1(Node2 &node) {
-		float w = node.sCollide_Box.w / 4;
-		float h = node.sCollide_Box.h / 4;
+		float w = node.sCollide_Box.w / quad;
+		float h = node.sCollide_Box.h / quad;
 		int k = 0;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < quad; i++) {
+			for (int j = 0; j < quad; j++) {
 				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
 				Create_Node0(node.nodes[k]);
 				k++;
@@ -75,11 +76,11 @@ namespace Map {
 	}
 
 	void Create_Node2(Node3 &node) {
-		float w = node.sCollide_Box.w / 4;
-		float h = node.sCollide_Box.h / 4;
+		float w = node.sCollide_Box.w / quad;
+		float h = node.sCollide_Box.h / quad;
 		int k = 0;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < quad; i++) {
+			for (int j = 0; j < quad; j++) {
 				node.nodes[k].sCollide_Box = { node.sCollide_Box.x + (w * i), node.sCollide_Box.y + (h * j), w, h };
 				Create_Node1(node.nodes[k]);
 				k++;
@@ -91,19 +92,21 @@ namespace Map {
 	// h = 235, w = eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 	void Build_Map(Node3& zone) {
-		zone.sCollide_Box = { 0.0f, 0.0f, 25600.0f, 25600.0f };
+		zone.sCollide_Box = { 0.0f, 0.0f, 1600.0f, 1600.0f };
 		Create_Node2(zone);
 	}
 
+	int size = 4;
+
 	void Place_Point_on_Grid(SDL_FPoint& point, Map::Node3& map, entt::entity& entity) { //inserts unit into a sigle node
 		if (Utilities::bPoint_RectIntersect(point, map.sCollide_Box)) {
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < size; i++) {
 				if (Utilities::bPoint_RectIntersect(point, map.nodes[i].sCollide_Box)) {
-					for (int j = 0; j < 16; j++) {
+					for (int j = 0; j < size; j++) {
 						if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
-							for (int k = 0; k < 16; k++) {
+							for (int k = 0; k < size; k++) {
 								if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-									for (int l = 0; l < 16; l++) {
+									for (int l = 0; l < size; l++) {
 										if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
 											return;
@@ -120,13 +123,13 @@ namespace Map {
 
 	void Place_Rect_On_Grid_Once(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
 		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < size; i++) {
 				if (Utilities::bRect_Intersect(point, map.nodes[i].sCollide_Box)) {
-					for (int j = 0; j < 16; j++) {
+					for (int j = 0; j < size; j++) {
 						if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
-							for (int k = 0; k < 16; k++) {
+							for (int k = 0; k < size; k++) {
 								if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-									for (int l = 0; l < 16; l++) {
+									for (int l = 0; l < size; l++) {
 										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
 											return; //ensures the entity is only placed in one square
@@ -143,13 +146,13 @@ namespace Map {
 
 	void Place_Rect_On_Grid(SDL_FRect& point, Map::Node3& map, entt::entity& entity) { //inserts unit into every node withing its collider
 		if (Utilities::bRect_Intersect(point, map.sCollide_Box)) {
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < size; i++) {
 				if (Utilities::bRect_Intersect(point, map.nodes[i].sCollide_Box)) {
-					for (int j = 0; j < 16; j++) {
+					for (int j = 0; j < size; j++) {
 						if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
-							for (int k = 0; k < 16; k++) {
+							for (int k = 0; k < size; k++) {
 								if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-									for (int l = 0; l < 16; l++) {
+									for (int l = 0; l < size; l++) {
 										if (Utilities::bRect_Intersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
 											//return; //ensures the entity is only placed in one square

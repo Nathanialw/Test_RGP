@@ -94,8 +94,8 @@ namespace Scene {
 		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
 		//grass
-		for (auto j = 0; j < 64; j++) {
-			for (auto i = 0; i < 64; i++) {
+		for (auto j = 0; j < 16; j++) {
+			for (auto i = 0; i < 16; i++) {
 				auto grass = scene.create();
 
 				scene.emplace<animation>(grass, grass_0, 0, 0, 100, 100, 0, 0, 100, 100); /// need to load hetexture	 only once and pass the pointer into this function
@@ -113,10 +113,10 @@ namespace Scene {
 		}		
 		
 		//Skeletons
-		Spawn_Skeletons(8, 2);
+		Spawn_Skeletons(8, 4);
 			
 		//archers
-		Units::Create_Archer(8, 2);
+		Units::Create_Archer(0, 0);
 		
 		//trees
 		for (auto j = 0; j < 5; ++j) {

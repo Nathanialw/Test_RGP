@@ -66,12 +66,14 @@ namespace Event_Handler {
 				case SDLK_3: Timer::Pause_Control();  break;
 				case SDLK_4: scene.emplace_or_replace<Attack>(entity); break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode();  break;
-				case SDLK_6: break;
-				case SDLK_7: break;
+				case SDLK_6: Interface::gridDepth++; break;
+				case SDLK_7: Interface::gridDepth--; break;
 				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
 				case SDLK_ESCAPE: closeContext();  break;
+				case SDLK_PLUS: Interface::gridDepth++; break;
+				case SDLK_MINUS: Interface::gridDepth--; break;
 				}
 			}
 			if (event.type == SDL_KEYUP) {
