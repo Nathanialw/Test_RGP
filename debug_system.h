@@ -11,8 +11,8 @@ using namespace Scene;
 
 namespace Debug_System {
 
-	int iFramePollRate;
-	Surface_Data framerate;
+	int iFramePollRate = 0;
+	
 
 
 	void Entity_Data_Debug(float x, float y, float sx, float sy) {
@@ -45,21 +45,50 @@ namespace Debug_System {
 			SDL_DestroyTexture(y_Position.pTexture);
 		}
 
+	Surface_Data framerate;
+	Surface_Data timeStep;
+	bool frameRateMode = true;
+	bool frameTimeMode = false;
+
+	void Toggle_Count_Rate_Mode() {
+		if (frameRateMode) {
+			frameRateMode = false;
+			frameTimeMode = true;			
+		}
+		else {
+			frameRateMode = true;
+			frameTimeMode = false;
+		}
+		iFramePollRate = 500;
+	}
+
 	void Framerate() {		
 		auto view = scene.view<Camera, Position_X, Position_Y>();
+
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
 			auto& x = view.get<Position_X>(focus);
 			auto& y = view.get<Position_Y>(focus);
 
-			iFramePollRate -= Timer::timeStep;
-			if (iFramePollRate <= 0) {
-				iFramePollRate = 500;
-				SDL_DestroyTexture(framerate.pTexture);
-				framerate = Load_Text_Texture(std::to_string(float(Timer::avgFPS)), { 133,255,133 });
+			iFramePollRate += Timer::timeStep;
+			if (iFramePollRate >= 500) {
+				iFramePollRate = 0;
+				if (frameRateMode) {
+					SDL_DestroyTexture(framerate.pTexture);
+					framerate = Load_Text_Texture(std::to_string(float(Timer::avgFPS)), { 133,255,133 });
+				}
+				if (frameTimeMode) {
+					SDL_DestroyTexture(timeStep.pTexture);
+					timeStep = Load_Text_Texture(std::to_string(float(Timer::timeStep) / 1000), { 133,255,133 });
+				}
 			}
 			SDL_Rect c = { 0,0,200 / componentCamera.scale.fX,100 / componentCamera.scale.fY };
-			SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
+			if (frameRateMode) {
+				SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
+			}
+			if (frameTimeMode) {
+				SDL_RenderCopy(Graphics::renderer, timeStep.pTexture, &timeStep.k, &c);
+			}
 		}
 	}
 

@@ -423,6 +423,8 @@ namespace User_Mouse_Input {
 					squad.fMass.emplace_back(m.fKilos);
 					squad.fRadius.emplace_back(r.fRadius);
 					squad.iSub_Units.emplace_back(SOLDIER_ID);
+					squad.iStruck.emplace_back(0);
+					squad.bAlive.emplace_back(true);
 					soldier.iIndex = squad.iSub_Units.size() - 1;
 					soldier.iUnit_Assigned_To = SQUAD_ID;
 					iUnit++;

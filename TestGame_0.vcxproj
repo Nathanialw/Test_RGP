@@ -75,19 +75,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(Path);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(Path);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(Path);C:\Workspace\Libraries\SDL2\include;C:\Workspace\Libraries\SDL2_image\include;C:\Workspace\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;C:\Workspace\Libraries\SDL2_ttf\lib\x64;$(Path);$(VC_IncludePath);$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
@@ -164,7 +164,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;shell32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2\VisualC\x64\Release;$(Path);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Workspace\Libraries\SDL2_image\lib\x64;C:\Workspace\Libraries\SDL2_ttf\lib\x64;C:\Workspace\Libraries\SDL2\lib\x64;$(Path);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>

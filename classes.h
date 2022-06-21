@@ -190,6 +190,8 @@ namespace Mil_Struc {
 		std::vector<float>fRadius;
 
 		std::vector<f2d>vPosition; //
+		std::vector<int>iStruck;
+		std::vector<bool>bAlive;
 
 
 		Squad() {
@@ -202,6 +204,8 @@ namespace Mil_Struc {
 			fMass.reserve(size);
 			fRadius.reserve(size);
 			vPosition.reserve(size);
+			iStruck.reserve(size);
+			bAlive.reserve(size);
 		}
 	};
 

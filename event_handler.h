@@ -73,9 +73,9 @@ namespace Event_Handler {
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);  break;
 				case SDLK_3: Timer::Pause_Control();  break;
 				case SDLK_4: act.action = slash; scene.emplace_or_replace<Attacking>(entity); break;
-				case SDLK_5: act.action = stab; break;
-				case SDLK_6: act.action = block; break;
-				case SDLK_7: act.action = stab; break;
+				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode();  break;
+				case SDLK_6: break;
+				case SDLK_7: break;
 				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;

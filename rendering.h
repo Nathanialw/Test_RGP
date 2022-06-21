@@ -38,6 +38,7 @@ namespace Camera_Control {
 }
 
 namespace Rendering {
+	bool debug = false;
 	float fRenderable = 0.0f;
 
 	void sort_Positions() {
@@ -166,6 +167,9 @@ namespace Rendering {
 	void Check_Renderable(Map::Node3& terrain) { //doesn't need to happen every frame
 		// check: grid, military structure, player (maybe a seperate grid for terrain?)
 		// NEED to update grid position every frame to maake this work for mobile units
+		if (debug) {
+			std::cout << "--- Starting Check_Renderable() --- = Good" << std::endl;
+		}
 		fRenderable += Timer::timeStep;
 		int grassnum = 0;
 		int unitnum = 0;
@@ -184,7 +188,7 @@ namespace Rendering {
 			for (auto id : view) {
 				auto& camera = view.get<Camera>(id);
 				SDL_FRect screen = {camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2};
-				SDL_FRect debug;
+				
 
 				if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
 					for (int i = 0; i < 16; i++) {
@@ -214,6 +218,9 @@ namespace Rendering {
 						}
 					}
 				}
+				if (debug) {
+					std::cout << "terrain = Good" << std::endl;
+				}
 
 				if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
 					for (int i = 0; i < 16; i++) {
@@ -227,6 +234,7 @@ namespace Rendering {
 													for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
 														Renderable& show = scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a));
 														show.y = scene.get<Position_Y>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(a)).fY;
+
 														/*debug.x = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - screen.x;
 														debug.y = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - screen.y;
 														debug.w = Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
@@ -243,6 +251,9 @@ namespace Rendering {
 						}
 					}
 				}
+				if (debug) {
+					std::cout << "Map::map = Good" << std::endl;
+				}
 
 				auto player_view = scene.view<Input, Position_X, Position_Y>();
 
@@ -255,6 +266,9 @@ namespace Rendering {
 						show.y = y.fY;
 						playernum++;
 					}
+				}
+				if (debug) {
+					std::cout << "player_view = Good" << std::endl;
 				}
 
 				auto spell_view = scene.view<Spell, Position_X, Position_Y>();
@@ -269,7 +283,10 @@ namespace Rendering {
 						spellnum++;
 					}
 				}
-				
+				if (debug) {
+					std::cout << "spell_view = Good" << std::endl;
+				}
+
 				auto company_view = scene.view<Company>();
 				
 				for (auto companies : company_view) {
@@ -282,8 +299,10 @@ namespace Rendering {
 									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											Renderable& show = scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
-											show.y = scene.get<Position_Y>(squad.iSub_Units[i]).fY;
+											if (squad.bAlive.at(i) == true) {
+												Renderable& show = scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
+												show.y = scene.get<Position_Y>(squad.iSub_Units[i]).fY;
+											}
 											armynum++;
 										}
 									}
@@ -291,7 +310,11 @@ namespace Rendering {
 							}
 						}
 					}
-				}	
+				}
+				if (debug) {
+					std::cout << "company_view = Good" << std::endl;
+				}
+
 			}
 		}
 
@@ -302,20 +325,40 @@ namespace Rendering {
 		//std::cout << armynum << std::endl;
 		//std::cout << "----------------------------------" << std::endl;
 		//system("CLS");
+		if (debug) {
+			std::cout << "--- ending Check_Renderable() --- = Good" << std::endl;
+		}
 	};
 
 	void Rendering() {
+		if (debug) {
+			std::cout << "--- Starting Rendering() --- = Good" << std::endl;
+		}
 		Camera_Control::Update_Camera();
+		if (debug) {
+			std::cout << "Update_Camera = Good" << std::endl;
+		}
 		Check_Renderable(Map::terrain);
+		if (debug) {
+			std::cout << "Check_Renderable = Good" << std::endl;
+		}
 		Render_Terrain();
+		//std::cout << "Render_Terrain = Good" << std::endl;
 		sort_Positions();
+		//std::cout << "sort_Positions = Good" << std::endl;
 		Animation_Frame();
+		//std::cout << "Animation_Frame = Good" << std::endl;
 		Interface::Run_Interface();
-		Interface::Unit_Arrive_UI();
+		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_RenderPresent(Graphics::renderer);
+		//std::cout << "SDL_RenderPresent = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 12, 20, 20, SDL_ALPHA_OPAQUE);
+		//std::cout << "SDL_SetRenderDrawColor = Good" << std::endl;
 		SDL_RenderClear(Graphics::renderer);
+		//std::cout << "SDL_RenderClear = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 255, 100, 50, SDL_ALPHA_OPAQUE);
+		//std::cout << "SDL_SetRenderDrawColor = Good" << std::endl;
+		//std::cout << "--- Ending Rendering() ---  = Good" << std::endl;
 	}
 
 

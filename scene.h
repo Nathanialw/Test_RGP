@@ -49,10 +49,10 @@ namespace Scene {
 		}
 	}
 
-	void Spawn_Skeletons() {
+	void Spawn_Skeletons(int x, int y) {
 		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
-		for (auto j = 0; j < 16; ++j) {
-			for (auto i = 0; i < 16; ++i) {
+		for (auto j = 0; j < x; ++j) {
+			for (auto i = 0; i < y; ++i) {
 				Death_Spells::Summon_Skeleton((100.0f + (i * 60.0f)), (100.0f + (j * 60.0f)));
 			}
 		}
@@ -112,7 +112,7 @@ namespace Scene {
 		}		
 		
 		//Skeletons
-		Spawn_Skeletons();
+		Spawn_Skeletons(48, 80);
 			
 		
 		//trees
@@ -207,16 +207,41 @@ namespace Scene {
 
 	}	
 
+	void Update_Army() {
+		auto company_view = scene.view<Company>();
+		for (auto companies : company_view) {
+			auto& company = company_view.get<Company>(companies);	
+			for (int c = 0; c < company.iSub_Units.size(); c++) {
+				auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+				for (int p = 0; p < platoon.iSub_Units.size(); p++) {
+					auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+					for (int i = 0; i < squad.iSub_Units.size(); i++) {
+						if (squad.bAlive.at(i) == false) {
+							
+						}
+					}						
+				}				
+			}
+		}
+	}
+
 	void update_scene() {
+		//Update_Army();
+		//std::cout << "Update_Army = Good" << std::endl;
+
 		auto view = scene.view<Alive>();
 		for (auto entity : view) {
-			auto& x = view.get<Alive>(entity);
-			if (x.bIsAlive == false) {
+			auto& x = view.get<Alive>(entity).bIsAlive;
+			if (x == false) {
 				scene.destroy(entity);
 			}
 		}
+
 		add_unit_to_grid(Map::map);
-		add_terrain_to_grid(Map::terrain);
+		//std::cout << "add_unit_to_grid = Good" << std::endl;
+		add_terrain_to_grid(Map::terrain);		
+		//std::cout << "add_terrain_to_grid = Good" << std::endl;
+
 	}
 
 	void Init_Game() {

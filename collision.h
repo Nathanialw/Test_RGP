@@ -12,6 +12,7 @@ namespace collision {
 	int iSquad_Check = 0;
 	int iPlatoon_Check = 0;
 	int iCompany_Check = 0;
+	int iunitGridCollisionCheck = 0;
 	int stat = 0;
 
 
@@ -75,7 +76,7 @@ namespace collision {
 
 
 	void Update_Collided_Unit() {
-		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier>();
+		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier, Health, Alive>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -84,6 +85,18 @@ namespace collision {
 			auto& squad = scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			x.fPX = squad.fPX.at(soldier.iIndex);
 			y.fPY = squad.fPY.at(soldier.iIndex);
+			
+			//reduces health if Struck
+			if (squad.iStruck.at(soldier.iIndex) > 0) {
+				auto& h = view.get<Health>(entity).iHealth;
+				auto& a = view.get<Alive>(entity).bIsAlive;
+				h -= squad.iStruck.at(soldier.iIndex);
+				squad.iStruck.at(soldier.iIndex) = 0;
+				if (h <= 0) {
+					squad.bAlive.at(soldier.iIndex) = false;
+					a = false;					
+				}
+			}
 		}
 	}
 	
@@ -154,25 +167,27 @@ namespace collision {
 											if (Utilities::bRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
 												for (int i = 0; i < squad1.iSub_Units.size(); i++) {
 													for (int j = 0; j < squad2.iSub_Units.size(); j++) {
-														if (squad1.iSub_Units[i] != squad2.iSub_Units[j]) {
-															float fx = squad1.fPX.at(i) - squad2.fPX.at(j);
-															float fy = squad1.fPY.at(i) - squad2.fPY.at(j);
-															float fDistance = (fx * fx) + (fy * fy);
-															iNumber++;
-															if (fDistance <= ((squad1.fRadius.at(i) + squad2.fRadius.at(j)) * (squad1.fRadius.at(i) + squad2.fRadius.at(j))) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-																fDistance = sqrtf(fDistance);
-																float fOverlap = fDistance - (squad1.fRadius.at(i) + squad2.fRadius.at(j));
-																f2d resolver = {};
-																resolver.fX = fOverlap * (squad2.fPX.at(j) - squad1.fPX.at(i)) / fDistance;
-																resolver.fY = fOverlap * (squad2.fPY.at(j) - squad1.fPY.at(i)) / fDistance;
-																float fTotalmass = squad1.fMass.at(i) + squad2.fMass.at(j);
-																float fNomalizedMassA = (squad1.fMass.at(i) / fTotalmass);
-																float fNomalizedMassB = (squad2.fMass.at(j) / fTotalmass);
-																squad1.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-																squad2.fPX.at(j) -= (resolver.fX * fNomalizedMassA);
-																squad1.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-																squad2.fPY.at(j) -= (resolver.fY * fNomalizedMassA);
-																iActual_Resolves;
+														if (squad1.bAlive.at(i) || squad2.bAlive.at(j) != false) {
+															if (squad1.iSub_Units[i] != squad2.iSub_Units[j]) {
+																float fx = squad1.fPX.at(i) - squad2.fPX.at(j);
+																float fy = squad1.fPY.at(i) - squad2.fPY.at(j);
+																float fDistance = (fx * fx) + (fy * fy);
+																iNumber++;
+																if (fDistance <= ((squad1.fRadius.at(i) + squad2.fRadius.at(j)) * (squad1.fRadius.at(i) + squad2.fRadius.at(j))) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+																	fDistance = sqrtf(fDistance);
+																	float fOverlap = fDistance - (squad1.fRadius.at(i) + squad2.fRadius.at(j));
+																	f2d resolver = {};
+																	resolver.fX = fOverlap * (squad2.fPX.at(j) - squad1.fPX.at(i)) / fDistance;
+																	resolver.fY = fOverlap * (squad2.fPY.at(j) - squad1.fPY.at(i)) / fDistance;
+																	float fTotalmass = squad1.fMass.at(i) + squad2.fMass.at(j);
+																	float fNomalizedMassA = (squad1.fMass.at(i) / fTotalmass);
+																	float fNomalizedMassB = (squad2.fMass.at(j) / fTotalmass);
+																	squad1.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+																	squad2.fPX.at(j) -= (resolver.fX * fNomalizedMassA);
+																	squad1.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+																	squad2.fPY.at(j) -= (resolver.fY * fNomalizedMassA);
+																	iActual_Resolves;
+																}
 															}
 														}
 													}
@@ -212,24 +227,27 @@ namespace collision {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
 								auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
-										for (int i = 0; i < squad.iSub_Units.size(); i++) {											
-											float fx = squad.fPX.at(i) - x.fPX;
-											float fy = squad.fPY.at(i) - y.fPY;
-											float fDistance = (fx * fx) + (fy * fy);
-											if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-												fDistance = sqrtf(fDistance);
-												float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-												f2d resolver = {};
-												resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
-												resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
-												float fTotalmass = squad.fMass.at(i) + mass.fKilos;
-												float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
-												float fNomalizedMassB = (mass.fKilos / fTotalmass);
-												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-												x.fPX -= (resolver.fX * fNomalizedMassA);
-												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-												y.fPY -= (resolver.fY * fNomalizedMassA); 
-												alive.bIsAlive = false;
+										for (int i = 0; i < squad.iSub_Units.size(); i++) {
+											if (squad.bAlive.at(i) != false) {
+												float fx = squad.fPX.at(i) - x.fPX;
+												float fy = squad.fPY.at(i) - y.fPY;
+												float fDistance = (fx * fx) + (fy * fy);
+												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+													fDistance = sqrtf(fDistance);
+													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
+													f2d resolver = {};
+													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
+													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
+													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
+													float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
+													float fNomalizedMassB = (mass.fKilos / fTotalmass);
+													squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+													x.fPX -= (resolver.fX * fNomalizedMassA);
+													squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+													y.fPY -= (resolver.fY * fNomalizedMassA);
+													squad.iStruck.at(i)++;
+													alive.bIsAlive = false;
+												}
 											}
 										}
 									}
@@ -267,24 +285,27 @@ namespace collision {
 									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											float fx = squad.fPX.at(i) - x.fPX;
-											float fy = squad.fPY.at(i) - y.fPY;
-											float fDistance = (fx * fx) + (fy * fy);
-											if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-												fDistance = sqrtf(fDistance);
-												float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-												f2d resolver = {};
-												resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
-												resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
-												float fTotalmass = squad.fMass.at(i) + mass.fKilos;
-												float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
-												float fNomalizedMassB = (mass.fKilos / fTotalmass);
-												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-												x.fPX -= (resolver.fX * fNomalizedMassA);
-												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-												y.fPY -= (resolver.fY * fNomalizedMassA);
-												alive.bIsAlive = false;
-												//std::cout << "Hit!" << std::endl;
+											if (squad.bAlive.at(i) != false) {
+												float fx = squad.fPX.at(i) - x.fPX;
+												float fy = squad.fPY.at(i) - y.fPY;
+												float fDistance = (fx * fx) + (fy * fy);
+												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+													fDistance = sqrtf(fDistance);
+													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
+													f2d resolver = {};
+													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
+													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
+													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
+													float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
+													float fNomalizedMassB = (mass.fKilos / fTotalmass);
+													squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+													x.fPX -= (resolver.fX * fNomalizedMassA);
+													squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+													y.fPY -= (resolver.fY * fNomalizedMassA);
+													squad.iStruck.at(i)++;
+													alive.bIsAlive = false;
+													//std::cout << "Hit!" << std::endl;
+												}
 											}
 										}
 									}
@@ -391,9 +412,10 @@ namespace collision {
 	void spell_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Spell>();
+			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
+				auto& a = spells.get<Alive>(spell);
 				auto& x = spells.get<Position_X>(spell);
 				auto& y = spells.get<Position_Y>(spell);
 				auto& mass = spells.get<Mass>(spell);
@@ -427,7 +449,7 @@ namespace collision {
 									x.fPX -= (resolver.fX * fNomalizedMassA);
 									map_y.fPY += (resolver.fY * fNomalizedMassB);
 									y.fPY -= (resolver.fY * fNomalizedMassA);
-
+									a.bIsAlive = false; //destroy spell on contact
 								}
 						//	}
 						}
@@ -439,14 +461,14 @@ namespace collision {
 		stat = 0;
 	}
 
-	void unit_grid_collision(Map::Node3& map) {
+	void unit_grid_collision(Map::Node3& map) { //waaaaay too slow		
+
 		auto company_view = scene.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (Utilities::bRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
 				for (int a = 0; a < 16; a++) {
 					for (int i = 0; i < company.iSub_Units.size(); i++) {
-						auto& company = company_view.get<Company>(companies);
 						if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < 16; j++) {
 								for (int b = 0; b < company.iSub_Units.size(); b++) {
@@ -458,30 +480,33 @@ namespace collision {
 													auto& squad = scene.get<Squad>(platoon.iSub_Units[c]);
 													for (int l = 0; l < 16; l++) {
 														for (int d = 0; d < squad.iSub_Units.size(); d++) {
-															if (Utilities::bRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-																for (int l = 0; l < 16; l++) {
-																	for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
-																		auto& radius = scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																		auto& mass = scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																		auto& x = scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																		auto& y = scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																		for (int e = 0; e < squad.iSub_Units.size(); e++) {
-																			float fx = squad.fPX.at(e) - x.fPX;
-																			float fy = squad.fPY.at(e) - y.fPY;
-																			float fDistance = (fx * fx) + (fy * fy);
-																			if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-																				fDistance = sqrtf(fDistance);
-																				float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
-																				f2d resolver = {};
-																				resolver.fX = fOverlap * (x.fPX - squad.fPX.at(e)) / fDistance;
-																				resolver.fY = fOverlap * (y.fPY - squad.fPY.at(e)) / fDistance;
-																				float fTotalmass = squad.fMass.at(e) + mass.fKilos;
-																				float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
-																				float fNomalizedMassB = (mass.fKilos / fTotalmass);
-																				squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
-																				x.fPX -= (resolver.fX * fNomalizedMassA);
-																				squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
-																				y.fPY -= (resolver.fY * fNomalizedMassA);
+															if (squad.bAlive.at(d) != false) {
+																if (Utilities::bRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+																	for (int l = 0; l < 16; l++) {
+																		for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
+																			auto& radius = scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																			auto& mass = scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																			auto& x = scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																			auto& y = scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																			for (int e = 0; e < squad.iSub_Units.size(); e++) {
+																				float fx = squad.fPX.at(e) - x.fPX;
+																				float fy = squad.fPY.at(e) - y.fPY;
+																				float fDistance = (fx * fx) + (fy * fy);
+																				if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+																					fDistance = sqrtf(fDistance);
+																					float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
+																					f2d resolver = {};
+																					resolver.fX = fOverlap * (x.fPX - squad.fPX.at(e)) / fDistance;
+																					resolver.fY = fOverlap * (y.fPY - squad.fPY.at(e)) / fDistance;
+																					float fTotalmass = squad.fMass.at(e) + mass.fKilos;
+																					float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
+																					float fNomalizedMassB = (mass.fKilos / fTotalmass);
+																					squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
+																					x.fPX -= (resolver.fX * fNomalizedMassA);
+																					squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
+																					y.fPY -= (resolver.fY * fNomalizedMassA);
+																					iunitGridCollisionCheck++;
+																				}
 																			}
 																		}																	
 																	}
@@ -525,22 +550,24 @@ namespace collision {
 									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											float fx = squad.fPX.at(i) - x.fPX;
-											float fy = squad.fPY.at(i) - y.fPY;
-											float fDistance = (fx * fx) + (fy * fy);
-											if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-												fDistance = sqrtf(fDistance);
-												float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-												f2d resolver = {};
-												resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
-												resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
-												float fTotalmass = squad.fMass.at(i) + mass.fKilos;
-												float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
-												float fNomalizedMassB = (mass.fKilos / fTotalmass);
-												squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-												x.fPX -= (resolver.fX * fNomalizedMassA);
-												squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-												y.fPY -= (resolver.fY * fNomalizedMassA);
+											if (squad.bAlive.at(i) != false) {
+												float fx = squad.fPX.at(i) - x.fPX;
+												float fy = squad.fPY.at(i) - y.fPY;
+												float fDistance = (fx * fx) + (fy * fy);
+												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+													fDistance = sqrtf(fDistance);
+													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
+													f2d resolver = {};
+													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
+													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
+													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
+													float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
+													float fNomalizedMassB = (mass.fKilos / fTotalmass);
+													squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
+													x.fPX -= (resolver.fX * fNomalizedMassA);
+													squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
+													y.fPY -= (resolver.fY * fNomalizedMassA);
+												}
 											}
 										}
 									}
@@ -561,6 +588,9 @@ namespace collision {
 			std::cout << "Squad:        " << scene.size<Squad>()   << "   checks:   " << iSquad_Check << std::endl;
 			std::cout << "Soldiers:     " << iNumber << std::endl;
 			std::cout << "Resolves:     " << iActual_Resolves << std::endl;
+			std::cout << "----------   " << iActual_Resolves << std::endl;
+			std::cout << "iunitGridCollisionCheck:     " << iunitGridCollisionCheck << std::endl;
+			std::cout << "----------   " << iActual_Resolves << std::endl;
 		}
 	}
 
@@ -587,7 +617,7 @@ namespace collision {
 
 		player_grid_collision(Map::map);
 		spell_grid_collision(Map::map);
-		unit_grid_collision(Map::map);
+		//unit_grid_collision(Map::map); //waaaaay too slow
 
 		player_unit_Collision();
 		Unit_unit_Collision(); 
@@ -597,7 +627,7 @@ namespace collision {
 
 		Update_Collided_Unit();
 		resolveCollisons();
-
+	
 		//CollisionsT();
 	}
 }

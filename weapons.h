@@ -29,7 +29,7 @@ namespace Weapons {
 		//Scenes::scene.emplace<Components::Weapon_Type>(weapon, sword);
 		Scenes::scene.emplace<Components::Damage>(weapon, 1, 4);
 		Scenes::scene.emplace<Components::Melee>(weapon);
-		Scenes::scene.emplace<Components::Attack_Box_Duration>(weapon, 100, 0);
+		Scenes::scene.emplace<Components::Attack_Box_Duration>(weapon, 0, 0);
 		Scenes::scene.emplace<Components::Radius>(weapon, 20.0f);
 		Scenes::scene.emplace<Components::Mass>(weapon, 500.0f);
 		Scenes::scene.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
@@ -67,7 +67,7 @@ namespace Weapons {
 	}
 
 	void Update_Attacks() {
-		Attack();
 		Attack_Box_Linger();
+		Attack();
 	}
 }
