@@ -17,14 +17,6 @@ namespace Spells {
 		}
 	}
 
-	void Spell_Move_Linear() { //sends spell in a straight line for a given distance
-
-	}
-
-
-
-
-
 	void create_spell(entt::entity& spell, f2d& pos, Compass& direction) {
 		Entity_Loader::Data data = Entity_Loader::parse_data("'fireball'");
 
@@ -87,15 +79,24 @@ namespace Spells {
 		cast_fireball();
 	}
 
-	void clear_nonMoving_spells() {
+	void Clear_NonMoving_Spells() {
 		auto view = scene.view<Spell>(entt::exclude<Mouse_Move>);
-		for (auto entity : view) 	
-			scene.destroy(entity);		
+		for (auto entity : view)	
+			scene.destroy(entity);
+	}
+
+	void Clear_Collided_Spells() {
+		auto view = scene.view<Spell, Alive>();
+		for (auto entity : view)
+			if (view.get<Alive>(entity).bIsAlive == false) {
+				scene.destroy(entity);
+			}
 	}
 	
 
 	void Update_Spells() {
-		clear_nonMoving_spells();
+		Clear_NonMoving_Spells();
+		Clear_Collided_Spells();
 		add_spells_to_scene();
 	}
 }

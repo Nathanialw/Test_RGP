@@ -61,14 +61,6 @@ namespace Event_Handler {
 				case SDLK_v:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
 				case SDLK_x:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
-
-					//push to front of the array when key down, read from front, remove when kep released
-				//case SDLK_3: act.action = slash; break;
-				//case SDLK_4: act.action = stab; break;
-				//case SDLK_5: act.action = block; break;
-				//case SDLK_6: act.action = dead; break;
-				//case SDLK_7: act.action = xbow; break;
-
 				case SDLK_1: scene.emplace_or_replace<Casting>(entity, fireball); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);  break;
 				case SDLK_3: Timer::Pause_Control();  break;
@@ -93,12 +85,6 @@ namespace Event_Handler {
 				case SDLK_r: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
 				case SDLK_v: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
 				case SDLK_x: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
-
-//				case SDLK_3: act.action = idle; break;
-//				case SDLK_4: act.action = idle; break;
-//				case SDLK_5: act.action = idle; break;
-//				case SDLK_6: act.action = idle; break;
-//				case SDLK_7: act.action = idle; break;
 				}
 			}
 		}

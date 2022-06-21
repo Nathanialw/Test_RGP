@@ -5,8 +5,6 @@
 
 namespace Weapons {
 
-
-
 	//take input of unit Radius and Weapon_Size to fill this out for any wielder and any weapon
 	SDL_FRect Attack_Direction(f2d& pos, Components::Compass& direction) {
 		switch (direction) {
@@ -20,7 +18,6 @@ namespace Weapons {
 		case SE :return { pos.fX + 15, pos.fY + 15, 30, 30 };
 		}
 	}
-
 
 	void create_attack(f2d& pos, Components::Compass& direction) {
 		SDL_FRect attackPos = Attack_Direction(pos, direction);
@@ -38,7 +35,6 @@ namespace Weapons {
 		Scenes::scene.emplace<Components::Alive>(weapon, true);
 	}
 
-
 	void Attack() {
 		auto view = scene.view<Direction, Position_X, Position_Y, Attacking>();
 		for (auto entity : view) {
@@ -53,7 +49,7 @@ namespace Weapons {
 		//create SDL_FRect in front of unit, size from a size component on weapon
 	}
 
-	void Attack_Box_Linger() {
+	void Attack_Box_Manager() {
 		auto view = scene.view<Attack_Box_Duration, Alive>();
 		for (auto entity : view) {
 			auto& time = view.get<Attack_Box_Duration>(entity).lifeTime;
@@ -61,13 +57,13 @@ namespace Weapons {
 			auto& alive = view.get<Alive>(entity).bIsAlive;
 			count += Timer::timeStep;
 			if (count >= time) {
-				alive = false;
+				Scenes::scene.destroy(entity);
 			}
 		}
 	}
 
 	void Update_Attacks() {
-		Attack_Box_Linger();
+		Attack_Box_Manager();
 		Attack();
 	}
 }

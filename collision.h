@@ -167,7 +167,7 @@ namespace collision {
 											if (Utilities::bRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
 												for (int i = 0; i < squad1.iSub_Units.size(); i++) {
 													for (int j = 0; j < squad2.iSub_Units.size(); j++) {
-														if (squad1.bAlive.at(i) || squad2.bAlive.at(j) != false) {
+														if (squad1.bAlive.at(i) == true && squad2.bAlive.at(j) == true) {
 															if (squad1.iSub_Units[i] != squad2.iSub_Units[j]) {
 																float fx = squad1.fPX.at(i) - squad2.fPX.at(j);
 																float fy = squad1.fPY.at(i) - squad2.fPY.at(j);

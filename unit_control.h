@@ -15,7 +15,6 @@ namespace User_Mouse_Input {
 		platoons,
 		companies,
 		battalions
-
 	};
 
 	Unit_Selection eUnit_Selection;
@@ -109,7 +108,7 @@ namespace User_Mouse_Input {
 
 	bool Select_Soldier() {
 		bool bSelected = false;
-		auto soldier_view = scene.view<Position_X, Position_Y, Radius, Soldier>();				
+		auto soldier_view = scene.view<Position_X, Position_Y, Radius, Soldier, Commandable>();				
 		for (auto soldiers : soldier_view) {
 			auto& x = soldier_view.get<Position_X>(soldiers);
 			auto& y = soldier_view.get<Position_Y>(soldiers);
@@ -153,7 +152,7 @@ namespace User_Mouse_Input {
 	}
 
 	void Order_Move() {
-		auto view = scene.view<Selected, Soldier>();
+		auto view = scene.view<Selected, Commandable, Soldier>();
 		for (auto entity : view) {
 			auto& mov = scene.emplace_or_replace<Mouse_Move>(entity);
 			scene.emplace_or_replace<Moving>(entity);
@@ -166,7 +165,7 @@ namespace User_Mouse_Input {
 	void Command_Unit() {
 		if (!scene.empty<Selected>()) {
 			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
-				auto view = scene.view<Selected, Soldier>();
+				auto view = scene.view<Selected, Soldier, Commandable>();
 				int x = 0;
 				int y = Mouse::Mouse_Selection_Box_y;
 				int i = 0;
@@ -268,14 +267,6 @@ namespace User_Mouse_Input {
 			Mouse::Mouse_Selection_Box_y = Mouse::iYWorld_Mouse;
 			Mouse::Mouse_Selection_Box_x_Display = Mouse::iXMouse;
 			Mouse::Mouse_Selection_Box_y_Display = Mouse::iYMouse;
-		}
-		else {
-			//scene.clear<Selected>();
-			//Mouse::bPressed = true;
-			//Mouse::Mouse_Selection_Box_x = Mouse::iXWorld_Mouse;
-			//Mouse::Mouse_Selection_Box_y = Mouse::iYWorld_Mouse;
-			//Mouse::Mouse_Selection_Box_x_Display = Mouse::iXMouse;
-			//Mouse::Mouse_Selection_Box_y_Display = Mouse::iYMouse;
 		}
 	}
 

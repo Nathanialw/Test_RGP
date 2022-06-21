@@ -19,17 +19,17 @@ namespace Death_Spells {
 		scene.emplace<animation>(skeleton0, skeleton_1); /// need to load the texture nly once and pass the pointer intothis function
 		scene.get<animation>(skeleton0).sheet = { //populate the vector
 			{ NULL },
-			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
-			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f},//walk
-			{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 75.0f},//atack
-			{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 75.0f},
-			{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 75.0f},
-			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 75.0f}, //reverse to summon
-			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f},
+			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 75.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
+			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 75.0f},//walk
+			{ {1536, 0, 128, 128}, 1536, 512,  1, 0, {60, 95}, 75.0f, 75.0f},//atack
+			{ {2048, 0, 128, 128}, 2048, 512,  1, 0, {60, 95}, 75.0f, 75.0f},
+			{ {2560, 0, 128, 128}, 2560, 256,  1, 0, {60, 95}, 75.0f, 75.0f},
+			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 75.0f, 75.0f}, //reverse to summon
+			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 75.0f},
 		};
 
 		scene.emplace<Actions>(skeleton0, idle);
-		scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 0, 0}, {0, 0}, {4, 0}, {8,0}, {4,0}, {4,0}, {8,0} };
+		scene.get<Actions>(skeleton0).frameCount = { {0, 0}, { 4, 0}, {8, 0}, {4, 0}, {4,0}, {2,0}, {6,0}, {4,0} };
 
 		scene.emplace<Position_X>(skeleton0, 0.0f, x, 0.0f);
 		scene.emplace<Position_Y>(skeleton0, 0.0f, y, 0.0f);
@@ -44,6 +44,7 @@ namespace Death_Spells {
 		scene.emplace<Health>(skeleton0, 5);
 				
 		scene.emplace<Soldier>(skeleton0);
+		scene.emplace<Commandable>(skeleton0);
 	}
 
 }

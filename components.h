@@ -86,14 +86,15 @@ namespace Components {
 		walk,
 		slash,
 		stab,
-		block,
+		struck,
 		dead,
-		xbow
+		ranged,
+		cheer
 	};
 
 	struct Frame_Data {
-		int currentFrame;
 		int NumFrames;
+		int currentFrame;
 	}; 
 
 	struct Actions {
@@ -124,6 +125,7 @@ namespace Components {
 		bool bReversing;
 		i2d posOffset;
 		float timeBetweenFrames;
+		float currentFrameTime;
 	};
 	 
 	struct animation { 
