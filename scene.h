@@ -113,7 +113,7 @@ namespace Scene {
 		}		
 		
 		//Skeletons
-		Spawn_Skeletons(8, 4);
+		Spawn_Skeletons(96, 48);
 			
 		//archers
 		Units::Create_Archer(0, 0);
