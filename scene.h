@@ -51,10 +51,9 @@ namespace Scene {
 	}
 
 	void Spawn_Skeletons(int x, int y) {
-		Entity_Loader::Data data = Entity_Loader::parse_data("'skeleton'");
 		for (auto j = 0; j < x; ++j) {
 			for (auto i = 0; i < y; ++i) {
-				Death_Spells::Summon_Skeleton((100.0f + (i * 60.0f)), (100.0f + (j * 60.0f)));
+				Death_Spells::Summon_Skeleton((200.0f + (i * 60.0f)), (200.0f + (j * 60.0f)), "'skeleton'");
 			}
 		}
 	}
@@ -62,34 +61,33 @@ namespace Scene {
 	void Load_Entities() {		
 		//player
 		auto skeleton = scene.create();			//creates a unique handle for an entity
-		scene.emplace<animation>(skeleton, archer_0); /// need to load the texture /only /once and pass the pointer into this function
+		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
 		scene.get<animation>(skeleton).sheet = { //populate the vector
 			{ NULL },
-			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 75.0f },//idle
-			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 75.0f },//walk
-			{ {1536, 0, 128, 128}, 1536, 512,  0, 0, {60, 95}, 150.0f, 150.0f },//attack
-			{ NULL }, //		unused
-			{ {2048, 0, 128, 128}, 2048, 256,  0, 0, {60, 95}, 75.0f, 75.0f },//struck
-			{ {2304, 0, 128, 128}, 2560, 768,  0, 0, {60, 95}, 75.0f, 75.0f }, //dead
-			{ {3072, 0, 128, 128}, 2816, 512,  0, 0, {60, 95}, 75.0f, 75.0f }, //cheer
-			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 75.0f },//range
+			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 0.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
+			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 0.0f},//walk
+			{ {1536, 0, 128, 128}, 1536, 512,  0, 0, {60, 95}, 75.0f, 0.0f},//atack
+			{ {2048, 0, 128, 128}, 2048, 512,  0, 0, {60, 95}, 75.0f, 0.0f},
+			{ {2560, 0, 128, 128}, 2560, 256,  0, 0, {60, 95}, 75.0f, 0.0f},
+			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 75.0f, 0.0f}, //reverse to summon
+			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 0.0f},
 		};
 		scene.emplace<Actions>(skeleton, idle);
 		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 3, 0}, {7, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f, 0.0f);
-		scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f, 0.0f);
+		scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f);
+		scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f);
 				
 		scene.emplace<Radius>(skeleton, 15.0f );
 
 		scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
-		scene.emplace<Input>(skeleton);
 		scene.emplace<Direction>(skeleton, SE);
 		scene.emplace<Alive>(skeleton, true);
 		scene.emplace<handle>(skeleton, "Skeleton");
 		scene.emplace<Mass>(skeleton, 200.0f);
 
+		scene.emplace<Input>(skeleton);
 		scene.emplace<Camera>(skeleton, 0.0f, 0.0f, resolution.w, resolution.h, 1.0f, 1.0f );
 		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
@@ -105,29 +103,29 @@ namespace Scene {
 				scene.get<Actions>(grass).frameCount = { { 0, 0} };
 
 				scene.emplace<Radius>(grass, 50.0f);
-				scene.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f, i * 100.0f);
-				scene.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f, j * 100.0f);
+				scene.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f);
+				scene.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f);
 			
 				scene.emplace<Terrain>(grass);
 			}
 		}		
 		
 		//Skeletons
-		Spawn_Skeletons(96, 48);
+		Spawn_Skeletons(16, 4);
 			
 		//archers
 		Units::Create_Archer(0, 0);
 		
 		//trees
-		for (auto j = 0; j < 5; ++j) {
-			for (auto i = 0; i < 5; ++i) {
+		for (auto j = 0; j < 10; ++j) {
+			for (auto i = 0; i < 10; ++i) {
 				auto tree = scene.create();
 				scene.emplace<animation>(tree, tree_0); /// need to load hetexture	 only once and pass the pointer into this function
 				scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f), 100.0f + (i * 952.0f));
-				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f), 100.0f + (j * 1165.0f));
+				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f));
+				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f));
 				scene.emplace<Actions>(tree, isStatic);
 				scene.get<Actions>(tree).frameCount = { { 0, 0} };
 				scene.emplace<Direction>(tree, W);
@@ -139,7 +137,6 @@ namespace Scene {
 
 			}
 		}
-
 
 		//set positions
 		auto view = scene.view<Position_X, Position_Y>();
@@ -157,7 +154,6 @@ namespace Scene {
 			xx.fX = xx.fPX;
 			yy.fY = yy.fPY;
 		}
-
 	}	
 
 	void Update_Army() {
@@ -194,7 +190,6 @@ namespace Scene {
 		//std::cout << "add_unit_to_grid = Good" << std::endl;
 		add_terrain_to_grid(Map::terrain);		
 		//std::cout << "add_terrain_to_grid = Good" << std::endl;
-
 	}
 
 	void Init_Game() {

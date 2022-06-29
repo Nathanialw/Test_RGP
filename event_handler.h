@@ -61,19 +61,19 @@ namespace Event_Handler {
 				case SDLK_v:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
 				case SDLK_x:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
-				case SDLK_1: scene.emplace_or_replace<Casting>(entity, fireball); break;
-				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);  break;
+				case SDLK_1: scene.emplace_or_replace<Cast>(entity); break;
+				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'");  break;
 				case SDLK_3: Timer::Pause_Control();  break;
 				case SDLK_4: scene.emplace_or_replace<Attack>(entity); break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode();  break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
-				case SDLK_8: User_Mouse_Input::Selection_Platoons(); break;
+				case SDLK_8: Rendering::RenderCullMode(); break;
 				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
 				case SDLK_ESCAPE: closeContext();  break;
-				case SDLK_PLUS: Interface::gridDepth++; break;
-				case SDLK_MINUS: Interface::gridDepth--; break;
+				case SDLK_PLUS: break;
+				case SDLK_MINUS: break;
 				}
 			}
 			if (event.type == SDL_KEYUP) {
@@ -129,8 +129,6 @@ namespace Event_Handler {
 						vel.magnitude.fY = 0;
 					}
 					Keyboard_Input(vel, act, entity);
-
-
 				}
 				if (event.key.type == SDL_MOUSEWHEEL) {
 					Interface::Update_Zoom(event);

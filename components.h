@@ -36,31 +36,30 @@ namespace Components {
 
 	struct Alive {
 		bool bIsAlive;
+		
 	};
+
+
 
 	//Position		
 	struct Position_X {
 		float fX;
 		float fPX;
-		float fSX;
 	};	
 	
 	struct Position_Y {
 		float fY;
 		float fPY;
-		float fSY;
 	};
 
 	struct Terrain_Position_X {
 		float fX;
 		float fPX;
-		float fSX;
 	};
 
 	struct Terrain_Position_Y {
 		float fY;
 		float fPY;
-		float fSY;
 	};
 	////////////
 
@@ -89,7 +88,8 @@ namespace Components {
 		struck,
 		dead,
 		ranged,
-		cheer
+		cheer,
+		summon
 	};
 
 	struct Frame_Data {
@@ -193,8 +193,11 @@ namespace Components {
 		float fY_Destination;
 	};
 
-	enum Casting {
-		fireball
+	struct Casting {
+	};
+
+	enum Cast {
+
 	};
 
 	struct Spell {
@@ -253,3 +256,5 @@ namespace Component_Camera { //unused yet
 	};
 
 }
+
+

@@ -29,7 +29,7 @@ namespace Utilities {
 	};	
 	
 
-	SDL_Rect SDL_Rect_To_SDL_FRect(SDL_FRect a) {
+	SDL_Rect SDL_FRect_To_SDL_Rect(SDL_FRect a) {
 		SDL_Rect b;
 		b.x = (int)a.x;
 		b.y = (int)a.y;
@@ -38,5 +38,13 @@ namespace Utilities {
 		return b;
 	}
 
+	SDL_FRect SDL_Rect_To_SDL_FRect(SDL_Rect a) {
+		SDL_FRect b;
+		b.x = (float)a.x;
+		b.y = (float)a.y;
+		b.w = (float)a.w;
+		b.h = (float)a.h;
+		return b;
+	}
 
 }

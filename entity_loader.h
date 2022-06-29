@@ -4,21 +4,23 @@
 #include "sqlite3.h"
 
 namespace Entity_Loader {
-	
-	sqlite3* db;
-	
+	namespace {
+		sqlite3* db;
 
-	struct Data {
-		float radius = 0;
-		float speed = 0;
-		float mass = 0;
 
-	};
+		struct Data {
+			float radius = 0;
+			float speed = 0;
+			float mass = 0;
+
+		};
+
+	}
 
 	void init_db() {
 		sqlite3_open("data.db", &db);
 	}
-
+	
 	Data parse_data(const char *name) {// needs to search for  a specific row that I can input in the arguments
 		//check if the name exists??
 		Data values;

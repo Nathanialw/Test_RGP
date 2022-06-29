@@ -7,10 +7,11 @@
 
 
 namespace Movement {
-	int Player_Move_Poll;
-	int Update_Position_Poll;
-	int number_of_units = 0;
-
+	namespace {
+		int Player_Move_Poll;
+		int Update_Position_Poll;
+		int number_of_units = 0;
+	}
 
 	void Move_Order(entt::entity& entity, float& x, float& y) {
 		scene.emplace_or_replace<Mouse_Move>(entity);
@@ -84,7 +85,6 @@ namespace Movement {
 		}
 	}
 
-
 	void Mouse_Move_To() { //calculates unit direction after you give them a "Mouse_Move" component with destination coordinates
 		Player_Move_Poll += Timer::timeStep;
 		if (Player_Move_Poll >= 200) {
@@ -102,8 +102,7 @@ namespace Movement {
 			}
 		}
 	}
-	
-	
+		
 	void Mouse_Move_Arrived() {
 		auto view = scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
 		for (auto entity : view) {
@@ -121,7 +120,6 @@ namespace Movement {
 			}
 		}
 	}
-
 
 	void Movement_Handler() {
 		Mouse_Order_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location

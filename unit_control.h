@@ -241,6 +241,51 @@ namespace User_Mouse_Input {
 		}
 	}
 
+	void Command_Platoon() {
+		if (!scene.empty<Selected>()) {
+			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
+				auto view = scene.view<Selected, Platoon>();
+				int x = 0;
+				int y = Mouse::Mouse_Selection_Box_y;
+				int i = 0;
+				int spacing = 0;
+				int z = abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse) / (50));// z is the # of units that can fit along x
+				for (auto entity : view) {
+					auto& squad = view.get<Platoon>(entity);
+					for (int j = 0; j < squad.iSub_Units.size(); j++) {
+						x = Mouse::Mouse_Selection_Box_x + spacing;
+						if (i == z) {
+							spacing = 0;
+							x = Mouse::Mouse_Selection_Box_x + spacing;
+							y = y + 50;
+							i = 0;
+						}
+						i++;
+						spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
+
+						scene.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						auto& mov = scene.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j]);
+						mov.fX_Destination = x;
+						mov.fY_Destination = y;
+					}
+				}
+			}
+			else { //moves all the units onto a single point, I want to have the spread out in some kind of formation
+				auto squads_view = scene.view<Selected, Platoon>();
+				for (auto squads : squads_view) {
+					auto& squad = scene.get<Platoon>(squads);
+					for (int j = 0; j < squad.iSub_Units.size(); j++) {
+						scene.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						auto& mov = scene.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j]);
+						mov.fX_Destination = Mouse::iXWorld_Mouse;
+						mov.fY_Destination = Mouse::iYWorld_Mouse;
+					}
+				}
+			}
+			Mouse::bRight_Mouse_Pressed = false;
+		}
+	}
+
 	void Selection_Box() {
 		if (scene.empty<Selected>()) {
 			Mouse::bLeft_Mouse_Pressed = true;

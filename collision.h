@@ -520,17 +520,18 @@ namespace collision {
 	void unit_grid_collision(Map::Node3& map) { //waaaaay too slow		
 
 		auto company_view = scene.view<Company>();
+		
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (Utilities::bRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
-				for (int i = 0; i < Map::size; i++) {
-					for (int j = 0; j < Map::size; j++) {
-						for (int b = 0; b < company.iSub_Units.size(); b++) {
+				for (int b = 0; b < company.iSub_Units.size(); b++) {
+					for (int i = 0; i < Map::size; i++) {
+						for (int j = 0; j < Map::size; j++) {
 
 							if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
 								auto& platoon = scene.get<Platoon>(company.iSub_Units[b]);
-								for (int k = 0; k < Map::size; k++) {
-									for (int c = 0; c < platoon.iSub_Units.size(); c++) {
+								for (int c = 0; c < platoon.iSub_Units.size(); c++) {
+									for (int k = 0; k < Map::size; k++) {
 
 										if (Utilities::bRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 											auto& squad = scene.get<Squad>(platoon.iSub_Units[c]);

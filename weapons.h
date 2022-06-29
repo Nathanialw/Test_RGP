@@ -30,8 +30,8 @@ namespace Weapons {
 		Scenes::scene.emplace<Components::Radius>(weapon, 20.0f);
 		Scenes::scene.emplace<Components::Mass>(weapon, 500.0f);
 		Scenes::scene.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
-		Scenes::scene.emplace<Components::Position_X>(weapon, pos.fX, pos.fX, 0.0f);
-		Scenes::scene.emplace<Components::Position_Y>(weapon, pos.fY, pos.fY, 0.0f);
+		Scenes::scene.emplace<Components::Position_X>(weapon, pos.fX, pos.fX);
+		Scenes::scene.emplace<Components::Position_Y>(weapon, pos.fY, pos.fY);
 		Scenes::scene.emplace<Components::Alive>(weapon, true);
 	}
 
@@ -53,12 +53,11 @@ namespace Weapons {
 		//create SDL_FRect in front of unit, size from a size component on weapon
 	}
 
-	void Attack_Box_Manager() {
-		auto view = scene.view<Attack_Box_Duration, Alive>();
+	void Attack_Box_Destroy() {
+		auto view = scene.view<Attack_Box_Duration>();
 		for (auto entity : view) {
 			auto& time = view.get<Attack_Box_Duration>(entity).lifeTime;
 			auto& count = view.get<Attack_Box_Duration>(entity).count;
-			auto& alive = view.get<Alive>(entity).bIsAlive;
 			count += Timer::timeStep;
 			if (count >= time) {
 				Scenes::scene.destroy(entity);
@@ -76,11 +75,10 @@ namespace Weapons {
 				scene.remove<Attacking>(entity);
 			}
 		}
-
 	}
 
 	void Update_Attacks() {
-		Attack_Box_Manager();
+		Attack_Box_Destroy();
 		Attacking_Updater();
 		Attack_cast();
 	}

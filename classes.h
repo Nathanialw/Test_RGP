@@ -593,3 +593,81 @@ namespace Military {
 
 	};
 }
+
+namespace Test {
+
+	struct Unit {
+		int size;
+		std::string name;
+		SDL_FRect sCollide_Box;
+
+		std::vector<entt::entity>iSub_Units;
+		std::vector<float>fPX;
+		std::vector<float>fPY;
+
+		Unit() {
+			name = "Default";
+			size = 3;
+			sCollide_Box = { 0,0,0,0 };
+			iSub_Units.reserve(size);
+			fPX.reserve(size);
+			fPY.reserve(size);
+		}
+	};
+//
+//	class Unit {
+//	public:
+//		int size;
+//		std::string name;
+//		SDL_FRect sCollide_Box;
+//
+//		std::vector<entt::entity>soldiers;
+//		std::vector<float>fPX;
+//		std::vector<float>fPY;
+//		std::vector<float>fMass;
+//		std::vector<float>fRadius;	
+//		std::vector<f2d>vPosition; //
+//
+//		Unit() {
+//			name = "Default";
+//			size = 8;
+//			sCollide_Box = { 0,0,0,0 };
+//			soldiers.reserve(size);
+//			fPX.reserve(size);
+//			fPY.reserve(size);
+//			fMass.reserve(size);
+//			fRadius.reserve(size);
+//			vPosition.reserve(size);
+//		}
+//	};
+//
+//	class Command_Unit : unit {
+//
+//
+////
+////	};
+//
+//	class Platoon : unit {
+//		int size;
+//		std::string name;
+//		SDL_FRect sCollide_Box;
+//
+//		std::vector<Squad>squads;
+//		std::vector<float>fPX;
+//		std::vector<float>fPY;
+//		std::vector<float>fPW;
+//		std::vector<float>fPH;
+//
+//
+//		Platoon() {
+//			name = "Default";
+//			size = 6;
+//			sCollide_Box = { 0,0,0,0 };
+//			squads.reserve(size);
+//			fPX.reserve(size);
+//			fPY.reserve(size);
+//			fPW.reserve(size);
+//			fPH.reserve(size);
+//		}
+//	
+	};
