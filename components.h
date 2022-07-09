@@ -6,8 +6,6 @@
 #include "classes.h"
 
 
-using namespace Mil_Struc;
-
 namespace Components {
 
 
@@ -70,13 +68,13 @@ namespace Components {
 
 	struct Velocity {
 		float dX, dY;
-		f2d magnitude;
+		DataTypes::f2d magnitude;
 		float speed;
 		float angle1, angle2;
 	};
 
 	struct Building_Collider {
-		std::vector<i2d>walls;
+		std::vector<DataTypes::i2d>walls;
 	};
 	
 	enum Action_States {
@@ -123,7 +121,7 @@ namespace Components {
 		int sheetWidth;
 		bool bReversable;
 		bool bReversing;
-		i2d posOffset;
+		DataTypes::i2d posOffset;
 		float timeBetweenFrames;
 		float currentFrameTime;
 	};
@@ -149,7 +147,7 @@ namespace Components {
 		
 	struct Camera {
 		SDL_FRect screen;
-		f2d scale;
+		DataTypes::f2d scale;
 	};
 
 	struct Mass {
@@ -193,15 +191,35 @@ namespace Components {
 		float fY_Destination;
 	};
 
+	struct Linear_Move {
+		float fX_Direction;
+		float fY_Direction;
+	};
+
+	struct Spell_Range {
+		float fSourceX;
+		float fSourceY;
+		float fRange;
+	};
+
 	struct Casting {
 	};
 
-	enum Cast {
-
+	struct Cast {
+		float targetX;
+		float targetY;
 	};
 
 	struct Spell {
 
+	};
+
+	struct Spellbook {
+
+	};
+
+	struct Spell_Name {
+		const char* spell;
 	};
 
 	struct Casted {
@@ -238,6 +256,24 @@ namespace Components {
 		int64_t count;
 	};
 
+	//AI
+
+	struct Sight_Range {
+		SDL_FRect sightBox;
+	};
+
+	struct Bag {
+		std::vector<entt::entity> bag;
+	};
+
+	enum Item_Type {
+		weapon,
+		armour,
+		potion
+	};
+	
+
+	
 }
 
 

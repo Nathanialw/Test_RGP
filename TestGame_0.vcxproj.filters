@@ -119,6 +119,9 @@
     <ClInclude Include="recruitable_units.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="items.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

@@ -14,17 +14,14 @@ namespace Movement {
 	}
 
 	void Move_Order(entt::entity& entity, float& x, float& y) {
-		scene.emplace_or_replace<Mouse_Move>(entity);
-		scene.emplace_or_replace<Moving>(entity);
-		auto& mov = scene.get<Mouse_Move>(entity);
-		mov.fX_Destination = x;
-		mov.fY_Destination = y;
+		Scenes::scene.emplace_or_replace<Mouse_Move>(entity, x, y);
+		Scenes::scene.emplace_or_replace<Moving>(entity);
 	}
 
 	void Mouse_Order_Move() {
-		if (scene.empty<Selected>()) {
+		if (Scenes::scene.empty<Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
-				auto view = scene.view<Input>();
+				auto view = Scenes::scene.view<Input>();
 				for (auto entity : view) {
 					Move_Order(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 				}
@@ -89,7 +86,7 @@ namespace Movement {
 		Player_Move_Poll += Timer::timeStep;
 		if (Player_Move_Poll >= 200) {
 			Player_Move_Poll = 0;
-			auto view = scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions, Moving>();
+			auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions, Moving>();
 			for (auto entity : view) {	
 				auto& x = view.get<Position_X>(entity);
 				auto& y = view.get<Position_Y>(entity);
@@ -104,7 +101,7 @@ namespace Movement {
 	}
 		
 	void Mouse_Move_Arrived() {
-		auto view = scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
+		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			auto& v = view.get<Velocity>(entity);
@@ -115,14 +112,45 @@ namespace Movement {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;
-				scene.remove<Mouse_Move>(entity);
-				scene.remove<Moving>(entity);
+				Scenes::scene.remove<Mouse_Move>(entity);
+				Scenes::scene.remove<Moving>(entity);
 			}
+		}
+	}
+
+
+	int linearMovePoll = 0;
+
+	void Linear_Move_To() {
+		linearMovePoll += Timer::timeStep;
+		if (linearMovePoll >= 50) {
+			auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
+			for (auto entity : view) {
+				auto& x = view.get<Position_X>(entity);
+				auto& y = view.get<Position_Y>(entity);
+				auto& act = view.get<Actions>(entity);
+				auto& v = view.get<Velocity>(entity);
+				auto& mov = view.get<Linear_Move>(entity);
+				auto& range = view.get<Spell_Range>(entity);
+				
+				if (range.fRange <= 1500) {
+					act.action = walk;
+					v.magnitude.fX = v.speed * (mov.fX_Direction - range.fSourceX);
+					v.magnitude.fY = v.speed * (mov.fY_Direction - range.fSourceY);
+					range.fRange += linearMovePoll;
+					
+				}
+				else {
+					Scenes::scene.remove<Linear_Move>(entity);
+				}
+			}
+			linearMovePoll = 0;
 		}
 	}
 
 	void Movement_Handler() {
 		Mouse_Order_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location
+		Linear_Move_To();
 		Mouse_Move_To();
 		Mouse_Move_Arrived();
 		Update_Position();

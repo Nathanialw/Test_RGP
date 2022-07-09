@@ -9,34 +9,34 @@ namespace Interface {
 
 	namespace {
 		int iMousePollRate;
-		Surface_Data mouseX;
-		Surface_Data mouseY;
+		Graphics::Surface_Data mouseX;
+		Graphics::Surface_Data mouseY;
 		int gridDepth = -1;
 	}
 
 	void Update_Zoom(SDL_Event& e) {
-		auto view = scene.view<Camera>();
+		auto view = Scenes::scene.view<Camera>();
 		for (auto focus : view) {
 			auto& x = view.get<Camera>(focus);
 			if (e.wheel.y > 0) {
 				x.scale.fX *= 1.1f;
 				x.scale.fY *= 1.1f;
-				SDL_RenderSetScale(renderer, x.scale.fX, x.scale.fY);
+				SDL_RenderSetScale(Graphics::renderer, x.scale.fX, x.scale.fY);
 			}
 			if (e.wheel.y < 0) {
 				x.scale.fX *= 0.9f;
 				x.scale.fY *= 0.9f;
-				SDL_RenderSetScale(renderer, x.scale.fX, x.scale.fY);
+				SDL_RenderSetScale(Graphics::renderer, x.scale.fX, x.scale.fY);
 			}
 		}
 	}
 
 	void Display_Military_Groups() {
-		auto camera_view = scene.view<Camera>();
+		auto camera_view = Scenes::scene.view<Camera>();
 		for (auto cameras : camera_view) {
 			auto& cam = camera_view.get<Camera>(cameras);
 
-			auto squad_view = scene.view<Squad>();
+			auto squad_view = Scenes::scene.view<Squad>();
 			for (auto squads : squad_view) {
 				auto& x = squad_view.get<Squad>(squads);
 				SDL_FRect o = x.sCollide_Box;
@@ -46,7 +46,7 @@ namespace Interface {
 				//SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 
-			auto platoon_view = scene.view<Platoon>();
+			auto platoon_view = Scenes::scene.view<Platoon>();
 			for (auto platoons : platoon_view) {
 				auto& platoon = platoon_view.get<Platoon>(platoons);
 				SDL_FRect o = platoon.sCollide_Box;
@@ -56,7 +56,7 @@ namespace Interface {
 				//SDL_RenderDrawRectF(renderer, &o);
 			}		
 			
-			auto company_view = scene.view<Company>();
+			auto company_view = Scenes::scene.view<Company>();
 			for (auto companies : company_view) {
 				auto& company = company_view.get<Company>(companies);
 				SDL_FRect o = company.sCollide_Box;
@@ -87,7 +87,7 @@ namespace Interface {
 
 	void Display_Selection_Box() {
 		if (Mouse::bLeft_Mouse_Pressed) {
-			SDL_SetRenderDrawColor(renderer, 55, 255, 55, 255);
+			SDL_SetRenderDrawColor(Graphics::renderer, 55, 255, 55, 255);
 			SDL_Rect p = { Mouse::Mouse_Selection_Box_x_Display, Mouse::Mouse_Selection_Box_y_Display, Mouse::iXMouse - Mouse::Mouse_Selection_Box_x_Display, Mouse::iYMouse - Mouse::Mouse_Selection_Box_y_Display };
 			SDL_RenderDrawRect(Graphics::renderer, &p);
 		}
@@ -95,7 +95,7 @@ namespace Interface {
 
 
 	void Display_Mouse() {
-		auto view = scene.view<Camera>();
+		auto view = Scenes::scene.view<Camera>();
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
 			//auto& x = view.get<Position_X>(focus);
@@ -107,10 +107,10 @@ namespace Interface {
 				iMousePollRate = 0;
 				SDL_DestroyTexture(mouseX.pTexture);
 				SDL_DestroyTexture(mouseY.pTexture);
-				mouseX = Load_Text_Texture(std::to_string(Mouse::iXWorld_Mouse), { 133,255,133 });
-				mouseY = Load_Text_Texture(std::to_string(Mouse::iYWorld_Mouse), { 133,255,133 });
+				mouseX = Graphics::Load_Text_Texture(std::to_string(Mouse::iXWorld_Mouse), { 133,255,133 });
+				mouseY = Graphics::Load_Text_Texture(std::to_string(Mouse::iYWorld_Mouse), { 133,255,133 });
 			}
-			SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
+			SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
 			SDL_Rect d = { Mouse::iXMouse, Mouse::iYMouse, 50 / componentCamera.scale.fX, 50 / componentCamera.scale.fY };
 			SDL_RenderDrawRect(Graphics::renderer, &d);	
 			//v.y = v.y + 50;
@@ -120,7 +120,7 @@ namespace Interface {
 
 	
 	void Show_Grid(Map::Node3& terrain) {
-		SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
+		SDL_SetRenderDrawColor(Graphics::renderer, 255, 155, 255, 255);
 		
 		if (gridDepth > 3) {
 			gridDepth = 3;
@@ -129,7 +129,7 @@ namespace Interface {
 			gridDepth = -1;
 		}
 		else {
-			auto view = scene.view<Camera>();
+			auto view = Scenes::scene.view<Camera>();
 
 			for (auto id : view) {
 				auto& camera = view.get<Camera>(id);
@@ -144,7 +144,7 @@ namespace Interface {
 							SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.sCollide_Box);
 							o.x -= offset.x;
 							o.y -= offset.y;
-							SDL_RenderDrawRect(renderer, &o);
+							SDL_RenderDrawRect(Graphics::renderer, &o);
 						}
 						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < Map::size; j++) {
@@ -152,7 +152,7 @@ namespace Interface {
 									SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].sCollide_Box);
 									o.x -= offset.x;
 									o.y -= offset.y;
-									SDL_RenderDrawRect(renderer, &o);
+									SDL_RenderDrawRect(Graphics::renderer, &o);
 								}
 								if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
 									for (int k = 0; k < Map::size; k++) {
@@ -162,7 +162,7 @@ namespace Interface {
 													SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].nodes[j].nodes[k].sCollide_Box);
 													o.x -= offset.x;
 													o.y -= offset.y;
-													SDL_RenderDrawRect(renderer, &o);
+													SDL_RenderDrawRect(Graphics::renderer, &o);
 												}
 												if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
@@ -170,7 +170,7 @@ namespace Interface {
 															SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box);
 															o.x -= offset.x;
 															o.y -= offset.y;
-															SDL_RenderDrawRect(renderer, &o);
+															SDL_RenderDrawRect(Graphics::renderer, &o);
 														}
 													}
 													//std::cout << terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size() << std::endl;
@@ -188,9 +188,9 @@ namespace Interface {
 	}
 
 	void Show_Attacks() {
-		SDL_SetRenderDrawColor(renderer, 155, 155, 55, 255);
-		auto weapon_view = scene.view<Weapon_Size>();
-		auto camera_view = scene.view<Camera>();
+		SDL_SetRenderDrawColor(Graphics::renderer, 155, 155, 55, 255);
+		auto weapon_view = Scenes::scene.view<Weapon_Size>();
+		auto camera_view = Scenes::scene.view<Camera>();
 		for (auto camera : camera_view) {
 			auto& cam = camera_view.get<Camera>(camera);
 			SDL_FRect offset = cam.screen;
@@ -199,21 +199,21 @@ namespace Interface {
 				SDL_Rect c = Utilities::SDL_FRect_To_SDL_Rect(o);
 				c.x -= offset.x;
 				c.y -= offset.y;
-				SDL_RenderDrawRect(renderer, &c);
+				SDL_RenderDrawRect(Graphics::renderer, &c);
 			}
 		}
 	}
 
 	void Unit_Arrive_UI() {
-		auto view = scene.view<Mouse_Move>();
-		auto view2 = scene.view<Camera>();
+		auto view = Scenes::scene.view<Mouse_Move>();
+		auto view2 = Scenes::scene.view<Camera>();
 		for (auto camera : view2) {
 			auto& cam = view2.get<Camera>(camera);
 			for (auto entity : view) {
 				auto& mov = view.get<Mouse_Move>(entity);
 				SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
-				SDL_SetRenderDrawColor(renderer, 155, 155, 255, 255);				
-				SDL_RenderFillRect(renderer, &o);
+				SDL_SetRenderDrawColor(Graphics::renderer, 155, 155, 255, 255);				
+				SDL_RenderFillRect(Graphics::renderer, &o);
 			}
 		}
 	}

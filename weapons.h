@@ -6,7 +6,7 @@
 namespace Weapons {
 
 	//take input of unit Radius and Weapon_Size to fill this out for any wielder and any weapon
-	SDL_FRect Attack_Direction(f2d& pos, Components::Compass& direction) {
+	SDL_FRect Attack_Direction(DataTypes::f2d& pos, Components::Compass& direction) {
 		switch (direction) {
 		case N: return { pos.fX - 15, pos.fY - 55, 30, 40 };
 		case S: return { pos.fX - 15, pos.fY + 15, 30, 40 };
@@ -19,7 +19,7 @@ namespace Weapons {
 		}
 	}
 
-	void create_attack(f2d& pos, Components::Compass& direction) {
+	void create_attack(DataTypes::f2d& pos, Components::Compass& direction) {
 		SDL_FRect attackPos = Attack_Direction(pos, direction);
 
 		auto weapon = Scenes::scene.create();
@@ -36,7 +36,7 @@ namespace Weapons {
 	}
 
 	void Attack_cast() {
-		auto view = scene.view<Direction, Position_X, Position_Y, Actions, Attack>();
+		auto view = Scenes::scene.view<Direction, Position_X, Position_Y, Actions, Attack>();
 		for (auto entity : view) {
 		//	act.action = slash;
 			auto& act = view.get<Actions>(entity);
@@ -45,16 +45,16 @@ namespace Weapons {
 			auto& dir = view.get<Direction>(entity);
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
-			f2d pos = { x.fX, y.fY };
+			DataTypes::f2d pos = { x.fX, y.fY };
 			create_attack(pos, dir.eDirection);	
-			scene.emplace_or_replace<Attacking>(entity);
-			scene.remove<Attack>(entity);
+			Scenes::scene.emplace_or_replace<Attacking>(entity);
+			Scenes::scene.remove<Attack>(entity);
 		}
 		//create SDL_FRect in front of unit, size from a size component on weapon
 	}
 
 	void Attack_Box_Destroy() {
-		auto view = scene.view<Attack_Box_Duration>();
+		auto view = Scenes::scene.view<Attack_Box_Duration>();
 		for (auto entity : view) {
 			auto& time = view.get<Attack_Box_Duration>(entity).lifeTime;
 			auto& count = view.get<Attack_Box_Duration>(entity).count;
@@ -66,13 +66,13 @@ namespace Weapons {
 	}
 
 	void Attacking_Updater() {
-		auto view = scene.view<Attacking, Actions>();
+		auto view = Scenes::scene.view<Attacking, Actions>();
 		for (auto entity : view) {
 			auto &act = view.get<Actions>(entity);
 			//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
 			if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
 				act.action = idle;
-				scene.remove<Attacking>(entity);
+				Scenes::scene.remove<Attacking>(entity);
 			}
 		}
 	}

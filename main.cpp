@@ -13,11 +13,12 @@ int main(int argc, char* argv[]) {
 	
 	//initialization
 	Init::init();
-	createGraphicsContext();
+	Graphics::createGraphicsContext();
 	Init_Game();
   
 	while (Graphics::running == true) {
-		update_scene();
+		AI::Run_AI();
+
 		//std::cout << "update_scene = Good" << std::endl;
 		Weapons::Update_Attacks();
 		//std::cout << "Update_Attacks = Good" << std::endl;
@@ -31,6 +32,7 @@ int main(int argc, char* argv[]) {
 		//std::cout << "Movement_Handler = Good" << std::endl;
 		collision::Collisions();		
 		//std::cout << "Collisions = Good" << std::endl;
+		update_scene();
 			
 		Rendering::Rendering();
 		//std::cout << "Rendering = Good" << std::endl;
@@ -38,7 +40,7 @@ int main(int argc, char* argv[]) {
 		//std::cout << "frameTime = Good" << std::endl;
 	}
 	//close
-	closeContext();
+	Graphics::closeContext();
 		
 	return 0;
 }

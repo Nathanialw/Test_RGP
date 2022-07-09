@@ -1,3 +1,4 @@
+#pragma once
 #include "scene.h"
 #include "graphics.h"
 #include <SDL.h>
@@ -6,12 +7,11 @@
 #include "utilities.h"
 #include <vector>
 
-using namespace Scene;
 
 namespace Camera_Control {
 
 	void Update_Camera() {
-		auto view = scene.view<Camera, Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Camera, Position_X, Position_Y>();
 		for (auto focus : view) {
 			auto& x = view.get<Position_X>(focus);
 			auto& y = view.get<Position_Y>(focus);
@@ -44,8 +44,8 @@ namespace Rendering {
 	}
 
 	void Render_Terrain() { //state
-		auto view1 = scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions>();
-		auto view2 = scene.view<Camera>();
+		auto view1 = Scenes::scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions>();
+		auto view2 = Scenes::scene.view<Camera>();
 		float sx;
 		float sy;
 		for (auto id : view2) {
@@ -69,7 +69,7 @@ namespace Rendering {
 
 	void sort_Positions() {
 		
-		scene.sort<Renderable>([](const auto& lhs, const auto& rhs) { return lhs.y < rhs.y; }); //sorts position least to	
+		Scenes::scene.sort<Renderable>([](const auto& lhs, const auto& rhs) { return lhs.y < rhs.y; }); //sorts position least to	
 	}
 
 	SDL_Rect Frame_Update(spriteframes& a, Direction& b, Actions& act) {
@@ -129,8 +129,8 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view1 = scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction>();
-		auto view2 = scene.view<Camera>();
+		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction>();
+		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id);
@@ -158,20 +158,22 @@ namespace Rendering {
 	}
 
 	void isDead() {
-		auto view = scene.view<Actions, Alive, Velocity>(entt::exclude<Spell>);
+		auto view = Scenes::scene.view<Actions, Health, Velocity>(entt::exclude<Spell>);
 		for (auto entity : view) {
-			auto& b = view.get<Alive>(entity);
-			if (b.bIsAlive == false) {
+			auto& health = view.get<Health>(entity);
+			if (health.iHealth <= 0) {
 				view.get<Actions>(entity).action = dead;
 				view.get<Actions>(entity).frameCount[view.get<Actions>(entity).action].currentFrame = 0;
 				view.get<Velocity>(entity).magnitude.fX = 0.0f;
 				view.get<Velocity>(entity).magnitude.fY = 0.0f;
 
-				scene.remove<Commandable>(entity);
-				scene.remove<Selected>(entity);
-				scene.remove<Moving>(entity);
-				scene.remove<Mouse_Move>(entity);
-				scene.remove<Velocity>(entity);
+				Scenes::scene.remove<Commandable>(entity);
+				Scenes::scene.remove<Selected>(entity);
+				Scenes::scene.remove<Moving>(entity);
+				Scenes::scene.remove<Mouse_Move>(entity);
+				Scenes::scene.remove<Velocity>(entity);
+				Scenes::scene.remove<Spellbook>(entity);
+				Scenes::scene.remove<Mass>(entity);
 			}
 		}
 	}
@@ -179,16 +181,16 @@ namespace Rendering {
 	void RenderCullMode() {
 		if (renderType == true) {
 			renderType = false;
-			scene.clear<Renderable>();
+			Scenes::scene.clear<Renderable>();
 			}
 		else {
 			renderType = true;
-			scene.clear<Renderable>();			
+			Scenes::scene.clear<Renderable>();
 		}
 	}
 
 	void Component_Renerable() {
-		auto view = scene.view<Camera>();
+		auto view = Scenes::scene.view<Camera>();
 		//system("CLS");
 		int i = 0;
 		int j = 0;
@@ -197,31 +199,31 @@ namespace Rendering {
 			auto& camera = view.get<Camera>(id);
 			SDL_FRect screen = { camera.screen.x - (camera.screen.w / 2),camera.screen.y - (camera.screen.h / 2), camera.screen.w * 2, camera.screen.h * 2 };
 
-			auto view2 = scene.view<Terrain_Position_Y, Terrain_Position_X>();
+			auto view2 = Scenes::scene.view<Terrain_Position_Y, Terrain_Position_X>();
 			for (auto pos : view2) {
 				auto& x = view2.get<Terrain_Position_X>(pos);
 				auto& y = view2.get<Terrain_Position_Y>(pos);
 				SDL_FPoint point = { x.fX,y.fY };
 				if (SDL_PointInFRect(&point, &screen)) {
-					scene.emplace_or_replace<Terrain_Renderable>(pos);
+					Scenes::scene.emplace_or_replace<Terrain_Renderable>(pos);
 					i++;
 				}
 				else {
-					scene.remove<Terrain_Renderable>(pos);
+					Scenes::scene.remove<Terrain_Renderable>(pos);
 				}
 			}
 
-			auto view3 = scene.view<Position_Y, Position_X>();
+			auto view3 = Scenes::scene.view<Position_Y, Position_X>();
 			for (auto pos : view3) {
 				auto& x = view3.get<Position_X>(pos);
 				auto& y = view3.get<Position_Y>(pos);
 				SDL_FPoint point = { x.fX,y.fY };
 				if (SDL_PointInFRect(&point, &screen)) {
-					scene.emplace_or_replace<Renderable>(pos, y.fY);
+					Scenes::scene.emplace_or_replace<Renderable>(pos, y.fY);
 					j++;
 				}
 				else {
-					scene.remove<Renderable>(pos);
+					Scenes::scene.remove<Renderable>(pos);
 				}
 			}
 			//std::cout << "entt render" << std::endl;
@@ -249,7 +251,7 @@ namespace Rendering {
 		int spellnum = 0;
 		int spellremoved = 0;
 
-		auto view = scene.view<Camera>();
+		auto view = Scenes::scene.view<Camera>();
 
 		//SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
 
@@ -261,9 +263,9 @@ namespace Rendering {
 			//SDL_RenderDrawRectF(renderer, &drawRect);
 			//SDL_FRect screen = camera.screen;
 
-			std::vector<entt::entity>grassvec(scene.view<Terrain_Renderable>().size());
+			std::vector<entt::entity>grassvec(Scenes::scene.view<Terrain_Renderable>().size());
 			//grassvec.reserve(scene.view<Terrain_Renderable>().size());
-			std::vector<entt::entity>grassvecremove(scene.view<Terrain_Renderable>().size());
+			std::vector<entt::entity>grassvecremove(Scenes::scene.view<Terrain_Renderable>().size());
 			//grassvecremove.reserve(scene.view<Terrain_Renderable>().size());
 
 			if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
@@ -303,10 +305,10 @@ namespace Rendering {
 			//std::cout << grassvec.size() << std::endl;
 			//std::cout << grassvecremove.size() << std::endl;
 			for (int i = 0; i < grassvec.size(); i++) {
-				scene.emplace_or_replace<Terrain_Renderable>(grassvec[i]);
+				Scenes::scene.emplace_or_replace<Terrain_Renderable>(grassvec[i]);
 			}
 			for (int i = 0; i < grassvecremove.size(); i++) {
-				scene.remove<Terrain_Renderable>(grassvecremove[i]);
+				Scenes::scene.remove<Terrain_Renderable>(grassvecremove[i]);
 			}
 
 
@@ -354,7 +356,7 @@ namespace Rendering {
 				std::cout << "Map::map = Good" << std::endl;
 			}
 
-			auto player_view = scene.view<Input, Position_X, Position_Y>();
+			auto player_view = Scenes::scene.view<Input, Position_X, Position_Y>();
 
 			for (auto player_id : player_view) {
 				auto& x = player_view.get<Position_X>(player_id);
@@ -376,7 +378,7 @@ namespace Rendering {
 				std::cout << "player_view = Good" << std::endl;
 			}
 
-			auto spell_view = scene.view<Spell, Position_X, Position_Y>();
+			auto spell_view = Scenes::scene.view<Spell, Position_X, Position_Y>();
 
 			for (auto spell_id : spell_view) {
 				auto& x = spell_view.get<Position_X>(spell_id);
@@ -398,16 +400,16 @@ namespace Rendering {
 				std::cout << "spell_view = Good" << std::endl;
 			}
 
-			auto company_view = scene.view<Company>();
+			auto company_view = Scenes::scene.view<Company>();
 
 			for (auto companies : company_view) {
 				auto& company = company_view.get<Company>(companies);
 				if (Utilities::bRect_Intersect(company.sCollide_Box, screen)) {
 					for (int c = 0; c < company.iSub_Units.size(); c++) {
-						auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+						auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
 						if (Utilities::bRect_Intersect(platoon.sCollide_Box, screen)) {
 							for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-								auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 								if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
 									for (int i = 0; i < squad.iSub_Units.size(); i++) {
 										//if (squad.bAlive.at(i) == true) {
@@ -435,11 +437,11 @@ namespace Rendering {
 			//std::cout << unitvec.size() << std::endl;
 			//std::cout << unitvecremove.size() << std::endl;
 			for (int i = 0; i < unitvec.size(); i++) {
-				scene.emplace_or_replace<Renderable>(unitvec[i].first, unitvec[i].second);
+				Scenes::scene.emplace_or_replace<Renderable>(unitvec[i].first, unitvec[i].second);
 						
 			}
 			for (int i = 0; i < unitvecremove.size(); i++) {
-				scene.remove<Renderable>(unitvecremove[i]);
+				Scenes::scene.remove<Renderable>(unitvecremove[i]);
 			}
 
 			if (debug) {

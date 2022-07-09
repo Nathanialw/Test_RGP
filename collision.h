@@ -2,8 +2,8 @@
 #include "components.h"
 #include "scene.h"
 #include "timer.h"
+#include <vector>
 
-using namespace Scene;
 
 namespace collision {
 
@@ -20,7 +20,7 @@ namespace collision {
 	Timer::Frame_Timer Print_calcs(500.0f);
 
 	void resolveCollisons() {	
-		auto view = scene.view<Position_X, Position_Y>();			
+		auto view = Scenes::scene.view<Position_X, Position_Y>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -30,12 +30,12 @@ namespace collision {
 	}
 
 	void Update_Unit() { // updates positions of soldiers stored in units for collision box
-		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier>();
+		auto view = Scenes::scene.view<Position_X, Position_Y, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			auto& soldier = view.get<Assigned>(entity);
-			auto& squad = scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
+			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			squad.fPX.at(soldier.iIndex) = x.fPX;
 			squad.fPY.at(soldier.iIndex) = y.fPY;
 		}
@@ -43,11 +43,11 @@ namespace collision {
 
 
 	void Update_Company() { // updates positions of soldiers stored in units for collision box
-		auto company_view = scene.view<Company>();
+		auto company_view = Scenes::scene.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			for (int i = 0; i < company.iSub_Units.size(); i++) {
-				auto& platoon = scene.get<Platoon>(company.iSub_Units[i]); // gets the squad that the soldier is attached to
+				auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[i]); // gets the squad that the soldier is attached to
 				company.fPX[i] = platoon.sCollide_Box.x;
 				company.fPY[i] = platoon.sCollide_Box.y;
 				company.fPW[i] = platoon.sCollide_Box.x + platoon.sCollide_Box.w;
@@ -59,11 +59,11 @@ namespace collision {
 
 
 	void Update_Platoons() { // updates positions of soldiers stored in units for collision box
-		auto view = scene.view<Platoon>();
+		auto view = Scenes::scene.view<Platoon>();
 		for (auto platoons : view) {
 			auto& platoon = view.get<Platoon>(platoons);
 			for (int i = 0; i < platoon.iSub_Units.size(); i++) {
-				auto& squad = scene.get<Squad>(platoon.iSub_Units[i]); // gets the squad that the soldier is attached to
+				auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[i]); // gets the squad that the soldier is attached to
 				platoon.fPX[i] = squad.sCollide_Box.x;
 				platoon.fPY[i] = squad.sCollide_Box.y;
 				platoon.fPW[i] = squad.sCollide_Box.x + squad.sCollide_Box.w;
@@ -76,13 +76,13 @@ namespace collision {
 
 
 	void Update_Collided_Unit() {
-		auto view = scene.view<Position_X, Position_Y, Assigned, Soldier, Health, Alive>();
+		auto view = Scenes::scene.view<Position_X, Position_Y, Assigned, Soldier, Health, Alive>();
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			//auto& z = view.get<Collision_Radius>(entity);
 			auto& soldier = view.get<Assigned>(entity);
-			auto& squad = scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
+			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			x.fPX = squad.fPX.at(soldier.iIndex);
 			y.fPY = squad.fPY.at(soldier.iIndex);
 			
@@ -102,7 +102,7 @@ namespace collision {
 	
 ////////////////////////////////////////////////////////////////////////////////////	
 	void Update_Squad_Box() {
-		auto view = scene.view<Squad>();
+		auto view = Scenes::scene.view<Squad>();
 		for (auto squads : view) { //update colliders
 			auto& squad1 = view.get<Squad>(squads);
 			if (!squad1.iSub_Units.empty()) { //will crash if vector is empty
@@ -117,7 +117,7 @@ namespace collision {
 	}
 
 	void Update_Platoon_Box() {
-		auto Platoon_View = scene.view<Platoon>();
+		auto Platoon_View = Scenes::scene.view<Platoon>();
 		for (auto platoons : Platoon_View) {
 			auto& platoon1 = Platoon_View.get<Platoon>(platoons);
 			if (!platoon1.iSub_Units.empty()) { //will crash if vector is empty {
@@ -131,7 +131,7 @@ namespace collision {
 	}
 	
 	void Update_Company_Box() {
-		auto company_view = scene.view<Company>();
+		auto company_view = Scenes::scene.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (!company.iSub_Units.empty()) { //will crash if vector is empty {
@@ -146,7 +146,7 @@ namespace collision {
 
 	void player_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
+			auto spells = Scenes::scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -154,15 +154,15 @@ namespace collision {
 				auto& mass = spells.get<Mass>(spell);
 				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
-				auto company_view = scene.view<Company>();
+				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
@@ -172,7 +172,7 @@ namespace collision {
 												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 													fDistance = sqrtf(fDistance);
 													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-													f2d resolver = {};
+													DataTypes::f2d resolver = {};
 													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
 													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
 													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
@@ -197,7 +197,7 @@ namespace collision {
 
 	void Unit_unit_Collision() {
 		if (1) {
-			auto company_view = scene.view<Company>();
+			auto company_view = Scenes::scene.view<Company>();
 			for (auto companies : company_view) {
 				auto& company1 = company_view.get<Company>(companies);
 				for (auto companies : company_view) { 
@@ -206,14 +206,14 @@ namespace collision {
 					if (Utilities::bRect_Intersect(company1.sCollide_Box, company2.sCollide_Box)) {
 						for (int c1 = 0; c1 < company1.iSub_Units.size(); c1++) {
 							for (int c2 = 0; c2 < company2.iSub_Units.size(); c2++) {
-								auto& platoon1 = scene.get<Platoon>(company1.iSub_Units[c1]);
-								auto& platoon2 = scene.get<Platoon>(company2.iSub_Units[c2]);
+								auto& platoon1 = Scenes::scene.get<Platoon>(company1.iSub_Units[c1]);
+								auto& platoon2 = Scenes::scene.get<Platoon>(company2.iSub_Units[c2]);
 								iPlatoon_Check++;
 								if (Utilities::bRect_Intersect(platoon1.sCollide_Box, platoon2.sCollide_Box)) {
 									for (int s1 = 0; s1 < platoon1.iSub_Units.size(); s1++) {
 										for (int s2 = 0; s2 < platoon2.iSub_Units.size(); s2++) {
-											auto& squad1 = scene.get<Squad>(platoon1.iSub_Units[s1]);
-											auto& squad2 = scene.get<Squad>(platoon2.iSub_Units[s2]);									
+											auto& squad1 = Scenes::scene.get<Squad>(platoon1.iSub_Units[s1]);
+											auto& squad2 = Scenes::scene.get<Squad>(platoon2.iSub_Units[s2]);
 											iSquad_Check++;							
 											if (Utilities::bRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
 												for (int i = 0; i < squad1.iSub_Units.size(); i++) {
@@ -227,7 +227,7 @@ namespace collision {
 																if (fDistance <= ((squad1.fRadius.at(i) + squad2.fRadius.at(j)) * (squad1.fRadius.at(i) + squad2.fRadius.at(j))) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 																	fDistance = sqrtf(fDistance);
 																	float fOverlap = fDistance - (squad1.fRadius.at(i) + squad2.fRadius.at(j));
-																	f2d resolver = {};
+																	DataTypes::f2d resolver = {};
 																	resolver.fX = fOverlap * (squad2.fPX.at(j) - squad1.fPX.at(i)) / fDistance;
 																	resolver.fY = fOverlap * (squad2.fPY.at(j) - squad1.fPY.at(i)) / fDistance;
 																	float fTotalmass = squad1.fMass.at(i) + squad2.fMass.at(j);
@@ -259,7 +259,7 @@ namespace collision {
 	//Use this for melee weapon collision as well
 	void Spell_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = scene.view<Spell, Radius, Position_X, Position_Y, Mass, Alive>();
+			auto spells = Scenes::scene.view<Spell, Radius, Position_X, Position_Y, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -268,15 +268,15 @@ namespace collision {
 				auto& alive = spells.get<Alive>(spell);
 				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
-				auto company_view = scene.view<Company>();
+				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-								auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
@@ -286,7 +286,7 @@ namespace collision {
 												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 													fDistance = sqrtf(fDistance);
 													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-													f2d resolver = {};
+													DataTypes::f2d resolver = {};
 													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
 													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
 													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
@@ -311,12 +311,54 @@ namespace collision {
 		}
 	}
 
+	void Spell_Player_Collision() {
+		auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
+		auto players = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Input, Health>();
 
+		for (auto spell : spells) {
+			auto& spellRadius = spells.get<Radius>(spell);
+			auto& spellAlive = spells.get<Alive>(spell);
+			auto& spellXPos = spells.get<Position_X>(spell);
+			auto& spellYPos = spells.get<Position_Y>(spell);
+			auto& spellMass = spells.get<Mass>(spell);
+			for (auto player : players) {
+				auto& playerRadius = players.get<Radius>(player);
+				auto& playerXPos = players.get<Position_X>(player);
+				auto& playerYPos = players.get<Position_Y>(player);
+				auto& playerMass = players.get<Mass>(player);
+				auto& playerHealth = players.get<Health>(player);
+
+				float fx = spellXPos.fPX - playerXPos.fPX;
+				float fy = spellYPos.fPY - playerYPos.fPY;
+				float fDistance = (fx * fx) + (fy * fy);
+				if (fDistance <= ((spellRadius.fRadius + playerRadius.fRadius) * (spellRadius.fRadius + playerRadius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+					fDistance = sqrtf(fDistance);
+					float fOverlap = fDistance - (spellRadius.fRadius + playerRadius.fRadius);
+					DataTypes::f2d resolver = {};
+					resolver.fX = fOverlap * (playerXPos.fPX - spellXPos.fPX) / fDistance;
+					resolver.fY = fOverlap * (playerYPos.fPY - spellYPos.fPY) / fDistance;
+					float fTotalmass = spellMass.fKilos + playerMass.fKilos;
+					float fNomalizedMassA = (spellMass.fKilos / fTotalmass);
+					float fNomalizedMassB = (playerMass.fKilos / fTotalmass);
+					spellXPos.fPX += (resolver.fX * fNomalizedMassB); // * normalized mass
+					playerXPos.fPX -= (resolver.fX * fNomalizedMassA);
+					spellYPos.fPY += (resolver.fY * fNomalizedMassB);
+					playerYPos.fPY -= (resolver.fY * fNomalizedMassA);
+					std::cout << "Hit!!!" << std::endl; 
+					//trigger hit
+					// -1 HP
+					playerHealth.iHealth -= 1.0f;
+					//destroy spell
+					spellAlive.bIsAlive = false;
+				}
+			}
+		}
+	}
 
 	//change to use weapon size instead of weapon radius
 	void MeleeAttack_unit_Collision() { //seems to work 
 		if (1) {
-			auto spells = scene.view<Melee, Radius, Position_X, Position_Y, Mass, Alive>();
+			auto spells = Scenes::scene.view<Melee, Radius, Position_X, Position_Y, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -325,15 +367,15 @@ namespace collision {
 				auto& alive = spells.get<Alive>(spell);
 				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
-				auto company_view = scene.view<Company>();
+				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-									auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
@@ -343,7 +385,7 @@ namespace collision {
 												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 													fDistance = sqrtf(fDistance);
 													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-													f2d resolver = {};
+													DataTypes::f2d resolver = {};
 													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
 													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
 													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
@@ -355,7 +397,7 @@ namespace collision {
 													y.fPY -= (resolver.fY * fNomalizedMassA);
 													squad.iStruck.at(i)++;
 													alive.bIsAlive = false;
-													//std::cout << "Hit!" << std::endl;
+													std::cout << "Hit!" << std::endl;
 												}
 											}
 										}
@@ -415,7 +457,7 @@ namespace collision {
 	void player_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Input>();
+			auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Input>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Position_X>(spell);
@@ -431,17 +473,17 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-							auto& map_x = scene.get<Position_X>(cell[j].at(i));
-							auto& map_y = scene.get<Position_Y>(cell[j].at(i));
-							auto& map_mass = scene.get<Mass>(cell[j].at(i));
-							auto& map_radius = scene.get<Radius>(cell[j].at(i));
+							auto& map_x = Scenes::scene.get<Position_X>(cell[j].at(i));
+							auto& map_y = Scenes::scene.get<Position_Y>(cell[j].at(i));
+							auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
+							auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
 							float fx = map_x.fPX - x.fPX;
 							float fy = map_y.fPY - y.fPY;
 							float fDistance = (fx * fx) + (fy * fy);
 							if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 								fDistance = sqrtf(fDistance);
 								float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
-								f2d resolver = {};
+								DataTypes::f2d resolver = {};
 								resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
 								resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
 								float fTotalmass = map_mass.fKilos + mass.fKilos;
@@ -462,11 +504,12 @@ namespace collision {
 		stat = 0;
 	}
 
+
 	
 	void spell_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
+			auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& a = spells.get<Alive>(spell);
@@ -483,17 +526,17 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-								auto& map_x = scene.get<Position_X>(cell[j].at(i));
-								auto& map_y = scene.get<Position_Y>(cell[j].at(i));
-								auto& map_mass = scene.get<Mass>(cell[j].at(i));
-								auto& map_radius = scene.get<Radius>(cell[j].at(i));
+								auto& map_x = Scenes::scene.get<Position_X>(cell[j].at(i));
+								auto& map_y = Scenes::scene.get<Position_Y>(cell[j].at(i));
+								auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
+								auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
 								float fx = map_x.fPX - x.fPX;
 								float fy = map_y.fPY - y.fPY;
 								float fDistance = (fx * fx) + (fy * fy);
 								if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 									fDistance = sqrtf(fDistance);
 									float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
-									f2d resolver = {};
+									DataTypes::f2d resolver = {};
 									resolver.fX = fOverlap * (x.fPX - map_x.fPX) / fDistance;
 									resolver.fY = fOverlap * (y.fPY - map_y.fPY) / fDistance;
 									float fTotalmass = map_mass.fKilos + mass.fKilos;
@@ -519,7 +562,7 @@ namespace collision {
 
 	void unit_grid_collision(Map::Node3& map) { //waaaaay too slow		
 
-		auto company_view = scene.view<Company>();
+		auto company_view = Scenes::scene.view<Company>();
 		
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
@@ -529,22 +572,22 @@ namespace collision {
 						for (int j = 0; j < Map::size; j++) {
 
 							if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
-								auto& platoon = scene.get<Platoon>(company.iSub_Units[b]);
+								auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[b]);
 								for (int c = 0; c < platoon.iSub_Units.size(); c++) {
 									for (int k = 0; k < Map::size; k++) {
 
 										if (Utilities::bRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-											auto& squad = scene.get<Squad>(platoon.iSub_Units[c]);
+											auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[c]);
 											for (int l = 0; l < Map::size; l++) {
 
 												if (Utilities::bRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int d = 0; d < squad.iSub_Units.size(); d++) {
 														if (squad.bAlive.at(d) != false) {
 															for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
-																auto& radius = scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& mass = scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& x = scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& y = scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& radius = Scenes::scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& mass = Scenes::scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& x = Scenes::scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& y = Scenes::scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
 																for (int e = 0; e < squad.iSub_Units.size(); e++) {
 																	float fx = squad.fPX.at(e) - x.fPX;
 																	float fy = squad.fPY.at(e) - y.fPY;
@@ -552,7 +595,7 @@ namespace collision {
 																	if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 																		fDistance = sqrtf(fDistance);
 																		float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
-																		f2d resolver = {};
+																		DataTypes::f2d resolver = {};
 																		resolver.fX = fOverlap * (x.fPX - squad.fPX.at(e)) / fDistance;
 																		resolver.fY = fOverlap * (y.fPY - squad.fPY.at(e)) / fDistance;
 																		float fTotalmass = squad.fMass.at(e) + mass.fKilos;
@@ -583,9 +626,9 @@ namespace collision {
 
 	void CollisionsT() {
 		if (Print_calcs.Calc()) {
-			std::cout << "Company:      " << scene.size<Company>() << "   checks:   " << iCompany_Check << std::endl;
-			std::cout << "Platoon:      " << scene.size<Platoon>() << "   checks:   " << iPlatoon_Check << std::endl;
-			std::cout << "Squad:        " << scene.size<Squad>()   << "   checks:   " << iSquad_Check << std::endl;
+			std::cout << "Company:      " << Scenes::scene.size<Company>() << "   checks:   " << iCompany_Check << std::endl;
+			std::cout << "Platoon:      " << Scenes::scene.size<Platoon>() << "   checks:   " << iPlatoon_Check << std::endl;
+			std::cout << "Squad:        " << Scenes::scene.size<Squad>()   << "   checks:   " << iSquad_Check << std::endl;
 			std::cout << "Soldiers:     " << iNumber << std::endl;
 			std::cout << "Resolves:     " << iActual_Resolves << std::endl;
 			std::cout << "----------   " << iActual_Resolves << std::endl;
@@ -622,6 +665,7 @@ namespace collision {
 		player_unit_Collision();
 		Unit_unit_Collision(); 
 		
+		Spell_Player_Collision();
 		Spell_unit_Collision();		
 		MeleeAttack_unit_Collision();
 

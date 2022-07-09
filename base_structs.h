@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace base {
+namespace DataTypes {
 	struct i2d {
 		int x;
 		int y;

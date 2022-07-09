@@ -42,9 +42,11 @@ namespace Death_Spells {
 		
 		Scenes::scene.emplace<Components::Alive>(skeleton0, true);
 		Scenes::scene.emplace<Components::Health>(skeleton0, 5);
+		Scenes::scene.emplace<Components::Sight_Range>(skeleton0, x - 250.0f, y - 250.0f, 500.0f, 500.0f);
 				
 		Scenes::scene.emplace<Components::Soldier>(skeleton0);
 		Scenes::scene.emplace<Components::Commandable>(skeleton0);
+		Scenes::scene.emplace<Components::Spellbook>(skeleton0);
 	}
 
 }

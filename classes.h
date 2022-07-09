@@ -3,8 +3,6 @@
 #include "Utilities.h"
 
 
-using namespace base;
-
 namespace Map {
 
 
@@ -176,7 +174,7 @@ namespace Map {
 
 
 
-namespace Mil_Struc {
+namespace Components {
 
 	
 	//wil have Regiments and Companies as administrative units
@@ -192,7 +190,7 @@ namespace Mil_Struc {
 		std::vector<float>fMass;
 		std::vector<float>fRadius;
 
-		std::vector<f2d>vPosition; //
+		std::vector<DataTypes::f2d>vPosition; //
 		std::vector<int>iStruck;
 		std::vector<bool>bAlive;
 
@@ -375,7 +373,7 @@ namespace Military {
 		std::vector<float>fMass;
 		std::vector<float>fRadius;
 
-		std::vector<f2d>vPosition; //
+		std::vector<DataTypes::f2d>vPosition; //
 
 
 		Squad() {

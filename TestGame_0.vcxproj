@@ -216,6 +216,7 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="init.h" />
     <ClInclude Include="interface.h" />
+    <ClInclude Include="items.h" />
     <ClInclude Include="joystick.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="mouse_control.h" />

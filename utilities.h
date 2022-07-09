@@ -11,7 +11,9 @@ namespace Utilities {
 
 	}
 
-
+	float Get_Hypotenuse(float& x, float &y) {
+		return sqrtf((x * x) + (y + y));
+	}
 
 
 	bool bRect_Intersect(SDL_FRect &entity, SDL_FRect &target) {

@@ -22,8 +22,8 @@ namespace Debug_System {
 	//	mass
 		//SDL_Rect j = { sx, sy, 30, 30 };
 		////SDL_RenderDrawRect(Graphics::renderer, &j);			
-		Surface_Data x_Position = Graphics::Load_Text_Texture(std::to_string(int(x)), { 255,0,133 });
-		Surface_Data y_Position = Graphics::Load_Text_Texture(std::to_string(int(y)), { 255,133,0	});
+		Graphics::Surface_Data x_Position = Graphics::Load_Text_Texture(std::to_string(int(x)), { 255,0,133 });
+		Graphics::Surface_Data y_Position = Graphics::Load_Text_Texture(std::to_string(int(y)), { 255,133,0	});
 		//Surface_Data collision_Radius = Graphics::Load_Text_Texture(std::to_string(mas), { 133,133,133 }, renderer);
 		//Surface_Data mass = Graphics::Load_Text_Texture(std::to_string(radius), { 133,133,133 }, renderer);
 
@@ -32,9 +32,9 @@ namespace Debug_System {
 		////SDL_RenderCopy(renderer, mass.pTexture, , );
 
 		SDL_Rect a = {sx+25, sy-20, 15, 15};
-		SDL_RenderCopy(renderer, x_Position.pTexture, &x_Position.k, &a);
+		SDL_RenderCopy(Graphics::renderer, x_Position.pTexture, &x_Position.k, &a);
 		SDL_Rect b = { sx+25, sy-10, 15, 15 };
-		SDL_RenderCopy(renderer, y_Position.pTexture, &y_Position.k,  &b);
+		SDL_RenderCopy(Graphics::renderer, y_Position.pTexture, &y_Position.k,  &b);
 		//SDL_Rect c = { sx, sy+20, 15, 10 };
 		//SDL_RenderCopy(renderer, collision_Radius.pTexture, &collision_Radius.k, &c);
 		//SDL_Rect d = { sx, sy+30, 15, 10 };
@@ -45,8 +45,8 @@ namespace Debug_System {
 		SDL_DestroyTexture(y_Position.pTexture);
 	}
 
-	Surface_Data framerate;
-	Surface_Data timeStep;
+	Graphics::Surface_Data framerate;
+	Graphics::Surface_Data timeStep;
 	bool frameRateMode = true;
 	bool frameTimeMode = false;
 
@@ -63,7 +63,7 @@ namespace Debug_System {
 	}
 
 	void Framerate() {		
-		auto view = scene.view<Camera, Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Camera, Position_X, Position_Y>();
 
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
@@ -75,11 +75,11 @@ namespace Debug_System {
 				iFramePollRate = 0;
 				if (frameRateMode) {
 					SDL_DestroyTexture(framerate.pTexture);
-					framerate = Load_Text_Texture(std::to_string(float(Timer::avgFPS)), { 133,255,133 });
+					framerate = Graphics::Load_Text_Texture(std::to_string(float(Timer::avgFPS)), { 133,255,133 });
 				}
 				if (frameTimeMode) {
 					SDL_DestroyTexture(timeStep.pTexture);
-					timeStep = Load_Text_Texture(std::to_string(float(Timer::timeStep) / 1000), { 133,255,133 });
+					timeStep = Graphics::Load_Text_Texture(std::to_string(float(Timer::timeStep) / 1000), { 133,255,133 });
 				}
 			}
 			SDL_Rect c = { 0, 0, 200 / componentCamera.scale.fX, 100 / componentCamera.scale.fY };

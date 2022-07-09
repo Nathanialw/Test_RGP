@@ -9,11 +9,8 @@
 #include "death_spells.h"
 #include "spells.h"
 #include "weapons.h"
-
-
-
-using namespace Scene;
-
+#include "ai_control.h"
+#include "rendering.h"
 
 namespace Event_Handler {
 
@@ -52,26 +49,26 @@ namespace Event_Handler {
 						poisition = potential position
 					*/
 				{
-				case SDLK_e:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; act.action = walk; break;
-				case SDLK_d:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; act.action = walk; break;
-				case SDLK_s:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX -= vel.speed; act.action = walk; break;
-				case SDLK_f:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_w:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
-				case SDLK_r:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_v:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_x:  scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_e:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; act.action = walk; break;
+				case SDLK_d:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; act.action = walk; break;
+				case SDLK_s:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_f:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_w:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_r:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_v:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_x:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
-				case SDLK_1: scene.emplace_or_replace<Cast>(entity); break;
+				case SDLK_1: AI::Spell_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'");  break;
 				case SDLK_3: Timer::Pause_Control();  break;
-				case SDLK_4: scene.emplace_or_replace<Attack>(entity); break;
-				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode();  break;
+				case SDLK_4: Scenes::scene.emplace_or_replace<Attack>(entity); break;
+				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
 				case SDLK_8: Rendering::RenderCullMode(); break;
-				case SDLK_9: User_Mouse_Input::Selection_Squads();  break;
+				case SDLK_9: AI::Turn_On();  break;
 				case SDLK_0: User_Mouse_Input::Selection_Soldiers();  break;
-				case SDLK_ESCAPE: closeContext();  break;
+				case SDLK_ESCAPE: Graphics::closeContext();  break;
 				case SDLK_PLUS: break;
 				case SDLK_MINUS: break;
 				}
@@ -118,13 +115,13 @@ namespace Event_Handler {
 
 	void Player_Input() {
 		while (SDL_PollEvent(&event) != 0) {
-			auto view = scene.view<Velocity, Actions, Input>();
+			auto view = Scenes::scene.view<Velocity, Actions, Input>();
 			for (auto entity : view) {
 				auto& vel = view.get<Velocity>(entity);
 				auto& act = view.get<Actions>(entity);
 				if (event.key.type == SDL_KEYDOWN || event.key.type == SDL_KEYUP) {	
-					if (scene.all_of<Mouse_Move>(entity)) {
-						scene.remove<Mouse_Move>(entity);
+					if (Scenes::scene.all_of<Mouse_Move>(entity)) {
+						Scenes::scene.remove<Mouse_Move>(entity);
 						vel.magnitude.fX = 0;
 						vel.magnitude.fY = 0;
 					}

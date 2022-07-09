@@ -10,9 +10,6 @@
 
 
 using namespace Components;
-using namespace Graphics;
-using namespace Scenes;
-
 
 namespace Scene {
 
@@ -23,7 +20,7 @@ namespace Scene {
 
 	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = scene.view<Position_X, Position_Y, Radius, Environment>(entt::exclude<Assigned>);
+		auto view = Scenes::scene.view<Position_X, Position_Y, Radius, Environment>(entt::exclude<Assigned>);
 		for (auto entity : view) {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
@@ -31,14 +28,14 @@ namespace Scene {
 			SDL_FRect rect = { x.fX - r, y.fY - r, r * 2, r * 2 };
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
-			scene.emplace_or_replace<Assigned>(entity);
+			Scenes::scene.emplace_or_replace<Assigned>(entity);
 		}
 	}
 
 	//adds Environment items to map grid
 
 	void add_terrain_to_grid(Map::Node3& map) {
-		auto view = scene.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned>);
+		auto view = Scenes::scene.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned>);
 		for (auto entity : view) {
 			auto& x = view.get<Terrain_Position_X>(entity);
 			auto& y = view.get<Terrain_Position_Y>(entity);
@@ -46,7 +43,7 @@ namespace Scene {
 			SDL_FRect rect = { x.fX, y.fY, 100, 100 };
 
 			Map::Place_Rect_On_Grid_Once(rect, map, entity);
-			scene.emplace_or_replace<Assigned>(entity);
+			Scenes::scene.emplace_or_replace<Assigned>(entity);
 		}
 	}
 
@@ -60,9 +57,9 @@ namespace Scene {
 
 	void Load_Entities() {		
 		//player
-		auto skeleton = scene.create();			//creates a unique handle for an entity
-		scene.emplace<animation>(skeleton, skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
-		scene.get<animation>(skeleton).sheet = { //populate the vector
+		auto skeleton = Scenes::scene.create();			//creates a unique handle for an entity
+		Scenes::scene.emplace<animation>(skeleton, Graphics::skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
+		Scenes::scene.get<animation>(skeleton).sheet = { //populate the vector
 			{ NULL },
 			{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 0.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
 			{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 0.0f},//walk
@@ -72,41 +69,42 @@ namespace Scene {
 			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, {60, 95}, 75.0f, 0.0f}, //reverse to summon
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 0.0f},
 		};
-		scene.emplace<Actions>(skeleton, idle);
-		scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 3, 0}, {7, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
+		Scenes::scene.emplace<Actions>(skeleton, idle);
+		Scenes::scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 3, 0}, {7, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
 		//positon components
-		scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f);
-		scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f);
+		Scenes::scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f);
+		Scenes::scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f);
 				
-		scene.emplace<Radius>(skeleton, 15.0f );
+		Scenes::scene.emplace<Radius>(skeleton, 15.0f );
 
-		scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
-		scene.emplace<Direction>(skeleton, SE);
-		scene.emplace<Alive>(skeleton, true);
-		scene.emplace<handle>(skeleton, "Skeleton");
-		scene.emplace<Mass>(skeleton, 200.0f);
+		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.35f);
+		Scenes::scene.emplace<Direction>(skeleton, SE);
+		Scenes::scene.emplace<Alive>(skeleton, true);
+		Scenes::scene.emplace<handle>(skeleton, "Skeleton");
+		Scenes::scene.emplace<Mass>(skeleton, 200.0f);
+		Scenes::scene.emplace<Health>(skeleton, 10);
 
-		scene.emplace<Input>(skeleton);
-		scene.emplace<Camera>(skeleton, 0.0f, 0.0f, resolution.w, resolution.h, 1.0f, 1.0f );
+		Scenes::scene.emplace<Input>(skeleton);
+		Scenes::scene.emplace<Camera>(skeleton, 0.0f, 0.0f, Graphics::resolution.w, Graphics::resolution.h, 1.0f, 1.0f );
 		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
 		//grass
 		for (auto j = 0; j < 16; j++) {
 			for (auto i = 0; i < 16; i++) {
-				auto grass = scene.create();
+				auto grass = Scenes::scene.create();
 
-				scene.emplace<animation>(grass, grass_0, 0, 0, 100, 100, 0, 0, 100, 100); /// need to load hetexture	 only once and pass the pointer into this function
-				scene.get<animation>(grass).sheet = {
+				Scenes::scene.emplace<animation>(grass, Graphics::grass_0, 0, 0, 100, 100, 0, 0, 100, 100); /// need to load hetexture	 only once and pass the pointer into this function
+				Scenes::scene.get<animation>(grass).sheet = {
 					{{ 1, 1, 235, 235}, 0, 234, 0, 0, {0, 0}, 16.0f } }; //populate the vector
-				scene.emplace<Actions>(grass, isStatic);
-				scene.get<Actions>(grass).frameCount = { { 0, 0} };
+				Scenes::scene.emplace<Actions>(grass, isStatic);
+				Scenes::scene.get<Actions>(grass).frameCount = { { 0, 0} };
 
-				scene.emplace<Radius>(grass, 50.0f);
-				scene.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f);
-				scene.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f);
+				Scenes::scene.emplace<Radius>(grass, 50.0f);
+				Scenes::scene.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f);
+				Scenes::scene.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f);
 			
-				scene.emplace<Terrain>(grass);
+				Scenes::scene.emplace<Terrain>(grass);
 			}
 		}		
 		
@@ -119,27 +117,27 @@ namespace Scene {
 		//trees
 		for (auto j = 0; j < 10; ++j) {
 			for (auto i = 0; i < 10; ++i) {
-				auto tree = scene.create();
-				scene.emplace<animation>(tree, tree_0); /// need to load hetexture	 only once and pass the pointer into this function
-				scene.get<animation>(tree).sheet = {
+				auto tree = Scenes::scene.create();
+				Scenes::scene.emplace<animation>(tree, Graphics::tree_0); /// need to load hetexture	 only once and pass the pointer into this function
+				Scenes::scene.get<animation>(tree).sheet = {
 					{{ 0, 0, 631, 723}, 0, 631, 0, 0, {313, 609}, 16.0f } }; //populate the vector
 
-				scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f));
-				scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f));
-				scene.emplace<Actions>(tree, isStatic);
-				scene.get<Actions>(tree).frameCount = { { 0, 0} };
-				scene.emplace<Direction>(tree, W);
+				Scenes::scene.emplace<Position_X>(tree, 100.0f, 100.0f + (i * 952.0f));
+				Scenes::scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (j * 1165.0f));
+				Scenes::scene.emplace<Actions>(tree, isStatic);
+				Scenes::scene.get<Actions>(tree).frameCount = { { 0, 0} };
+				Scenes::scene.emplace<Direction>(tree, W);
 
-				scene.emplace<Radius>(tree, 30.0f);
-				scene.emplace<Environment>(tree);
-				scene.emplace<Mass>(tree, 40000.0f);
+				Scenes::scene.emplace<Radius>(tree, 30.0f);
+				Scenes::scene.emplace<Environment>(tree);
+				Scenes::scene.emplace<Mass>(tree, 40000.0f);
 
 
 			}
 		}
 
 		//set positions
-		auto view = scene.view<Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Position_X, Position_Y>();
 		for (auto entity : view) {
 			auto& xx = view.get<Position_X>(entity);
 			auto& yy = view.get<Position_Y>(entity);
@@ -147,7 +145,7 @@ namespace Scene {
 			yy.fY = yy.fPY;
 		}
 
-		auto view2 = scene.view<Terrain_Position_X, Terrain_Position_Y>();
+		auto view2 = Scenes::scene.view<Terrain_Position_X, Terrain_Position_Y>();
 		for (auto entity2 : view2) {
 			auto& xx = view2.get<Terrain_Position_X>(entity2);
 			auto& yy = view2.get<Terrain_Position_Y>(entity2);
@@ -157,13 +155,13 @@ namespace Scene {
 	}	
 
 	void Update_Army() {
-		auto company_view = scene.view<Company>();
+		auto company_view = Scenes::scene.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);	
 			for (int c = 0; c < company.iSub_Units.size(); c++) {
-				auto& platoon = scene.get<Platoon>(company.iSub_Units[c]);
+				auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
 				for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-					auto& squad = scene.get<Squad>(platoon.iSub_Units[p]);
+					auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 					for (int i = 0; i < squad.iSub_Units.size(); i++) {
 						if (squad.bAlive.at(i) == false) {
 							
@@ -178,7 +176,7 @@ namespace Scene {
 		//Update_Army();
 		//std::cout << "Update_Army = Good" << std::endl;
 
-		auto view = scene.view<Alive>();
+		auto view = Scenes::scene.view<Alive>();
 		for (auto entity : view) {
 			auto& x = view.get<Alive>(entity).bIsAlive;
 			if (x == false) {
