@@ -2,6 +2,7 @@
 #include "components.h"
 #include "scenes.h"
 #include "timer.h"
+#include "movement.h"
 
 namespace Weapons {
 
@@ -36,7 +37,7 @@ namespace Weapons {
 	}
 
 	void Attack_cast() {
-		auto view = Scenes::scene.view<Direction, Position_X, Position_Y, Actions, Attack>();
+		auto view = Scenes::scene.view<Direction, Position_X, Position_Y, Actions, Attack, Velocity>();
 		for (auto entity : view) {
 		//	act.action = slash;
 			auto& act = view.get<Actions>(entity);
@@ -45,8 +46,14 @@ namespace Weapons {
 			auto& dir = view.get<Direction>(entity);
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
+			auto& angle = view.get<Velocity>(entity).angle;
+			auto& target = view.get<Attack>(entity);
+
 			DataTypes::f2d pos = { x.fX, y.fY };
+			
+			dir.eDirection = Movement::Look_At_Target(x.fX, y.fY, target.targetX, target.targetY, angle);
 			create_attack(pos, dir.eDirection);	
+			//std::cout << dir.eDirection << std::endl;
 			Scenes::scene.emplace_or_replace<Attacking>(entity);
 			Scenes::scene.remove<Attack>(entity);
 		}
@@ -65,19 +72,34 @@ namespace Weapons {
 		}
 	}
 
+	//void Attacking_Updater() {
+	//	auto view = Scenes::scene.view<Attacking, Actions>();
+	//	for (auto entity : view) {
+	//		auto &act = view.get<Actions>(entity);
+	//		//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
+	//		if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
+	//			act.action = idle;
+	//			Scenes::scene.remove<Attacking>(entity);
+	//		}
+	//	}
+	//}
+
 	void Attacking_Updater() {
 		auto view = Scenes::scene.view<Attacking, Actions>();
 		for (auto entity : view) {
-			auto &act = view.get<Actions>(entity);
+			auto& act = view.get<Actions>(entity);
 			//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
-			if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
-				act.action = idle;
-				Scenes::scene.remove<Attacking>(entity);
+			if (act.action != dead) {
+				if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
+					act.action = idle;
+					Scenes::scene.remove<Attacking>(entity);
+				}
 			}
 		}
 	}
 
 	void Update_Attacks() {
+		
 		Attack_Box_Destroy();
 		Attacking_Updater();
 		Attack_cast();

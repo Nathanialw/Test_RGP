@@ -45,9 +45,11 @@ namespace Spells {
 		Scenes::scene.emplace<animation>(spell, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
 		Scenes::scene.get<animation>(spell).sheet = { //populate the vector
 			{ NULL },
-			{ {0, 0, 64, 64 }, 0, 512, 0, 0, { 32, 32 }, 16.0f }, //idle
-			{ {0, 0, 64, 64 }, 0, 512, 0, 0, { 32, 32 }, 16.0f } //walk
+			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f }, //idle
+			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f } //walk
 		};
+		Scenes::scene.emplace<Sprite_Offset>(spell, 32.0f, 32.0f);
+
 		Scenes::scene.emplace<Actions>(spell, walk);
 		Scenes::scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
 		
@@ -79,22 +81,27 @@ namespace Spells {
 		create_spell(fireball, pos, direction, spellname, targetX, targetY);
 	}
 
+
+
 	void cast_fireball() {
-		auto view = Scenes::scene.view<Direction, Actions, Position_X, Position_Y, Cast, Spell_Name>();
+		auto view = Scenes::scene.view<Direction, Actions, Position_X, Position_Y, Cast, Spell_Name, Velocity>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
-			act.action = slash;
+			act.action = cast;
 			act.frameCount[act.action].currentFrame = 0;
 			auto& target = view.get<Cast>(entity);
 
-			auto& dir = view.get<Direction>(entity);
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& direction = view.get<Direction>(entity).eDirection;
+			auto& x = view.get<Position_X>(entity).fX;
+			auto& y = view.get<Position_Y>(entity).fY;
+			auto& angle = view.get<Velocity>(entity).angle;
 	
-			auto& name = view.get<Spell_Name>(entity);
-
-			create_fireball(x.fX, y.fY, dir.eDirection, name.spell, target.targetX, target.targetY);		
-
+			auto& name = view.get<Spell_Name>(entity).spell;
+			//look at target
+			direction = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle);
+			//cast Fireball
+			create_fireball(x, y, direction, name, target.targetX, target.targetY);		
+			//set into casting mode
 			Scenes::scene.emplace_or_replace<Casting>(entity);
 			Scenes::scene.remove<Cast>(entity);			
 		}
@@ -105,16 +112,41 @@ namespace Spells {
 		cast_fireball();
 	}
 
-	void Clear_NonMoving_Spells() {
-		auto view = Scenes::scene.view<Spell>(entt::exclude<Mouse_Move, Linear_Move>);
-		for (auto entity : view)	
+	void Create_Explosion(float& x, float y) { //creates the explosion for fireballs
+		auto explosion = Scenes::scene.create();
+
+		Scenes::scene.emplace<Position_X>(explosion, x, x);
+		Scenes::scene.emplace<Position_Y>(explosion, y, y);
+		Scenes::scene.emplace<Sprite_Frames>(explosion, 15, 0);
+		Scenes::scene.emplace<Texture>(explosion, Graphics::fireball_explosion_0, 0, 0, 128, 128);
+		Scenes::scene.emplace<Frame_Delay>(explosion, 100.0f, 0.0f);
+		Scenes::scene.emplace<Explosion>(explosion, 0, 0, 0.0f, 0.0f, 128.0f, 128.0f, 64.0f, 100.0f);
+	}
+
+
+	void Destroy_NonMoving_Spells() {
+		auto view = Scenes::scene.view<Spell, Position_X, Position_Y>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
+		for (auto entity : view) {
+			auto& x = view.get<Position_X>(entity).fX;
+			auto& y = view.get<Position_Y>(entity).fY;
+			
+			//create explosion
+			Create_Explosion(x, y);
+			//destroy spell
 			Scenes::scene.destroy(entity);
+		}
 	}
 
 	void Clear_Collided_Spells() {
-		auto view = Scenes::scene.view<Spell, Alive>();
+		auto view = Scenes::scene.view<Spell, Position_X, Position_Y, Alive>();
 		for (auto entity : view)
 		if (view.get<Alive>(entity).bIsAlive == false) {
+			auto& x = view.get<Position_X>(entity).fX;
+			auto& y = view.get<Position_Y>(entity).fY;
+
+			//create explosion
+			Create_Explosion(x, y);
+			//destroy spell
 			Scenes::scene.destroy(entity);
 		}
 	}
@@ -134,7 +166,8 @@ namespace Spells {
 	}
 
 	void Update_Spells() {
-		Clear_NonMoving_Spells();
+		
+		Destroy_NonMoving_Spells();
 		Clear_Collided_Spells();
 		Casting_Updater();
 		add_spells_to_scene();

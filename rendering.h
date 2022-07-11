@@ -44,7 +44,7 @@ namespace Rendering {
 	}
 
 	void Render_Terrain() { //state
-		auto view1 = Scenes::scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions>();
+		auto view1 = Scenes::scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions, Sprite_Offset>();
 		auto view2 = Scenes::scene.view<Camera>();
 		float sx;
 		float sy;
@@ -55,13 +55,14 @@ namespace Rendering {
 				auto& x = view1.get<Terrain_Position_X>(entity);
 				auto& y = view1.get<Terrain_Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
+				auto& position = view1.get<Sprite_Offset>(entity);
 				//only fire this at 60 frames/sec
 				//anim.renderPosition = anim.sheet[act.action].clip;										//save sprite for vector
 				anim.clipSprite = anim.sheet[act.action].clip;											//save position for renderer
 				sx = x.fX - camera_offset.screen.x;	
 				sy = y.fY - camera_offset.screen.y;
-				anim.renderPosition.x = sx - anim.sheet[act.action].posOffset.x;
-				anim.renderPosition.y = sy - anim.sheet[act.action].posOffset.y;
+				anim.renderPosition.x = sx - position.offset.fX;
+				anim.renderPosition.y = sy - position.offset.fY;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 			}
 		}
@@ -129,7 +130,7 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction>();
+		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction, Sprite_Offset>();
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto id : view2) {
@@ -140,6 +141,7 @@ namespace Rendering {
 				auto& x = view1.get<Position_X>(entity);
 				auto& y = view1.get<Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
+				auto& position = view1.get<Sprite_Offset>(entity);
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].currentFrameTime += Timer::timeStep;
 				if (anim.sheet[act.action].currentFrameTime >= anim.sheet[act.action].timeBetweenFrames) {
@@ -150,9 +152,66 @@ namespace Rendering {
 				}
 				sx = x.fX - camera_offset.screen.x;
 				sy = y.fY - camera_offset.screen.y;
-				anim.renderPosition.x = sx - anim.sheet[act.action].posOffset.x;
-				anim.renderPosition.y = sy - anim.sheet[act.action].posOffset.y;
+				anim.renderPosition.x = sx - position.offset.fX;
+				anim.renderPosition.y = sy - position.offset.fY;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+			}
+		}
+	}
+
+	SDL_Rect Explosion_Frame_Update(int currentFrame, int maxFrames, SDL_Rect frameToUpdateClipOf) {
+		//increment to next frame if the spritesheet
+		// 128 x 128 pixels per
+		// 8 x 8 spritesheet frames
+		int row = currentFrame * 128;
+		int column = currentFrame * 128;
+		int width = 128;
+		int height = 128;
+
+		SDL_Rect rect = { row, column, width, height };
+
+		return rect;
+	}
+
+	void Explosions() {
+		SDL_Rect xClipPos;
+		float sx;
+		float sy;
+		auto view = Scenes::scene.view<Explosion, Position_X, Position_Y, Frame_Delay, Texture, Sprite_Frames>();
+		auto view2 = Scenes::scene.view<Camera>();
+
+		for (auto cam : view2) {
+			auto& camera_offset = view2.get<Camera>(cam);
+			for (auto spell : view) {
+				auto& anim = view.get<Explosion>(spell);
+				auto& x = view.get<Position_X>(spell);
+				auto& y = view.get<Position_Y>(spell);
+				auto& texture = view.get<Texture>(spell);
+				auto& frames = view.get<Sprite_Frames>(spell);
+				auto& delay = view.get<Frame_Delay>(spell);
+
+				delay.currentFrameTime += Timer::timeStep;
+				if (delay.currentFrameTime >= delay.timeBetweenFrames) {
+					if (frames.currentFrame <= frames.maxFrames) { // if there are still frames remaining
+					//only fire this at 60 frames/sec
+
+						xClipPos = Explosion_Frame_Update(frames.currentFrame, frames.maxFrames, texture.clippedSpriteFrame);		//get action and direction state sprite draw from
+						anim.renderPosition = Utilities::SDL_Rect_To_SDL_FRect(xClipPos);		//save sprite for vector
+						texture.clippedSpriteFrame = xClipPos;									//save position for renderer			
+						frames.currentFrame++;
+					}
+					delay.currentFrameTime = 0;
+				}
+				else {
+					//Scenes::scene.destroy(spell);
+					//continue;
+				}
+				sx = x.fX - camera_offset.screen.x - anim.offsetToAlignWithFireball.fX; 
+				sy = y.fY - camera_offset.screen.y - anim.offsetToAlignWithFireball.fY;
+				anim.renderPosition.x = sx - anim.posOffset.x;
+				anim.renderPosition.y = sy - anim.posOffset.y;
+				SDL_RenderCopyF(Graphics::renderer, texture.pTexture, &texture.clippedSpriteFrame, &anim.renderPosition);
+								
 			}
 		}
 	}
@@ -498,6 +557,7 @@ namespace Rendering {
 		//std::cout << "Render_Terrain = Good" << std::endl;
 		//std::cout << "sort_Positions = Good" << std::endl;
 		Animation_Frame();
+		Explosions();
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		Interface::Run_Interface();
 		///std::cout << "Run_Interface = Good" << std::endl;

@@ -33,6 +33,7 @@ namespace Movement {
 		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
+		float angleY = 0.0f;
 		//std::cout << Update_Position_Poll << std::endl;
 		if (Update_Position_Poll >= 20) {
 			for (auto entity : view) {
@@ -43,10 +44,10 @@ namespace Movement {
 					number_of_units++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
 					if (fabs(vel.magnitude.fY) < 0.01) { vel.magnitude.fY = 0; };
-					vel.angle1 = atan2f(vel.magnitude.fX, vel.magnitude.fY);
-					vel.angle2 = atan2f(vel.magnitude.fY, vel.magnitude.fX);
-					float velocityX = sinf(vel.angle1) * vel.speed;
-					float velocityY = sinf(vel.angle2) * vel.speed;
+					vel.angle = atan2f(vel.magnitude.fX, vel.magnitude.fY);
+					angleY = atan2f(vel.magnitude.fY, vel.magnitude.fX);
+					float velocityX = sinf(vel.angle) * vel.speed;
+					float velocityY = sinf(angleY) * vel.speed;
 					vel.dX = velocityX;
 					vel.dY = velocityY;
 					pX.fPX += velocityX * Update_Position_Poll;
@@ -57,26 +58,35 @@ namespace Movement {
 		}
 	};
 
+	Compass Set_Direction(float angleInRadians) {
+		
+		if      (angleInRadians > 2.74889    || angleInRadians <= (-2.74889)) { return N; }
+		else if (angleInRadians > 1.96349    && angleInRadians <= (2.74889))  { return NE; }
+		else if (angleInRadians > 1.17809 	 && angleInRadians <= (1.96349))  { return E; }
+		else if (angleInRadians > 0.39269	 && angleInRadians <= (1.17809))  { return SE; }
+		else if (angleInRadians > (-0.39269) && angleInRadians <= (0.39269))  { return S; }
+		else if (angleInRadians > (-1.17811) && angleInRadians <= (-0.39269)) { return SW; }
+		else if (angleInRadians > (-1.96351) && angleInRadians <= (-1.17811)) { return W; }
+		else if (angleInRadians > (-2.74889) && angleInRadians <= (-1.96351)) { return NW; }
+	}
+
+	Compass Look_At_Target(float& positionX, float& positionY, float& targetX, float& targetY, float& angleInRadians) {
+		angleInRadians = Utilities::Get_Direction_Point(positionX, positionY, targetX, targetY);
+		return Set_Direction(angleInRadians);
+	}
+
 	void Update_Direction() {
 		auto view = Scenes::scene.view<Direction, Actions, Velocity, Moving>();
 		for (auto entity : view) {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
 			auto& c = view.get<Actions>(entity);
-			if (vel.angle1 > 2.74889 || vel.angle1 <= (-2.74889)) { b.eDirection = N;}
-			else if (vel.angle1 > 1.96349 && vel.angle1 <= (2.74889)) { b.eDirection = NE; }
-			else if (vel.angle1 > 1.17809 && vel.angle1 <= (1.96349)) { b.eDirection = E;}
-			else if (vel.angle1 > 0.39269 && vel.angle1 <= (1.17809)) { b.eDirection = SE; }
 
-			else if (vel.angle1 > (-0.39269) && vel.angle1 <= (0.39269)) { b.eDirection = S; }
-			else if (vel.angle1 > (-1.17811) && vel.angle1 <= (-0.39269)) { b.eDirection = SW; }
-			else if (vel.angle1 > (-1.96351) && vel.angle1 <= (-1.17811)) { b.eDirection = W; }
-			else if (vel.angle1 > (-2.74889) && vel.angle1 <= (-1.96351)) { b.eDirection = NW; }
+			b.eDirection = Set_Direction(vel.angle);
 
 			if (c.action == walk) {
 				if (vel.magnitude.fX == 0 && vel.magnitude.fY == 0) {
 					c.action = idle;
-				//	scene.remove<Moving>(entity);
 				};
 			}
 		}

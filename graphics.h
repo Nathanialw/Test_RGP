@@ -19,13 +19,13 @@ namespace Graphics {
 	
 	SDL_Texture* skeleton_0;
 	SDL_Texture* skeleton_1;
+	SDL_Texture* skeleton_mage_0;
 	SDL_Texture* tree_0;
 	SDL_Texture* archer_0;
 	SDL_Texture* house_0;
 	SDL_Texture* grass_0;
-	SDL_Texture* fireball_0;
-	
-	SDL_Texture* axe;
+	SDL_Texture* fireball_0;	
+	SDL_Texture* fireball_explosion_0;
 
 
 
@@ -71,14 +71,13 @@ namespace Graphics {
 		Create_Font();
 		skeleton_0 = createTexture("sprites/units/skeleton/armoured_skeleton_00.png");
 		skeleton_1 = createTexture("sprites/units/skeleton/skeleton_00.png");
+		skeleton_mage_0 = createTexture("sprites/units/skeleton/skeleton_mage_00.png");
 		tree_0 = createTexture("sprites/environment/trees/_tree_01/_tree_01_00000.png");
 		house_0 = createTexture("sprites/buildings/building_04.png");
 		archer_0 = createTexture("sprites/units/archer/archer_00.png");
 		grass_0 = createTexture("sprites/environment/grass/grass.png");
-		fireball_0 = createTexture("sprites/spells/fireball_0.png");
-		
-		
-		axe = createTexture("sprites/spells/fireball_0.png");
+		fireball_0 = createTexture("sprites/spells/fireball_0.png");		
+		fireball_explosion_0 = createTexture("sprites/spells/fireball_explosion_0.png");
 	}
 
 

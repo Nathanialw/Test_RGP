@@ -14,18 +14,25 @@ namespace AI {
 	//if target is in range, melee attack
 
 
+	
+
 	void Move_Toward_Target(entt::entity& entity, float& x, float& y) {
 		Scenes::scene.emplace_or_replace<Moving>(entity);
 		Scenes::scene.emplace_or_replace<Mouse_Move>(entity, x, y);		
 	}
 
-	void Spell_Attack(entt::entity entity, float targetX, float targetY, const char* name) {
-		Scenes::scene.emplace_or_replace<Cast>(entity, targetX, targetY);
-		Scenes::scene.emplace_or_replace<Spell_Name>(entity, name);
+	void Spell_Attack(entt::entity& entity, float& targetX, float& targetY, const char* name) {
+	
+		if (Scenes::scene.any_of<Casting>(entity) == false) { //locks out casing until cast animation has finished
+			Scenes::scene.emplace_or_replace<Cast>(entity, targetX, targetY);
+			Scenes::scene.emplace_or_replace<Spell_Name>(entity, name);
+		}
 	}
 
-	void Melee_Attack(entt::entity entity) {
-		Scenes::scene.emplace_or_replace<Attack>(entity);
+	void Melee_Attack(entt::entity& entity, float& x, float& y) {
+		if (Scenes::scene.any_of<Attacking>(entity) == false) { //locks out attacking until attack animation has finished
+			Scenes::scene.emplace_or_replace<Attack>(entity, x, y);
+		}
 	}
 
 	void Check_For_Targets() {

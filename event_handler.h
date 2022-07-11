@@ -59,9 +59,9 @@ namespace Event_Handler {
 				case SDLK_x:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
 				case SDLK_1: AI::Spell_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
-				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'");  break;
-				case SDLK_3: Timer::Pause_Control();  break;
-				case SDLK_4: Scenes::scene.emplace_or_replace<Attack>(entity); break;
+				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
+				case SDLK_3: AI::Melee_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
+				case SDLK_4: break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
@@ -71,6 +71,7 @@ namespace Event_Handler {
 				case SDLK_ESCAPE: Graphics::closeContext();  break;
 				case SDLK_PLUS: break;
 				case SDLK_MINUS: break;
+				case SDLK_p: Timer::Pause_Control();  break; 
 				}
 			}
 			if (event.type == SDL_KEYUP) {

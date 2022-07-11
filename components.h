@@ -70,7 +70,7 @@ namespace Components {
 		float dX, dY;
 		DataTypes::f2d magnitude;
 		float speed;
-		float angle1, angle2;
+		float angle;
 	};
 
 	struct Building_Collider {
@@ -82,7 +82,7 @@ namespace Components {
 		idle,
 		walk,
 		slash,
-		stab,
+		cast,
 		struck,
 		dead,
 		ranged,
@@ -115,13 +115,20 @@ namespace Components {
 		Compass eDirection;
 	};
 
+	struct Update_Direction {
+
+	};
+
+	struct Sprite_Offset {
+		DataTypes::f2d offset;
+	};
+
 	struct spriteframes {
 		SDL_Rect clip;
 		int frameStart;
 		int sheetWidth;
 		bool bReversable;
 		bool bReversing;
-		DataTypes::i2d posOffset;
 		float timeBetweenFrames;
 		float currentFrameTime;
 	};
@@ -226,6 +233,28 @@ namespace Components {
 
 	};
 
+	struct Sprite_Frames {
+		int maxFrames;
+		int currentFrame;
+	};
+
+	struct Texture {
+		SDL_Texture* pTexture;		//texture
+		SDL_Rect clippedSpriteFrame;
+	};
+
+	struct Frame_Delay {
+		float timeBetweenFrames;
+		float currentFrameTime;
+	};
+
+	struct Explosion {
+		DataTypes::i2d posOffset;
+		SDL_FRect renderPosition;
+		DataTypes::f2d offsetToAlignWithFireball;
+
+	};
+
 	struct Melee {
 
 	};
@@ -235,7 +264,8 @@ namespace Components {
 	};
 
 	struct Attack {
-
+		float targetX;
+		float targetY;
 	};
 	
 	enum Weapon_Type {

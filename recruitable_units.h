@@ -9,22 +9,24 @@
 
 namespace Units {
 
-	void Create_Archer(int x, int y)  {
+	void Create_Archer(float x, float y)  {
 	for (auto j = 0; j < x; ++j) {
 		for (auto i = 0; i < y; ++i) {
 			auto archer = Scenes::scene.create();			//creates a unique handle for an entity
 			Scenes::scene.emplace<Components::animation>(archer, Graphics::archer_0); /// need to load the texture only onceand pass the pointer into this function
 			Scenes::scene.get<Components::animation>(archer).sheet = { //populate the vector
 				{ NULL },
-				{ {0   , 0, 128, 128}, 0,    512,  1, 0, {60, 95}, 75.0f, 75.0f },//idle
-				{ {512,  0, 128, 128}, 512,  1024, 0, 0, {60, 95}, 75.0f, 75.0f },//walk
-				{ {1536, 0, 128, 128}, 1536, 512,  0, 0, {60, 95}, 75.0f, 0.0f },//attack
-				{ NULL }, //		unused
-				{ {2048, 0, 128, 128}, 2048, 256,  0, 0, {60, 95}, 75.0f, 0.0f },//struck
-				{ {2304, 0, 128, 128}, 2560, 768,  0, 0, {60, 95}, 75.0f, 0.0f }, //dead
-				{ {3072, 0, 128, 128}, 2816, 512,  0, 0, {60, 95}, 75.0f, 0.0f }, //cheer
-				{ {3584, 0, 128, 128}, 3584, 512,  1, 0, {60, 95}, 75.0f, 0.0f },//range
+				{ {0   , 0, 128, 128}, 0,    512,  1, 0, 75.0f, 75.0f },//idle
+				{ {512,  0, 128, 128}, 512,  1024, 0, 0, 75.0f, 75.0f },//walk
+				{ {1536, 0, 128, 128}, 1536, 512,  0, 0, 75.0f, 0.0f },//attack
+				
+				{ {2048, 0, 128, 128}, 2048, 256,  0, 0, 75.0f, 0.0f },//struck
+				{ {2304, 0, 128, 128}, 2560, 768,  0, 0, 75.0f, 0.0f }, //dead
+				{ {3072, 0, 128, 128}, 2816, 512,  0, 0, 75.0f, 0.0f }, //cheer
+				{ {3584, 0, 128, 128}, 3584, 512,  1, 0, 75.0f, 0.0f },//range
 			};
+			Scenes::scene.emplace<Components::Sprite_Offset>(archer, 60.0f, 95.0f);
+
 			Scenes::scene.emplace<Components::Actions>(archer, Components::idle);
 			Scenes::scene.get<Components::Actions>(archer).frameCount = { {0, 0}, { 4, 0}, {8, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
