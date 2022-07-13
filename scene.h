@@ -109,7 +109,7 @@ namespace Scene {
 
 		Scenes::scene.emplace<Radius>(skeleton, 15.0f);
 
-		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.35f);
+		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.2f);
 		Scenes::scene.emplace<Direction>(skeleton, SE);
 		Scenes::scene.emplace<Alive>(skeleton, true);
 		Scenes::scene.emplace<handle>(skeleton, "Skeleton");
