@@ -101,7 +101,7 @@ namespace Interface {
 
 			SDL_Rect srcRect = { 0, 0 , 32, 32 };
 			SDL_Rect d = { Mouse::iXMouse, Mouse::iYMouse, 32 / componentCamera.scale.fX, 32 / componentCamera.scale.fY };
-			SDL_RenderDrawRect(Graphics::renderer, &d);	
+			
 			SDL_RenderCopy(Graphics::renderer, Graphics::cursor_0, &srcRect, &d);
 			
 		}
