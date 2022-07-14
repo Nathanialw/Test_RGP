@@ -7,6 +7,7 @@
 #include "utilities.h"
 #include "items.h"
 #include <vector>
+#include "ui.h"
 
 
 namespace Camera_Control {
@@ -596,6 +597,7 @@ namespace Rendering {
 		Animation_Frame();
 		Explosions();
 		//std::cout << "Animation_Frame = Good" << std::endl;
+		UI::Render_UI();
 		Interface::Run_Interface();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_RenderPresent(Graphics::renderer);

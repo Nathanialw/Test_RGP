@@ -98,22 +98,12 @@ namespace Interface {
 		auto view = Scenes::scene.view<Camera>();
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
-			//auto& x = view.get<Position_X>(focus);
-			//auto& y = view.get<Position_Y>(focus);
-			SDL_Color b = { 255, 255, 255, 255 };
 
-			iMousePollRate += Timer::timeStep;
-			if (iMousePollRate >= 500) {
-				iMousePollRate = 0;
-				SDL_DestroyTexture(mouseX.pTexture);
-				SDL_DestroyTexture(mouseY.pTexture);
-				mouseX = Graphics::Load_Text_Texture(std::to_string(Mouse::iXWorld_Mouse), { 133,255,133 });
-				mouseY = Graphics::Load_Text_Texture(std::to_string(Mouse::iYWorld_Mouse), { 133,255,133 });
-			}
-			SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
-			SDL_Rect d = { Mouse::iXMouse, Mouse::iYMouse, 50 / componentCamera.scale.fX, 50 / componentCamera.scale.fY };
+			SDL_Rect srcRect = { 0, 0 , 32, 32 };
+			SDL_Rect d = { Mouse::iXMouse, Mouse::iYMouse, 32 / componentCamera.scale.fX, 32 / componentCamera.scale.fY };
 			SDL_RenderDrawRect(Graphics::renderer, &d);	
-			//v.y = v.y + 50;
+			SDL_RenderCopy(Graphics::renderer, Graphics::cursor_0, &srcRect, &d);
+			
 		}
 	}
 
@@ -220,9 +210,9 @@ namespace Interface {
 
 	void Run_Interface() {
 		Show_Grid(Map::terrain);
-		//Display_Military_Groups();
+		Display_Military_Groups();
 		Debug_System::Debugger();
-		//Unit_Arrive_UI();
+		Unit_Arrive_UI();
 		Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();

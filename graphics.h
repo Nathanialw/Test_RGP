@@ -29,14 +29,13 @@ namespace Graphics {
 	SDL_Texture* fireball_explosion_0;
 	SDL_Texture* longsword_default;
 	SDL_Texture* item_ui;
-
-
+	SDL_Texture* itsmars_Inventory;
+	SDL_Texture* cursor_0;
 
 	struct Surface_Data {
 		SDL_Texture* pTexture;
 		SDL_Rect k;
 	};
-
 
 	Surface_Data Load_Text_Texture(std::string text, SDL_Color fontColor) {
 		SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), fontColor);		//convert font to Surface
@@ -52,8 +51,6 @@ namespace Graphics {
 	void Create_Font() {
 		font = TTF_OpenFont("fonts/FreeSans.ttf", 30);
 	}
-
-
 
 	//load texture when initializing components
 	//SDL_Texture* createTexture2(const char* spritesheet) {
@@ -85,10 +82,9 @@ namespace Graphics {
 	
 		longsword_default = createTexture("sprites/items/long_sword/w_longsword.png");
 		item_ui = createTexture("sprites/UI/equipment.jpg");
+		itsmars_Inventory = createTexture("sprites/UI/itsmars_Inventory.png");
+		cursor_0 = createTexture("sprites/UI/cursor.png");
 	}
-
-
-
 
 	void createGraphicsContext() {
 		//SDL_GL_SetSwapInterval(0);
@@ -96,15 +92,11 @@ namespace Graphics {
 		//renderer = GPU_Init(resolution.w, resolution.h, GPU_DEFAULT_INIT_FLAGS);
 		//
 		//cam = GPU_GetDefaultCamera();
-
 	
 		SDL_CreateWindowAndRenderer(resolution.w, resolution.h, NULL, &window, &renderer);
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 		Load_Textures();
 	}
-
-
-
 			
 	void closeContext() {
 		SDL_DestroyWindow(window);

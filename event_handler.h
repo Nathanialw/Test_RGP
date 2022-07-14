@@ -72,6 +72,7 @@ namespace Event_Handler {
 				case SDLK_PLUS: break;
 				case SDLK_MINUS: break;
 				case SDLK_p: Timer::Pause_Control();  break; 
+				case SDLK_i: UI::Toggle_Bag();  break;
 				}
 			}
 			if (event.type == SDL_KEYUP) {
