@@ -7,8 +7,8 @@ namespace Mouse {
 	float Cursor_Size = 5.0f;
 	bool bRight_Mouse_Pressed = false;
 	bool bLeft_Mouse_Pressed = false;
-	int iXMouse;
-	int iYMouse;
+	float iXMouse;
+	float iYMouse;
 	float iXWorld_Mouse;
 	float iYWorld_Mouse;
 	int Mouse_Selection_Box_x;

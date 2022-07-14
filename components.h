@@ -144,6 +144,10 @@ namespace Components {
 		float y;
 	};
 
+	struct Scale {
+		float scale;
+	};
+
 	struct Terrain_Renderable {
 		float y;
 	};

@@ -125,6 +125,9 @@
     <ClInclude Include="item_components.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

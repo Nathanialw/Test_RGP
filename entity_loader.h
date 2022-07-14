@@ -34,9 +34,9 @@ namespace Entity_Loader {
 		sqlite3_prepare_v2(db, buf, -1, &stmt, 0);
 
 		while (sqlite3_step(stmt) != SQLITE_DONE) {
-			values.radius = sqlite3_column_double(stmt, 0); //0 only increments up when calling more than one column
-			values.speed = sqlite3_column_double(stmt, 1); //0 only increments up when calling more than one column
-			values.mass= sqlite3_column_double(stmt, 2); //0 only increments up when calling more than one column
+			values.radius = (float)sqlite3_column_double(stmt, 0); //0 only increments up when calling more than one column
+			values.speed = (float)sqlite3_column_double(stmt, 1); //0 only increments up when calling more than one column
+			values.mass= (float)sqlite3_column_double(stmt, 2); //0 only increments up when calling more than one column
 		}
 
 		return values;

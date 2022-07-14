@@ -64,6 +64,7 @@ namespace Scene {
 		Scenes::scene.get<animation>(tree).sheet = {
 			{{ 0, 0, 631, 723}, 0, 631, 0, 0, 16.0f } }; //populate the vector
 		Scenes::scene.emplace<Sprite_Offset>(tree, 313.0f, 609.0f);
+		Scenes::scene.emplace<Scale>(tree, 1.0f);
 
 		Scenes::scene.emplace<Position_X>(tree, 100.0f, 100.0f + (x * 952.0f));
 		Scenes::scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (y * 1165.0f));
@@ -87,7 +88,7 @@ namespace Scene {
 	void Load_Entities() {
 		//player
 		auto skeleton = Scenes::scene.create();			//creates a unique handle for an entity
-		Scenes::scene.emplace<animation>(skeleton, Graphics::skeleton_0); /// need to load the texture /only /once and pass the pointer into this function
+		Scenes::scene.emplace<animation>(skeleton, Graphics::warrior_axe); /// need to load the texture /only /once and pass the pointer into this function
 		Scenes::scene.get<animation>(skeleton).sheet = { //populate the vector
 			{ NULL },
 			{ {0   , 0, 128, 128}, 0,    512,  1, 0, 75.0f, 0.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
@@ -99,6 +100,7 @@ namespace Scene {
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, 75.0f, 0.0f},//ranged
 		};
 		Scenes::scene.emplace<Sprite_Offset>(skeleton, 60.0f, 95.0f);
+		Scenes::scene.emplace<Scale>(skeleton, 1.0f);
 
 		Scenes::scene.emplace<Actions>(skeleton, idle);
 		Scenes::scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
@@ -109,7 +111,7 @@ namespace Scene {
 
 		Scenes::scene.emplace<Radius>(skeleton, 15.0f);
 
-		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.35f);
+		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.2f);
 		Scenes::scene.emplace<Direction>(skeleton, SE);
 		Scenes::scene.emplace<Alive>(skeleton, true);
 		Scenes::scene.emplace<handle>(skeleton, "Skeleton");

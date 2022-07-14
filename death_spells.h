@@ -27,6 +27,7 @@ namespace Death_Spells {
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, 75.0f, 0.0f},//ranged
 		};
 		Scenes::scene.emplace<Components::Sprite_Offset>(skeleton0, 60.0f, 95.0f );
+		Scenes::scene.emplace<Components::Scale>(skeleton0, 1.0f);
 
 		
 

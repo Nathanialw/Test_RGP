@@ -26,14 +26,14 @@ namespace Spells {
 
 	DataTypes::f2d Spell_Direction(DataTypes::f2d& pos, Components::Compass& direction) {
 		switch (direction) {
-		case N: return { pos.fX, pos.fY - 25.0f };
-		case S: return { pos.fX, pos.fY + 25.0f };
-		case E: return { pos.fX + 25.0f, pos.fY };
-		case W: return { pos.fX - 25.0f, pos.fY };
-		case NW:return { pos.fX - 25.0f, pos.fY - 25.0f };
-		case NE:return { pos.fX + 25.0f, pos.fY - 25.0f };
-		case SW:return { pos.fX - 25.0f, pos.fY + 25.0f };
-		case SE:return { pos.fX + 25.0f, pos.fY + 25.0f };
+		case N: return { pos.fX, pos.fY - 20.0f };
+		case S: return { pos.fX, pos.fY + 20.0f };
+		case E: return { pos.fX + 20.0f, pos.fY };
+		case W: return { pos.fX - 20.0f, pos.fY };
+		case NW: return { pos.fX - 20.0f, pos.fY - 20.0f };
+		case NE: return { pos.fX + 20.0f, pos.fY - 20.0f };
+		case SW: return { pos.fX - 20.0f, pos.fY + 20.0f };
+		case SE: return { pos.fX + 20.0f, pos.fY + 20.0f };
 		}
 	}
 
@@ -49,6 +49,7 @@ namespace Spells {
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f } //walk
 		};
 		Scenes::scene.emplace<Sprite_Offset>(spell, 32.0f, 32.0f);
+		Scenes::scene.emplace<Scale>(spell, 1.0f);
 
 		Scenes::scene.emplace<Actions>(spell, walk);
 		Scenes::scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };

@@ -20,12 +20,15 @@ namespace Graphics {
 	SDL_Texture* skeleton_0;
 	SDL_Texture* skeleton_1;
 	SDL_Texture* skeleton_mage_0;
+	SDL_Texture* warrior_axe;
 	SDL_Texture* tree_0;
 	SDL_Texture* archer_0;
 	SDL_Texture* house_0;
 	SDL_Texture* grass_0;
 	SDL_Texture* fireball_0;	
 	SDL_Texture* fireball_explosion_0;
+	SDL_Texture* longsword_default;
+	SDL_Texture* item_ui;
 
 
 
@@ -70,6 +73,7 @@ namespace Graphics {
 	void Load_Textures() {
 		Create_Font();
 		skeleton_0 = createTexture("sprites/units/skeleton/armoured_skeleton_00.png");
+		warrior_axe = createTexture("sprites/units/warrior/warrior_axe.png");
 		skeleton_1 = createTexture("sprites/units/skeleton/skeleton_00.png");
 		skeleton_mage_0 = createTexture("sprites/units/skeleton/skeleton_mage_00.png");
 		tree_0 = createTexture("sprites/environment/trees/_tree_01/_tree_01_00000.png");
@@ -78,6 +82,9 @@ namespace Graphics {
 		grass_0 = createTexture("sprites/environment/grass/grass.png");
 		fireball_0 = createTexture("sprites/spells/fireball_0.png");		
 		fireball_explosion_0 = createTexture("sprites/spells/fireball_explosion_0.png");
+	
+		longsword_default = createTexture("sprites/items/long_sword/w_longsword.png");
+		item_ui = createTexture("sprites/UI/equipment.jpg");
 	}
 
 
@@ -90,7 +97,7 @@ namespace Graphics {
 		//
 		//cam = GPU_GetDefaultCamera();
 
-
+	
 		SDL_CreateWindowAndRenderer(resolution.w, resolution.h, NULL, &window, &renderer);
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 		Load_Textures();

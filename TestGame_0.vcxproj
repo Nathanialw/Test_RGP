@@ -230,6 +230,7 @@
     <ClInclude Include="sprites.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="ui.h" />
     <ClInclude Include="ui_elements.h" />
     <ClInclude Include="unit_control.h" />
     <ClInclude Include="utilities.h" />

@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "interface.h"
 #include "utilities.h"
+#include "items.h"
 #include <vector>
 
 
@@ -26,7 +27,10 @@ namespace Camera_Control {
 			//updates the global variable that may be useful for getting scrren/world positions
 			Graphics::Screen = componentCamera.screen;
 			//update mouse
-			SDL_GetMouseState(&Mouse::iXMouse, &Mouse::iYMouse);
+			int mx, my;
+			SDL_GetMouseState(&mx, &my);
+			Mouse::iXMouse = (float)mx;
+			Mouse::iYMouse = (float)my;
 			Mouse::iXWorld_Mouse = (Mouse::iXMouse / componentCamera.scale.fX) + componentCamera.screen.x;//getting mouse world Position corrected for scale
 			Mouse::iYWorld_Mouse = (Mouse::iYMouse / componentCamera.scale.fY) + componentCamera.screen.y;//getting mouse world Position corrected for scale
 			Mouse::iXMouse = Mouse::iXMouse / componentCamera.scale.fX;  // getting the screen mouse position corrected for scale
@@ -125,18 +129,32 @@ namespace Rendering {
 		return x;
 	}
 
+
+	SDL_Rect Scale_Sprite_for_Render(SDL_Rect& clippedSprite, float& scale) {
+		SDL_FRect fScaledImage = Utilities::SDL_Rect_To_SDL_FRect(clippedSprite);
+		fScaledImage = {
+			fScaledImage.x - (fScaledImage.w * scale),
+			fScaledImage.y - (fScaledImage.h * scale),
+			fScaledImage.h * scale,
+			fScaledImage.w * scale
+		};
+
+		return Utilities::SDL_FRect_To_SDL_Rect(fScaledImage);
+	}
+
 	void Animation_Frame() { //state
 
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction, Sprite_Offset>();
+		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction, Sprite_Offset, Scale>();
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id);
 			for (auto entity : view1) {
 				auto& d = view1.get<Direction>(entity);
+				auto& scale = view1.get<Scale>(entity).scale;
 				auto& anim = view1.get<animation>(entity);
 				auto& x = view1.get<Position_X>(entity);
 				auto& y = view1.get<Position_Y>(entity);
@@ -147,7 +165,7 @@ namespace Rendering {
 				if (anim.sheet[act.action].currentFrameTime >= anim.sheet[act.action].timeBetweenFrames) {
 					anim.sheet[act.action].currentFrameTime = 0;
 					xClipPos = Frame_Update(anim.sheet[act.action], d, act);//get action and direction state sprite draw from
-					anim.renderPosition = xClipPos;										//save sprite for vector
+					anim.renderPosition = Scale_Sprite_for_Render(xClipPos, scale);										//save sprite for vector
 					anim.clipSprite = xClipPos;											//save position for renderer			
 				}
 				sx = x.fX - camera_offset.screen.x;
@@ -459,6 +477,25 @@ namespace Rendering {
 				std::cout << "spell_view = Good" << std::endl;
 			}
 
+			auto items_view = Scenes::scene.view<Ground_Item, Position_X, Position_Y>();
+
+			for (auto item : items_view) {
+				auto& x = items_view.get<Position_X>(item);
+				auto& y = items_view.get<Position_Y>(item);
+				SDL_FPoint point = { x.fX, y.fY };
+				if (Utilities::bPoint_RectIntersect(point, screen)) {
+					//Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
+					//show.y = y.fY;
+					unitvec.push_back({ item, y.fY });
+					//spellnum++;
+				}
+				else {
+					//scene.remove<Renderable>(spell_id);
+					unitvecremove.push_back(item);
+					//spellremoved++;
+				}
+			}
+
 			auto company_view = Scenes::scene.view<Company>();
 
 			for (auto companies : company_view) {
@@ -531,7 +568,7 @@ namespace Rendering {
 				Component_Renerable();
 			}
 			else {
-				Vector_Renderable(Map::terrain);
+			//	Vector_Renderable(Map::terrain);
 			}
 		}
 	};

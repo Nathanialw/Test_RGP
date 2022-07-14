@@ -1,5 +1,5 @@
 #pragma once
-
+#include <SDL.h>
 
 namespace Item_Components {
 
@@ -16,7 +16,7 @@ namespace Item_Components {
 
 
 	struct Ground_Item {
-
+		SDL_FRect box;
 	};
 
 
