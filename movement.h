@@ -8,8 +8,8 @@
 
 namespace Movement {
 	namespace {
-		int Player_Move_Poll;
-		int Update_Position_Poll;
+		int64_t Player_Move_Poll = 0;
+		int64_t Update_Position_Poll = 0;
 		int number_of_units = 0;
 	}
 
@@ -129,7 +129,7 @@ namespace Movement {
 	}
 
 
-	int linearMovePoll = 0;
+	int64_t linearMovePoll = 0;
 
 	void Linear_Move_To() {
 		linearMovePoll += Timer::timeStep;
