@@ -85,10 +85,11 @@ namespace AI {
 		time += Timer::timeStep;
 		//std::cout << time << std::endl;
 		if (time >= 1000.0f) {
-		//if (on) {
-			time = 0.0f;
-			Update_Sight_Box();
-			Check_For_Targets();
+			if (on) {
+				time = 0.0f;
+				Update_Sight_Box();
+				Check_For_Targets();
+			}
 		}
 	}
 }

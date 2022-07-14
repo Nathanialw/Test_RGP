@@ -58,13 +58,14 @@ namespace Scene {
 
 	void Create_Tree(float& x, float& y, const char* name, SDL_Texture* texture) {
 		Entity_Loader::Data data = Entity_Loader::parse_data(name);
+		float scale = 1.0f;
 
 		auto tree = Scenes::scene.create();
 		Scenes::scene.emplace<animation>(tree, Graphics::tree_0); /// need to load hetexture	 only once and pass the pointer into this function
 		Scenes::scene.get<animation>(tree).sheet = {
-			{{ 0, 0, 631, 723}, 0, 631, 0, 0, 16.0f } }; //populate the vector
-		Scenes::scene.emplace<Sprite_Offset>(tree, 313.0f, 609.0f);
-		Scenes::scene.emplace<Scale>(tree, 1.0f);
+			{{ 0, 0, 631, 723}, 0, 631, 0, 0, 16.0f, 0.0f } }; //populate the vector
+		Scenes::scene.emplace<Sprite_Offset>(tree, 313.0f * scale, 609.0f * scale);
+		Scenes::scene.emplace<Scale>(tree, scale);
 
 		Scenes::scene.emplace<Position_X>(tree, 100.0f, 100.0f + (x * 952.0f));
 		Scenes::scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (y * 1165.0f));
@@ -72,9 +73,9 @@ namespace Scene {
 		Scenes::scene.get<Actions>(tree).frameCount = { { 0, 0} };
 		Scenes::scene.emplace<Direction>(tree, W);
 
-		Scenes::scene.emplace<Radius>(tree, data.radius);
+		Scenes::scene.emplace<Radius>(tree, data.radius * scale);
 		Scenes::scene.emplace<Environment>(tree);
-		Scenes::scene.emplace<Mass>(tree, data.mass);
+		Scenes::scene.emplace<Mass>(tree, data.mass * scale);
 	}
 
 	void Spawn_Trees () {
@@ -86,6 +87,7 @@ namespace Scene {
 	}
 
 	void Load_Entities() {
+		float scale = 1.0f;
 		//player
 		auto skeleton = Scenes::scene.create();			//creates a unique handle for an entity
 		Scenes::scene.emplace<animation>(skeleton, Graphics::warrior_axe); /// need to load the texture /only /once and pass the pointer into this function
@@ -99,8 +101,8 @@ namespace Scene {
 			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, 75.0f, 0.0f},// death //reverse to summon
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, 75.0f, 0.0f},//ranged
 		};
-		Scenes::scene.emplace<Sprite_Offset>(skeleton, 60.0f, 95.0f);
-		Scenes::scene.emplace<Scale>(skeleton, 1.0f);
+		Scenes::scene.emplace<Sprite_Offset>(skeleton, 60.0f * scale, 95.0f *scale);
+		Scenes::scene.emplace<Scale>(skeleton, scale);
 
 		Scenes::scene.emplace<Actions>(skeleton, idle);
 		Scenes::scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
@@ -109,13 +111,13 @@ namespace Scene {
 		Scenes::scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f);
 		Scenes::scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f);
 
-		Scenes::scene.emplace<Radius>(skeleton, 15.0f);
+		Scenes::scene.emplace<Radius>(skeleton, 15.0f * scale);
 
 		Scenes::scene.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.2f);
 		Scenes::scene.emplace<Direction>(skeleton, SE);
 		Scenes::scene.emplace<Alive>(skeleton, true);
 		Scenes::scene.emplace<handle>(skeleton, "Skeleton");
-		Scenes::scene.emplace<Mass>(skeleton, 200.0f);
+		Scenes::scene.emplace<Mass>(skeleton, 200.0f * scale);
 		Scenes::scene.emplace<Health>(skeleton, 10);
 
 		Scenes::scene.emplace<Input>(skeleton);

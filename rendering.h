@@ -43,6 +43,7 @@ namespace Camera_Control {
 namespace Rendering {
 
 	namespace {
+		bool showSpriteBox = true;
 		bool renderType = true;
 		bool debug = false;
 		float fRenderable = 0.0f;
@@ -174,6 +175,9 @@ namespace Rendering {
 				anim.renderPosition.x = sx - position.offset.fX;
 				anim.renderPosition.y = sy - position.offset.fY;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				if (showSpriteBox) {
+					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);
+				}
 			}
 		}
 	}
@@ -230,7 +234,9 @@ namespace Rendering {
 				anim.renderPosition.x = sx - anim.posOffset.x;
 				anim.renderPosition.y = sy - anim.posOffset.y;
 				SDL_RenderCopyF(Graphics::renderer, texture.pTexture, &texture.clippedSpriteFrame, &anim.renderPosition);
-								
+				if (showSpriteBox) {
+					SDL_RenderDrawRectF(Graphics::renderer, &anim.renderPosition);
+				}
 			}
 		}
 	}

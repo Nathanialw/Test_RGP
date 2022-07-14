@@ -24,22 +24,25 @@ namespace Spells {
 		}
 	}
 
-	DataTypes::f2d Spell_Direction(DataTypes::f2d& pos, Components::Compass& direction) {
+	DataTypes::f2d Spell_Direction(DataTypes::f2d& pos, Components::Compass& direction, float& scale) {
 		switch (direction) {
-		case N: return { pos.fX, pos.fY - 20.0f };
-		case S: return { pos.fX, pos.fY + 20.0f };
-		case E: return { pos.fX + 20.0f, pos.fY };
-		case W: return { pos.fX - 20.0f, pos.fY };
-		case NW: return { pos.fX - 20.0f, pos.fY - 20.0f };
-		case NE: return { pos.fX + 20.0f, pos.fY - 20.0f };
-		case SW: return { pos.fX - 20.0f, pos.fY + 20.0f };
-		case SE: return { pos.fX + 20.0f, pos.fY + 20.0f };
+		case N: return { pos.fX, pos.fY - (20.0f * scale) };
+		case S: return { pos.fX, pos.fY + (20.0f * scale) };
+		case E: return { pos.fX + (20.0f * scale) , pos.fY };
+		case W: return { pos.fX - (20.0f * scale) , pos.fY };
+		case NW: return { pos.fX - (20.0f * scale) , pos.fY - (20.0f * scale)  };
+		case NE: return { pos.fX + (20.0f * scale) , pos.fY - (20.0f * scale)  };
+		case SW: return { pos.fX - (20.0f * scale) , pos.fY + (20.0f * scale)  };
+		case SE: return { pos.fX + (20.0f * scale) , pos.fY + (20.0f * scale)  };
 		}
 	}
 
 	void create_spell(entt::entity& spell, DataTypes::f2d& pos, Compass& direction, const char* spellname, float& targetX, float& targetY) {
+		
+		float scale = 1.0f;
+		
 		Entity_Loader::Data data = Entity_Loader::parse_data(spellname);
-		DataTypes::f2d spelldir = Spell_Direction(pos, direction);
+		DataTypes::f2d spelldir = Spell_Direction(pos, direction, scale);
  
 		//rendering data
 		Scenes::scene.emplace<animation>(spell, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
@@ -48,8 +51,8 @@ namespace Spells {
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f }, //idle
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f } //walk
 		};
-		Scenes::scene.emplace<Sprite_Offset>(spell, 32.0f, 32.0f);
-		Scenes::scene.emplace<Scale>(spell, 1.0f);
+		Scenes::scene.emplace<Sprite_Offset>(spell, 32.0f * scale, 32.0f * scale);
+		Scenes::scene.emplace<Scale>(spell, scale);
 
 		Scenes::scene.emplace<Actions>(spell, walk);
 		Scenes::scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
@@ -59,9 +62,9 @@ namespace Spells {
 		Scenes::scene.emplace<Position_Y>(spell, spelldir.fY, spelldir.fY); 
 
 		//spell data
-		Scenes::scene.emplace<Radius>(spell, data.radius);
+		Scenes::scene.emplace<Radius>(spell, data.radius * scale);
 		Scenes::scene.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
-		Scenes::scene.emplace<Mass>(spell, data.mass);
+		Scenes::scene.emplace<Mass>(spell, data.mass * scale);
 		//Scenes::scene.emplace<Spell_Range>(spell, 1000.0f);
 
 		//default data

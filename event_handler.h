@@ -61,7 +61,7 @@ namespace Event_Handler {
 				case SDLK_1: AI::Spell_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
 				case SDLK_3: AI::Melee_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
-				case SDLK_4: Items::Drop_Item(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse); break;
+				case SDLK_4: Items::Create_And_Drop_Item(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse); break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
