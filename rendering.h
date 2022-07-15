@@ -137,8 +137,8 @@ namespace Rendering {
 		fScaledImage = {
 			fScaledImage.x - (fScaledImage.w * scale),
 			fScaledImage.y - (fScaledImage.h * scale),
-			fScaledImage.h * scale,
-			fScaledImage.w * scale
+			fScaledImage.w * scale,
+			fScaledImage.h * scale
 		};
 
 		return Utilities::SDL_FRect_To_SDL_Rect(fScaledImage);
@@ -153,7 +153,7 @@ namespace Rendering {
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto id : view2) {
-			auto& camera_offset = view2.get<Camera>(id);
+			auto& camera_offset = view2.get<Camera>(id).screen;
 			for (auto entity : view1) {
 				auto& d = view1.get<Direction>(entity);
 				auto& scale = view1.get<Scale>(entity).scale;
@@ -161,7 +161,7 @@ namespace Rendering {
 				auto& x = view1.get<Position_X>(entity);
 				auto& y = view1.get<Position_Y>(entity);
 				auto& act = view1.get<Actions>(entity);
-				auto& position = view1.get<Sprite_Offset>(entity);
+				auto& offset = view1.get<Sprite_Offset>(entity).offset;
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].currentFrameTime += Timer::timeStep;
 				if (anim.sheet[act.action].currentFrameTime >= anim.sheet[act.action].timeBetweenFrames) {
@@ -170,13 +170,14 @@ namespace Rendering {
 					anim.renderPosition = Scale_Sprite_for_Render(xClipPos, scale);										//save sprite for vector
 					anim.clipSprite = xClipPos;											//save position for renderer			
 				}
-				sx = x.fX - camera_offset.screen.x;
-				sy = y.fY - camera_offset.screen.y;
-				anim.renderPosition.x = sx - position.offset.fX;
-				anim.renderPosition.y = sy - position.offset.fY;
+				sx = x.fX - camera_offset.x;
+				sy = y.fY - camera_offset.y;
+								
+				anim.renderPosition.x = sx - offset.fX;
+				anim.renderPosition.y = sy - offset.fY;
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 				if (showSpriteBox) {
-					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);
+					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);					
 				}
 			}
 		}
