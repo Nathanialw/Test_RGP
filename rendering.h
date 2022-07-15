@@ -155,6 +155,7 @@ namespace Rendering {
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id).screen;
 			for (auto entity : view1) {
+				auto& alpha = view1.get<Renderable>(entity).alpha;
 				auto& d = view1.get<Direction>(entity);
 				auto& scale = view1.get<Scale>(entity).scale;
 				auto& anim = view1.get<animation>(entity);
@@ -175,10 +176,15 @@ namespace Rendering {
 								
 				anim.renderPosition.x = sx - offset.fX;
 				anim.renderPosition.y = sy - offset.fY;
+
+				
+				SDL_SetTextureAlphaMod(anim.pTexture, alpha);
+
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 				if (showSpriteBox) {
 					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);					
 				}
+				
 			}
 		}
 	}
@@ -234,6 +240,8 @@ namespace Rendering {
 				sy = y.fY - camera_offset.screen.y - anim.offsetToAlignWithFireball.fY;
 				anim.renderPosition.x = sx - anim.posOffset.x;
 				anim.renderPosition.y = sy - anim.posOffset.y;
+
+				
 				SDL_RenderCopyF(Graphics::renderer, texture.pTexture, &texture.clippedSpriteFrame, &anim.renderPosition);
 				if (showSpriteBox) {
 					SDL_RenderDrawRectF(Graphics::renderer, &anim.renderPosition);
@@ -274,6 +282,20 @@ namespace Rendering {
 		}
 	}
 
+	int Set_Render_Position_Alpha(float& screenEdge, float& renderEdge, float& yPosition) {
+		if (yPosition <= screenEdge) {
+			return 255;
+		}
+		else {
+			float x = yPosition - screenEdge;
+			float edgeBuffer = renderEdge - screenEdge;
+			float y = edgeBuffer / x;
+			int z = 255 - ( 255 / y );
+			
+			return z;
+		}
+	}
+
 	void Component_Renerable() {
 		auto view = Scenes::scene.view<Camera>();
 		//system("CLS");
@@ -281,15 +303,22 @@ namespace Rendering {
 		int j = 0;
 
 		for (auto id : view) {
-			auto& camera = view.get<Camera>(id);
-			SDL_FRect screen = { camera.screen.x - (camera.screen.w / 2),camera.screen.y - (camera.screen.h / 2), camera.screen.w * 2, camera.screen.h * 2 };
+			auto& screenEdge = view.get<Camera>(id).screen;
+			
+			screenEdge;				//The actual screen
+			SDL_FRect renderEdge;	//expanded screen renderer
+			// camera.screen.y = 100%
+			// screen.y = 0%
 
+			renderEdge = { screenEdge.x - (screenEdge.w / 2), screenEdge.y - (screenEdge.h / 2), screenEdge.w * 2, screenEdge.h * 2 };
+			
 			auto view2 = Scenes::scene.view<Terrain_Position_Y, Terrain_Position_X>();
+			
 			for (auto pos : view2) {
 				auto& x = view2.get<Terrain_Position_X>(pos);
 				auto& y = view2.get<Terrain_Position_Y>(pos);
 				SDL_FPoint point = { x.fX,y.fY };
-				if (SDL_PointInFRect(&point, &screen)) {
+				if (SDL_PointInFRect(&point, &renderEdge)) {
 					Scenes::scene.emplace_or_replace<Terrain_Renderable>(pos);
 					i++;
 				}
@@ -299,12 +328,15 @@ namespace Rendering {
 			}
 
 			auto view3 = Scenes::scene.view<Position_Y, Position_X>();
+			
 			for (auto pos : view3) {
 				auto& x = view3.get<Position_X>(pos);
 				auto& y = view3.get<Position_Y>(pos);
 				SDL_FPoint point = { x.fX,y.fY };
-				if (SDL_PointInFRect(&point, &screen)) {
-					Scenes::scene.emplace_or_replace<Renderable>(pos, y.fY);
+				if (SDL_PointInFRect(&point, &renderEdge)) {
+					float bottomOfScreenEdge = screenEdge.y + screenEdge.h;
+					float bottomOfRenderRect = renderEdge.y + renderEdge.h;
+					Scenes::scene.emplace_or_replace<Renderable>(pos, y.fY, Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y.fY));					
 					j++;
 				}
 				else {
@@ -319,253 +351,253 @@ namespace Rendering {
 	}
 
 	void Vector_Renderable(Map::Node3& terrain) {
-	// check: grid, military structure, player (maybe a seperate grid for terrain?)
-		// NEED to update grid position every frame to maake this work for mobile units
-		if (debug) {
-			std::cout << "--- Starting Check_Renderable() --- = Good" << std::endl;
-		}
+	//// check: grid, military structure, player (maybe a seperate grid for terrain?)
+	//	// NEED to update grid position every frame to maake this work for mobile units
+	//	if (debug) {
+	//		std::cout << "--- Starting Check_Renderable() --- = Good" << std::endl;
+	//	}
 
-		int grassnum = 0;
-		int grassremoved = 0;
-		int unitnum = 0;
-		int unitremoved = 0;
-		int playernum = 0;
-		int playerremoved = 0;
-		int armynum = 0;
-		int armyremoved = 0;
-		int spellnum = 0;
-		int spellremoved = 0;
+	//	int grassnum = 0;
+	//	int grassremoved = 0;
+	//	int unitnum = 0;
+	//	int unitremoved = 0;
+	//	int playernum = 0;
+	//	int playerremoved = 0;
+	//	int armynum = 0;
+	//	int armyremoved = 0;
+	//	int spellnum = 0;
+	//	int spellremoved = 0;
 
-		auto view = Scenes::scene.view<Camera>();
+	//	auto view = Scenes::scene.view<Camera>();
 
-		//SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
+	//	//SDL_SetRenderDrawColor(renderer, 255, 155, 255, 255);
 
-		for (auto id : view) {
-			auto& camera = view.get<Camera>(id);
-			SDL_FRect screen = { camera.screen.x - (camera.screen.w / 2),camera.screen.y - (camera.screen.h / 2), camera.screen.w * 2, camera.screen.h * 2 };
-			//SDL_FRect drawRect = screen;
+	//	for (auto id : view) {
+	//		auto& camera = view.get<Camera>(id);
+	//		SDL_FRect screen = { camera.screen.x - (camera.screen.w / 2),camera.screen.y - (camera.screen.h / 2), camera.screen.w * 2, camera.screen.h * 2 };
+	//		//SDL_FRect drawRect = screen;
 
-			//SDL_RenderDrawRectF(renderer, &drawRect);
-			//SDL_FRect screen = camera.screen;
+	//		//SDL_RenderDrawRectF(renderer, &drawRect);
+	//		//SDL_FRect screen = camera.screen;
 
-			std::vector<entt::entity>grassvec(Scenes::scene.view<Terrain_Renderable>().size());
-			//grassvec.reserve(scene.view<Terrain_Renderable>().size());
-			std::vector<entt::entity>grassvecremove(Scenes::scene.view<Terrain_Renderable>().size());
-			//grassvecremove.reserve(scene.view<Terrain_Renderable>().size());
+	//		std::vector<entt::entity>grassvec(Scenes::scene.view<Terrain_Renderable>().size());
+	//		//grassvec.reserve(scene.view<Terrain_Renderable>().size());
+	//		std::vector<entt::entity>grassvecremove(Scenes::scene.view<Terrain_Renderable>().size());
+	//		//grassvecremove.reserve(scene.view<Terrain_Renderable>().size());
 
-			if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
-				for (int i = 0; i < Map::size; i++) {
-					if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
-						for (int j = 0; j < Map::size; j++) {
-							if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
-								for (int k = 0; k < Map::size; k++) {
-									if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-										for (int l = 0; l < Map::size; l++) {
-											if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-												for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-												//	scene.emplace_or_replace<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													grassvec.emplace_back(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													grassnum++;
-												}
-											}
-											else {
-												for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-												//	scene.remove<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													grassvecremove.emplace_back(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													grassremoved++;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	//		if (Utilities::bRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
+	//			for (int i = 0; i < Map::size; i++) {
+	//				if (Utilities::bRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
+	//					for (int j = 0; j < Map::size; j++) {
+	//						if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
+	//							for (int k = 0; k < Map::size; k++) {
+	//								if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+	//									for (int l = 0; l < Map::size; l++) {
+	//										if (Utilities::bRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+	//											for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+	//											//	scene.emplace_or_replace<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												grassvec.emplace_back(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												grassnum++;
+	//											}
+	//										}
+	//										else {
+	//											for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+	//											//	scene.remove<Terrain_Renderable>(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												grassvecremove.emplace_back(terrain.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												grassremoved++;
+	//											}
+	//										}
+	//									}
+	//								}
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
 
-					
-			//std::cout << "vector render" << std::endl;
-			//std::cout << "--------------------" << std::endl;
-			//std::cout << grassvec.size() << std::endl;
-			//std::cout << grassvecremove.size() << std::endl;
-			for (int i = 0; i < grassvec.size(); i++) {
-				Scenes::scene.emplace_or_replace<Terrain_Renderable>(grassvec[i]);
-			}
-			for (int i = 0; i < grassvecremove.size(); i++) {
-				Scenes::scene.remove<Terrain_Renderable>(grassvecremove[i]);
-			}
+	//				
+	//		//std::cout << "vector render" << std::endl;
+	//		//std::cout << "--------------------" << std::endl;
+	//		//std::cout << grassvec.size() << std::endl;
+	//		//std::cout << grassvecremove.size() << std::endl;
+	//		for (int i = 0; i < grassvec.size(); i++) {
+	//			Scenes::scene.emplace_or_replace<Terrain_Renderable>(grassvec[i]);
+	//		}
+	//		for (int i = 0; i < grassvecremove.size(); i++) {
+	//			Scenes::scene.remove<Terrain_Renderable>(grassvecremove[i]);
+	//		}
 
 
-			std::vector<std::pair<entt::entity, float>>unitvec;
-			//unitvec.resize(scene.view<Renderable>().size());
-			std::vector<entt::entity>unitvecremove;
-			//unitvecremove.resize(scene.view<Renderable>().size());
+	//		std::vector<std::pair<entt::entity, float>>unitvec;
+	//		//unitvec.resize(scene.view<Renderable>().size());
+	//		std::vector<entt::entity>unitvecremove;
+	//		//unitvecremove.resize(scene.view<Renderable>().size());
 
-			if (debug) {
-				std::cout << "terrain = Good" << std::endl;
-			}
+	//		if (debug) {
+	//			std::cout << "terrain = Good" << std::endl;
+	//		}
 
-			if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
-				for (int i = 0; i < Map::size; i++) {
-					if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].sCollide_Box)) {
-						for (int j = 0; j < Map::size; j++) {
-							if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].sCollide_Box)) {
-								for (int k = 0; k < Map::size; k++) {
-									if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-										for (int l = 0; l < Map::size; l++) {
-											if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-												for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-													/*Renderable& show = scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													show.y = scene.get<Position_Y>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]).fY;*/
-													unitvec.push_back({Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a], 15.0f});
-													unitnum++;
-												}
-											}
-											else {
-												for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
-													//scene.remove<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
-													unitvecremove.push_back({Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]});
-													unitremoved++;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			if (debug) {
-				std::cout << "Map::map = Good" << std::endl;
-			}
+	//		if (Utilities::bRect_Intersect(screen, Map::map.sCollide_Box)) {// checks individul units for visibility
+	//			for (int i = 0; i < Map::size; i++) {
+	//				if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].sCollide_Box)) {
+	//					for (int j = 0; j < Map::size; j++) {
+	//						if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].sCollide_Box)) {
+	//							for (int k = 0; k < Map::size; k++) {
+	//								if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+	//									for (int l = 0; l < Map::size; l++) {
+	//										if (Utilities::bRect_Intersect(screen, Map::map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+	//											for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+	//												/*Renderable& show = scene.emplace_or_replace<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												show.y = scene.get<Position_Y>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]).fY;*/
+	//												unitvec.push_back({Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a], 15.0f});
+	//												unitnum++;
+	//											}
+	//										}
+	//										else {
+	//											for (int a = 0; a < Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
+	//												//scene.remove<Renderable>(Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]);
+	//												unitvecremove.push_back({Map::map.nodes[i].nodes[j].nodes[k].cells[l].entities[a]});
+	//												unitremoved++;
+	//											}
+	//										}
+	//									}
+	//								}
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//		if (debug) {
+	//			std::cout << "Map::map = Good" << std::endl;
+	//		}
 
-			auto player_view = Scenes::scene.view<Input, Position_X, Position_Y>();
+	//		auto player_view = Scenes::scene.view<Input, Position_X, Position_Y>();
 
-			for (auto player_id : player_view) {
-				auto& x = player_view.get<Position_X>(player_id);
-				auto& y = player_view.get<Position_Y>(player_id);
-				SDL_FPoint point = { x.fX, y.fY };
-				if (Utilities::bPoint_RectIntersect(point, screen)) {
-					//Renderable& show = scene.emplace_or_replace<Renderable>(player_id);
-					//show.y = y.fY;
-					unitvec.push_back({ player_id, y.fY });
-					playernum++;
-				}
-				else {
-					//scene.remove<Renderable>(player_id);
-					unitvecremove.push_back(player_id);
-					playerremoved++;
-				}
-			}
-			if (debug) {
-				std::cout << "player_view = Good" << std::endl;
-			}
+	//		for (auto player_id : player_view) {
+	//			auto& x = player_view.get<Position_X>(player_id);
+	//			auto& y = player_view.get<Position_Y>(player_id);
+	//			SDL_FPoint point = { x.fX, y.fY };
+	//			if (Utilities::bPoint_RectIntersect(point, screen)) {
+	//				//Renderable& show = scene.emplace_or_replace<Renderable>(player_id);
+	//				//show.y = y.fY;
+	//				unitvec.push_back({ player_id, y.fY });
+	//				playernum++;
+	//			}
+	//			else {
+	//				//scene.remove<Renderable>(player_id);
+	//				unitvecremove.push_back(player_id);
+	//				playerremoved++;
+	//			}
+	//		}
+	//		if (debug) {
+	//			std::cout << "player_view = Good" << std::endl;
+	//		}
 
-			auto spell_view = Scenes::scene.view<Spell, Position_X, Position_Y>();
+	//		auto spell_view = Scenes::scene.view<Spell, Position_X, Position_Y>();
 
-			for (auto spell_id : spell_view) {
-				auto& x = spell_view.get<Position_X>(spell_id);
-				auto& y = spell_view.get<Position_Y>(spell_id);
-				SDL_FPoint point = { x.fX, y.fY };
-				if (Utilities::bPoint_RectIntersect(point, screen)) {
-					//Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
-					//show.y = y.fY;
-					unitvec.push_back({ spell_id, y.fY });
-					spellnum++;
-				}
-				else {
-					//scene.remove<Renderable>(spell_id);
-					unitvecremove.push_back(spell_id);
-					spellremoved++;
-				}
-			}
-			if (debug) {
-				std::cout << "spell_view = Good" << std::endl;
-			}
+	//		for (auto spell_id : spell_view) {
+	//			auto& x = spell_view.get<Position_X>(spell_id);
+	//			auto& y = spell_view.get<Position_Y>(spell_id);
+	//			SDL_FPoint point = { x.fX, y.fY };
+	//			if (Utilities::bPoint_RectIntersect(point, screen)) {
+	//				//Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
+	//				//show.y = y.fY;
+	//				unitvec.push_back({ spell_id, y.fY });
+	//				spellnum++;
+	//			}
+	//			else {
+	//				//scene.remove<Renderable>(spell_id);
+	//				unitvecremove.push_back(spell_id);
+	//				spellremoved++;
+	//			}
+	//		}
+	//		if (debug) {
+	//			std::cout << "spell_view = Good" << std::endl;
+	//		}
 
-			auto items_view = Scenes::scene.view<Ground_Item, Position_X, Position_Y>();
+	//		auto items_view = Scenes::scene.view<Ground_Item, Position_X, Position_Y>();
 
-			for (auto item : items_view) {
-				auto& x = items_view.get<Position_X>(item);
-				auto& y = items_view.get<Position_Y>(item);
-				SDL_FPoint point = { x.fX, y.fY };
-				if (Utilities::bPoint_RectIntersect(point, screen)) {
-					//Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
-					//show.y = y.fY;
-					unitvec.push_back({ item, y.fY });
-					//spellnum++;
-				}
-				else {
-					//scene.remove<Renderable>(spell_id);
-					unitvecremove.push_back(item);
-					//spellremoved++;
-				}
-			}
+	//		for (auto item : items_view) {
+	//			auto& x = items_view.get<Position_X>(item);
+	//			auto& y = items_view.get<Position_Y>(item);
+	//			SDL_FPoint point = { x.fX, y.fY };
+	//			if (Utilities::bPoint_RectIntersect(point, screen)) {
+	//				//Renderable& show = scene.emplace_or_replace<Renderable>(spell_id);
+	//				//show.y = y.fY;
+	//				unitvec.push_back({ item, y.fY });
+	//				//spellnum++;
+	//			}
+	//			else {
+	//				//scene.remove<Renderable>(spell_id);
+	//				unitvecremove.push_back(item);
+	//				//spellremoved++;
+	//			}
+	//		}
 
-			auto company_view = Scenes::scene.view<Company>();
+	//		auto company_view = Scenes::scene.view<Company>();
 
-			for (auto companies : company_view) {
-				auto& company = company_view.get<Company>(companies);
-				if (Utilities::bRect_Intersect(company.sCollide_Box, screen)) {
-					for (int c = 0; c < company.iSub_Units.size(); c++) {
-						auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
-						if (Utilities::bRect_Intersect(platoon.sCollide_Box, screen)) {
-							for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
-								if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
-									for (int i = 0; i < squad.iSub_Units.size(); i++) {
-										//if (squad.bAlive.at(i) == true) {
-										//Renderable& show = scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
-										//show.y = scene.get<Position_Y>(squad.iSub_Units[i]).fY;
-										//}
-										unitvec.push_back({ squad.iSub_Units[i], squad.fPY[i]});
-										armynum++;
-									}
-								}
-								else {
-									for (int i = 0; i < squad.iSub_Units.size(); i++) {
-										//scene.remove<Renderable>(squad.iSub_Units[i]);
-										unitvecremove.push_back(squad.iSub_Units[i]);
-										armyremoved++;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	//		for (auto companies : company_view) {
+	//			auto& company = company_view.get<Company>(companies);
+	//			if (Utilities::bRect_Intersect(company.sCollide_Box, screen)) {
+	//				for (int c = 0; c < company.iSub_Units.size(); c++) {
+	//					auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
+	//					if (Utilities::bRect_Intersect(platoon.sCollide_Box, screen)) {
+	//						for (int p = 0; p < platoon.iSub_Units.size(); p++) {
+	//							auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
+	//							if (Utilities::bRect_Intersect(squad.sCollide_Box, screen)) { //checks against itself too so that units with the squad will have collision
+	//								for (int i = 0; i < squad.iSub_Units.size(); i++) {
+	//									//if (squad.bAlive.at(i) == true) {
+	//									//Renderable& show = scene.emplace_or_replace<Renderable>(squad.iSub_Units[i]);
+	//									//show.y = scene.get<Position_Y>(squad.iSub_Units[i]).fY;
+	//									//}
+	//									unitvec.push_back({ squad.iSub_Units[i], squad.fPY[i]});
+	//									armynum++;
+	//								}
+	//							}
+	//							else {
+	//								for (int i = 0; i < squad.iSub_Units.size(); i++) {
+	//									//scene.remove<Renderable>(squad.iSub_Units[i]);
+	//									unitvecremove.push_back(squad.iSub_Units[i]);
+	//									armyremoved++;
+	//								}
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
 
-			//std::cout << "--------------------" << std::endl;
-			//std::cout << unitvec.size() << std::endl;
-			//std::cout << unitvecremove.size() << std::endl;
-			for (int i = 0; i < unitvec.size(); i++) {
-				Scenes::scene.emplace_or_replace<Renderable>(unitvec[i].first, unitvec[i].second);
-						
-			}
-			for (int i = 0; i < unitvecremove.size(); i++) {
-				Scenes::scene.remove<Renderable>(unitvecremove[i]);
-			}
+	//		//std::cout << "--------------------" << std::endl;
+	//		//std::cout << unitvec.size() << std::endl;
+	//		//std::cout << unitvecremove.size() << std::endl;
+	//		for (int i = 0; i < unitvec.size(); i++) {
+	//			Scenes::scene.emplace_or_replace<Renderable>(unitvec[i].first, unitvec[i].second);
+	//					
+	//		}
+	//		for (int i = 0; i < unitvecremove.size(); i++) {
+	//			Scenes::scene.remove<Renderable>(unitvecremove[i]);
+	//		}
 
-			if (debug) {
-				std::cout << "company_view = Good" << std::endl;
-			}
-		}
+	//		if (debug) {
+	//			std::cout << "company_view = Good" << std::endl;
+	//		}
+	//	}
 
-		//system("CLS");
-		//std::cout << "vector render" << std::endl;				
-		////std::cout << " in Rendering.h" << std::endl;
-		//std::cout << scene.view<Terrain_Renderable>().size() << "  /  " << grassnum << std::endl;
-		////std::cout << grassnum << std::endl;
-		//std::cout << scene.view<Renderable>().size() << "  /  " << unitnum + playernum + armynum << std::endl;
-		////std::cout << unitnum + playernum + armynum << std::endl;
-		///*std::cout << playernum << std::endl;
-		//std::cout << armynum << std::endl;*/
-		//std::cout << "----------------------------------" << std::endl;
-		if (debug) {
-			std::cout << "--- ending Check_Renderable() --- = Good" << std::endl;
-		}
+	//	//system("CLS");
+	//	//std::cout << "vector render" << std::endl;				
+	//	////std::cout << " in Rendering.h" << std::endl;
+	//	//std::cout << scene.view<Terrain_Renderable>().size() << "  /  " << grassnum << std::endl;
+	//	////std::cout << grassnum << std::endl;
+	//	//std::cout << scene.view<Renderable>().size() << "  /  " << unitnum + playernum + armynum << std::endl;
+	//	////std::cout << unitnum + playernum + armynum << std::endl;
+	//	///*std::cout << playernum << std::endl;
+	//	//std::cout << armynum << std::endl;*/
+	//	//std::cout << "----------------------------------" << std::endl;
+	//	if (debug) {
+	//		std::cout << "--- ending Check_Renderable() --- = Good" << std::endl;
+	//	}
 	}
 
 	void Check_Renderable() { //doesn't need to happen every frame

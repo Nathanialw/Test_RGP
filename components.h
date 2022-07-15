@@ -142,6 +142,7 @@ namespace Components {
 
 	struct Renderable {
 		float y;
+		int alpha;
 	};
 
 	struct Scale {
