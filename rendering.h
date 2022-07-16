@@ -203,7 +203,7 @@ namespace Rendering {
 		return rect;
 	}
 
-	void Explosions() {
+	void Render_Explosions() {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
@@ -229,6 +229,10 @@ namespace Rendering {
 						anim.renderPosition = Utilities::SDL_Rect_To_SDL_FRect(xClipPos);		//save sprite for vector
 						texture.clippedSpriteFrame = xClipPos;									//save position for renderer			
 						frames.currentFrame++;
+					}
+					else {
+						//remove explosion from scene and free the entity
+						Scenes::scene.destroy(spell);
 					}
 					delay.currentFrameTime = 0;
 				}
@@ -290,57 +294,56 @@ namespace Rendering {
 			float x = yPosition - screenEdge;
 			float edgeBuffer = renderEdge - screenEdge;
 			float y = edgeBuffer / x;
-			int z = 255 - ( 255 / y );
+			int alpha = 255 - ( 255 / y );
 			
-			return z;
+			return alpha;
 		}
 	}
 
-	void Component_Renerable() {
-		auto view = Scenes::scene.view<Camera>();
+	void Add_Remove_Renderable_Component() {
+		auto camera_view = Scenes::scene.view<Camera>();
 		//system("CLS");
 		int i = 0;
 		int j = 0;
 
-		for (auto id : view) {
-			auto& screenEdge = view.get<Camera>(id).screen;
+		for (auto camera : camera_view) {
+			auto& screenRect = camera_view.get<Camera>(camera).screen;
+			SDL_FRect renderRect = { 
+				screenRect.x - (screenRect.w / 2), 
+				screenRect.y - (screenRect.h / 2), 
+				screenRect.w * 2, 
+				screenRect.h * 2 };
 			
-			screenEdge;				//The actual screen
-			SDL_FRect renderEdge;	//expanded screen renderer
-			// camera.screen.y = 100%
-			// screen.y = 0%
-
-			renderEdge = { screenEdge.x - (screenEdge.w / 2), screenEdge.y - (screenEdge.h / 2), screenEdge.w * 2, screenEdge.h * 2 };
+			auto terrainView = Scenes::scene.view<Terrain_Position_Y, Terrain_Position_X>();
 			
-			auto view2 = Scenes::scene.view<Terrain_Position_Y, Terrain_Position_X>();
-			
-			for (auto pos : view2) {
-				auto& x = view2.get<Terrain_Position_X>(pos);
-				auto& y = view2.get<Terrain_Position_Y>(pos);
-				SDL_FPoint point = { x.fX,y.fY };
-				if (SDL_PointInFRect(&point, &renderEdge)) {
-					Scenes::scene.emplace_or_replace<Terrain_Renderable>(pos);
+			for (auto terrain : terrainView) {
+				auto& x = terrainView.get<Terrain_Position_X>(terrain).fX;
+				auto& y = terrainView.get<Terrain_Position_Y>(terrain).fY;
+				SDL_FPoint point = { x, y};
+				if (SDL_PointInFRect(&point, &renderRect)) {
+					Scenes::scene.emplace_or_replace<Terrain_Renderable>(terrain);
 					i++;
 				}
 				else {
-					Scenes::scene.remove<Terrain_Renderable>(pos);
+					Scenes::scene.remove<Terrain_Renderable>(terrain);
 				}
 			}
 
-			auto view3 = Scenes::scene.view<Position_Y, Position_X>();
+			auto objectsView = Scenes::scene.view<Position_Y, Position_X>();
+			float bottomOfScreenEdge = screenRect.y + screenRect.h;
+			float bottomOfRenderRect = renderRect.y + renderRect.h;
 			
-			for (auto pos : view3) {
-				auto& x = view3.get<Position_X>(pos);
-				auto& y = view3.get<Position_Y>(pos);
-				SDL_FPoint point = { x.fX,y.fY };
-				if (SDL_PointInFRect(&point, &renderEdge)) {
-					float bottomOfScreenEdge = screenEdge.y + screenEdge.h;
-					float bottomOfRenderRect = renderEdge.y + renderEdge.h;
-					Scenes::scene.emplace_or_replace<Renderable>(pos, y.fY, Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y.fY));					
+			for (auto entity : objectsView) {
+				auto& x = objectsView.get<Position_X>(entity).fX;
+				auto& y = objectsView.get<Position_Y>(entity).fY;
+				SDL_FPoint point = { x, y};
+				if (SDL_PointInFRect(&point, &renderRect)) {
+					int alpha = Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y);
+					Scenes::scene.emplace_or_replace<Renderable>(entity, y, alpha);
 					j++;
 				}
 				else {
-					Scenes::scene.remove<Renderable>(pos);
+					Scenes::scene.remove<Renderable>(entity);
 				}
 			}
 			//std::cout << "entt render" << std::endl;
@@ -605,7 +608,7 @@ namespace Rendering {
 		if (fRenderable >= 100) {		
 			fRenderable = 0;
 			if (renderType) {
-				Component_Renerable();
+				Add_Remove_Renderable_Component();
 			}
 			else {
 			//	Vector_Renderable(Map::terrain);
@@ -634,7 +637,7 @@ namespace Rendering {
 		//std::cout << "Render_Terrain = Good" << std::endl;
 		//std::cout << "sort_Positions = Good" << std::endl;
 		Animation_Frame();
-		Explosions();
+		Render_Explosions();
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
