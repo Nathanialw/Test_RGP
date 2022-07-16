@@ -241,6 +241,8 @@ namespace Components {
 	struct Sprite_Frames {
 		int maxFrames;
 		int currentFrame;
+		int frameX;
+		int frameY;
 	};
 
 	struct Texture {

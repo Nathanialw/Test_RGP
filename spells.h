@@ -121,9 +121,9 @@ namespace Spells {
 
 		Scenes::scene.emplace<Position_X>(explosion, x, x);
 		Scenes::scene.emplace<Position_Y>(explosion, y, y);
-		Scenes::scene.emplace<Sprite_Frames>(explosion, 15, 0);
+		Scenes::scene.emplace<Sprite_Frames>(explosion, 63, 0, 0, 0);
 		Scenes::scene.emplace<Texture>(explosion, Graphics::fireball_explosion_0, 0, 0, 128, 128);
-		Scenes::scene.emplace<Frame_Delay>(explosion, 100.0f, 0.0f);
+		Scenes::scene.emplace<Frame_Delay>(explosion, 16.0f, 0.0f);
 		Scenes::scene.emplace<Explosion>(explosion, 0, 0, 0.0f, 0.0f, 128.0f, 128.0f, 64.0f, 100.0f);
 	}
 
