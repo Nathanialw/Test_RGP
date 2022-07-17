@@ -18,6 +18,9 @@ namespace Weapons {
 		case SW :return { pos.fX - 45, pos.fY + 15, 30, 30 };
 		case SE :return { pos.fX + 15, pos.fY + 15, 30, 30 };
 		}
+		std::cout << "Weapons::Attack_Direction() passthrough error" << std::endl;
+		return {0,0,0,0};
+
 	}
 
 	void create_attack(DataTypes::f2d& pos, Components::Compass& direction) {

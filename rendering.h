@@ -38,8 +38,8 @@ namespace Rendering {
 				anim.clipSprite = anim.sheet[act.action].clip;											//save position for renderer
 				sx = x.fX - camera_offset.screen.x;	
 				sy = y.fY - camera_offset.screen.y;
-				anim.renderPosition.x = sx - position.offset.fX;
-				anim.renderPosition.y = sy - position.offset.fY;
+				anim.renderPosition.x = (int)(sx - position.offset.fX);
+				anim.renderPosition.y = (int)(sy - position.offset.fY);
 				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 			}
 		}
@@ -270,7 +270,7 @@ namespace Rendering {
 			float x = yPosition - screenEdge;
 			float edgeBuffer = renderEdge - screenEdge;
 			float y = edgeBuffer / x;
-			int alpha = 255 - ( 255 / y );
+			int alpha = 255 - ( 255 / (int)y );
 			
 			return alpha;
 		}

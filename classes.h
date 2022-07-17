@@ -180,7 +180,7 @@ namespace Components {
 	//wil have Regiments and Companies as administrative units
 
 	struct Squad {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -211,7 +211,7 @@ namespace Components {
 	};
 
 	struct Platoon {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -235,7 +235,7 @@ namespace Components {
 	};
 
 	struct Company {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -259,7 +259,7 @@ namespace Components {
 	};
 
 	struct Battalion {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -282,7 +282,7 @@ namespace Components {
 	};	
 
 	struct Regiment {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -301,7 +301,7 @@ namespace Components {
 	};
 	
 	struct Brigade {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -320,7 +320,7 @@ namespace Components {
 	};		
 	
 	struct Division {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -339,7 +339,7 @@ namespace Components {
 	};		
 	
 	struct Army {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -363,7 +363,7 @@ namespace Components {
 namespace Military {
 
 	struct Squad {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -390,7 +390,7 @@ namespace Military {
 	};
 
 	struct Platoon {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -414,7 +414,7 @@ namespace Military {
 	};
 
 	struct Company {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -438,7 +438,7 @@ namespace Military {
 	};
 
 	struct Battalion {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -461,7 +461,7 @@ namespace Military {
 	};
 
 	struct Regiment {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -480,7 +480,7 @@ namespace Military {
 	};
 
 	struct Brigade {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -499,7 +499,7 @@ namespace Military {
 	};
 
 	struct Division {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 
@@ -518,7 +518,7 @@ namespace Military {
 	};
 
 	struct Army {
-		int size;
+		size_t size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 

@@ -347,7 +347,7 @@ namespace collision {
 					std::cout << "Hit!!!" << std::endl; 
 					//trigger hit
 					// -1 HP
-					playerHealth.iHealth -= 1.0f;
+					playerHealth.iHealth -= 1;
 					//destroy spell
 					spellAlive.bIsAlive = false;
 				}
