@@ -120,7 +120,7 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view1 = Scenes::scene.view<Renderable, Position_Y, Position_X, animation, Actions, Direction, Sprite_Offset, Scale>();
+		auto view1 = Scenes::scene.view<Renderable, Position, animation, Actions, Direction, Sprite_Offset, Scale>();
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto id : view2) {
@@ -130,8 +130,8 @@ namespace Rendering {
 				auto& d = view1.get<Direction>(entity);
 				auto& scale = view1.get<Scale>(entity).scale;
 				auto& anim = view1.get<animation>(entity);
-				auto& x = view1.get<Position_X>(entity);
-				auto& y = view1.get<Position_Y>(entity);
+				auto& x = view1.get<Position>(entity);
+				auto& y = view1.get<Position>(entity);
 				auto& act = view1.get<Actions>(entity);
 				auto& offset = view1.get<Sprite_Offset>(entity).offset;
 				//only fire this at 60 frames/sec
@@ -183,15 +183,15 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view = Scenes::scene.view<Explosion, Position_X, Position_Y, Frame_Delay, Texture, Sprite_Frames>();
+		auto view = Scenes::scene.view<Explosion, Position, Frame_Delay, Texture, Sprite_Frames>();
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto cam : view2) {
 			auto& camera_offset = view2.get<Camera>(cam);
 			for (auto spell : view) {
 				auto& anim = view.get<Explosion>(spell);
-				auto& x = view.get<Position_X>(spell);
-				auto& y = view.get<Position_Y>(spell);
+				auto& x = view.get<Position>(spell);
+				auto& y = view.get<Position>(spell);
 				auto& texture = view.get<Texture>(spell);
 				auto& frames = view.get<Sprite_Frames>(spell);
 				auto& delay = view.get<Frame_Delay>(spell);
@@ -305,13 +305,13 @@ namespace Rendering {
 				}
 			}
 
-			auto objectsView = Scenes::scene.view<Position_Y, Position_X>();
+			auto objectsView = Scenes::scene.view<Position>();
 			float bottomOfScreenEdge = screenRect.y + screenRect.h;
 			float bottomOfRenderRect = renderRect.y + renderRect.h;
 			
 			for (auto entity : objectsView) {
-				auto& x = objectsView.get<Position_X>(entity).fX;
-				auto& y = objectsView.get<Position_Y>(entity).fY;
+				auto& x = objectsView.get<Position>(entity).fX;
+				auto& y = objectsView.get<Position>(entity).fY;
 				SDL_FPoint point = { x, y};
 				if (SDL_PointInFRect(&point, &renderRect)) {
 					int alpha = Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y);

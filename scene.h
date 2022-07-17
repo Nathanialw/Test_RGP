@@ -20,12 +20,12 @@ namespace Scene {
 
 	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = Scenes::scene.view<Position_X, Position_Y, Radius, Environment>(entt::exclude<Assigned>);
+		auto view = Scenes::scene.view<Potential_Position, Radius, Environment>(entt::exclude<Assigned>);
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Potential_Position>(entity);
+			auto& y = view.get<Potential_Position>(entity);
 			auto& r = view.get<Radius>(entity).fRadius;
-			SDL_FRect rect = { x.fX - r, y.fY - r, r * 2, r * 2 };
+			SDL_FRect rect = { x.fPX - r, y.fPY - r, r * 2, r * 2 };
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
 			Scenes::scene.emplace_or_replace<Assigned>(entity);
@@ -67,8 +67,8 @@ namespace Scene {
 		Scenes::scene.emplace<Sprite_Offset>(tree, 313.0f * scale, 609.0f * scale);
 		Scenes::scene.emplace<Scale>(tree, scale);
 
-		Scenes::scene.emplace<Position_X>(tree, 100.0f, 100.0f + (x * 952.0f));
-		Scenes::scene.emplace<Position_Y>(tree, 100.0f, 100.0f + (y * 1165.0f));
+		Scenes::scene.emplace<Position>(tree, 100.0f, 100.0f);
+		Scenes::scene.emplace<Potential_Position>(tree, (x * 952.0f), 100.0f + (y * 1165.0f));
 		Scenes::scene.emplace<Actions>(tree, isStatic);
 		Scenes::scene.get<Actions>(tree).frameCount = { { 0, 0} };
 		Scenes::scene.emplace<Direction>(tree, W);
@@ -108,8 +108,8 @@ namespace Scene {
 		Scenes::scene.get<Actions>(skeleton).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
 		//positon components
-		Scenes::scene.emplace<Position_X>(skeleton, 1100.0f, 1100.0f);
-		Scenes::scene.emplace<Position_Y>(skeleton, 1100.0f, 1100.0f);
+		Scenes::scene.emplace<Position>(skeleton, 1100.0f, 1100.0f);
+		Scenes::scene.emplace<Potential_Position>(skeleton, 1100.0f, 1100.0f);
 
 		Scenes::scene.emplace<Radius>(skeleton, 15.0f * scale);
 
@@ -154,12 +154,14 @@ namespace Scene {
 		Spawn_Trees();
 
 		//set positions
-		auto view = Scenes::scene.view<Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Position, Potential_Position>();
 		for (auto entity : view) {
-			auto& xx = view.get<Position_X>(entity);
-			auto& yy = view.get<Position_Y>(entity);
-			xx.fX = xx.fPX;
-			yy.fY = yy.fPY;
+			auto& x = view.get<Position>(entity);
+			auto& y = view.get<Position>(entity);
+			auto& px = view.get<Potential_Position>(entity);
+			auto& py = view.get<Potential_Position>(entity);
+			x.fX = px.fPX;
+			y.fY = py.fPY;
 		}
 
 		auto view2 = Scenes::scene.view<Terrain_Position_X, Terrain_Position_Y>();

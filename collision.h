@@ -20,20 +20,22 @@ namespace collision {
 	Timer::Frame_Timer Print_calcs(500.0f);
 
 	void resolveCollisons() {	
-		auto view = Scenes::scene.view<Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Position, Potential_Position>();
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
-			x.fX = x.fPX;
-			y.fY = y.fPY;		
+			auto& x = view.get<Position>(entity);
+			auto& y = view.get<Position>(entity);
+			auto& px = view.get<Potential_Position>(entity);
+			auto& py = view.get<Potential_Position>(entity);
+			x.fX = px.fPX;
+			y.fY = py.fPY;		
 		}
 	}
 
 	void Update_Unit() { // updates positions of soldiers stored in units for collision box
-		auto view = Scenes::scene.view<Position_X, Position_Y, Assigned, Soldier>();
+		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier>();
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Potential_Position>(entity);
+			auto& y = view.get<Potential_Position>(entity);
 			auto& soldier = view.get<Assigned>(entity);
 			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			squad.fPX.at(soldier.iIndex) = x.fPX;
@@ -76,10 +78,10 @@ namespace collision {
 
 
 	void Update_Collided_Unit() {
-		auto view = Scenes::scene.view<Position_X, Position_Y, Assigned, Soldier, Health, Alive>();
+		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier, Health, Alive>();
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Potential_Position>(entity);
+			auto& y = view.get<Potential_Position>(entity);
 			//auto& z = view.get<Collision_Radius>(entity);
 			auto& soldier = view.get<Assigned>(entity);
 			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
@@ -146,13 +148,13 @@ namespace collision {
 
 	void player_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = Scenes::scene.view<Camera, Radius, Position_X, Position_Y, Mass>();
+			auto spells = Scenes::scene.view<Camera, Radius, Potential_Position, Mass>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Position_X>(spell);
-				auto& y = spells.get<Position_Y>(spell);
+				auto& x = spells.get<Potential_Position>(spell);
+				auto& y = spells.get<Potential_Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
-				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
@@ -259,14 +261,14 @@ namespace collision {
 	//Use this for melee weapon collision as well
 	void Spell_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = Scenes::scene.view<Spell, Radius, Position_X, Position_Y, Mass, Alive>();
+			auto spells = Scenes::scene.view<Spell, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Position_X>(spell);
-				auto& y = spells.get<Position_Y>(spell);
+				auto& x = spells.get<Potential_Position>(spell);
+				auto& y = spells.get<Potential_Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
 				auto& alive = spells.get<Alive>(spell);
-				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
@@ -312,19 +314,19 @@ namespace collision {
 	}
 
 	void Spell_Player_Collision() {
-		auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
-		auto players = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Input, Health>();
+		auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Spell, Alive>();
+		auto players = Scenes::scene.view<Radius, Potential_Position, Mass, Input, Health>();
 
 		for (auto spell : spells) {
 			auto& spellRadius = spells.get<Radius>(spell);
 			auto& spellAlive = spells.get<Alive>(spell);
-			auto& spellXPos = spells.get<Position_X>(spell);
-			auto& spellYPos = spells.get<Position_Y>(spell);
+			auto& spellXPos = spells.get<Potential_Position>(spell);
+			auto& spellYPos = spells.get<Potential_Position>(spell);
 			auto& spellMass = spells.get<Mass>(spell);
 			for (auto player : players) {
 				auto& playerRadius = players.get<Radius>(player);
-				auto& playerXPos = players.get<Position_X>(player);
-				auto& playerYPos = players.get<Position_Y>(player);
+				auto& playerXPos = players.get<Potential_Position>(player);
+				auto& playerYPos = players.get<Potential_Position>(player);
 				auto& playerMass = players.get<Mass>(player);
 				auto& playerHealth = players.get<Health>(player);
 
@@ -358,14 +360,14 @@ namespace collision {
 	//change to use weapon size instead of weapon radius
 	void MeleeAttack_unit_Collision() { //seems to work 
 		if (1) {
-			auto spells = Scenes::scene.view<Melee, Radius, Position_X, Position_Y, Mass, Alive>();
+			auto spells = Scenes::scene.view<Melee, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Position_X>(spell);
-				auto& y = spells.get<Position_Y>(spell);
+				auto& x = spells.get<Potential_Position>(spell);
+				auto& y = spells.get<Potential_Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
 				auto& alive = spells.get<Alive>(spell);
-				SDL_FRect spell_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
@@ -457,13 +459,13 @@ namespace collision {
 	void player_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Input>();
+			auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Input>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Position_X>(spell);
-				auto& y = spells.get<Position_Y>(spell);
+				auto& x = spells.get<Potential_Position>(spell);
+				auto& y = spells.get<Potential_Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
-				SDL_FRect unit_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect unit_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
 				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);
 
@@ -473,8 +475,8 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-							auto& map_x = Scenes::scene.get<Position_X>(cell[j].at(i));
-							auto& map_y = Scenes::scene.get<Position_Y>(cell[j].at(i));
+							auto& map_x = Scenes::scene.get<Potential_Position>(cell[j].at(i));
+							auto& map_y = Scenes::scene.get<Potential_Position>(cell[j].at(i));
 							auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
 							auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
 							float fx = map_x.fPX - x.fPX;
@@ -509,14 +511,14 @@ namespace collision {
 	void spell_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = Scenes::scene.view<Radius, Position_X, Position_Y, Mass, Spell, Alive>();
+			auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Spell, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& a = spells.get<Alive>(spell);
-				auto& x = spells.get<Position_X>(spell);
-				auto& y = spells.get<Position_Y>(spell);
+				auto& x = spells.get<Potential_Position>(spell);
+				auto& y = spells.get<Potential_Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
-				SDL_FRect unit_collider = { x.fX - radius.fRadius, y.fY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect unit_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 			
 				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);				
 
@@ -526,8 +528,8 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-								auto& map_x = Scenes::scene.get<Position_X>(cell[j].at(i));
-								auto& map_y = Scenes::scene.get<Position_Y>(cell[j].at(i));
+								auto& map_x = Scenes::scene.get<Potential_Position>(cell[j].at(i));
+								auto& map_y = Scenes::scene.get<Potential_Position>(cell[j].at(i));
 								auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
 								auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
 								float fx = map_x.fPX - x.fPX;
@@ -586,8 +588,8 @@ namespace collision {
 															for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
 																auto& radius = Scenes::scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
 																auto& mass = Scenes::scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& x = Scenes::scene.get<Position_X>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& y = Scenes::scene.get<Position_Y>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& x = Scenes::scene.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& y = Scenes::scene.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
 																for (int e = 0; e < squad.iSub_Units.size(); e++) {
 																	float fx = squad.fPX.at(e) - x.fPX;
 																	float fy = squad.fPY.at(e) - y.fPY;

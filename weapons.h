@@ -34,21 +34,21 @@ namespace Weapons {
 		Scenes::scene.emplace<Components::Radius>(weapon, 20.0f);
 		Scenes::scene.emplace<Components::Mass>(weapon, 500.0f);
 		Scenes::scene.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
-		Scenes::scene.emplace<Components::Position_X>(weapon, pos.fX, pos.fX);
-		Scenes::scene.emplace<Components::Position_Y>(weapon, pos.fY, pos.fY);
+		Scenes::scene.emplace<Components::Position>(weapon, pos.fX, pos.fY);
+		Scenes::scene.emplace<Components::Potential_Position>(weapon, pos.fX, pos.fY);
 		Scenes::scene.emplace<Components::Alive>(weapon, true);
 	}
 
 	void Attack_cast() {
-		auto view = Scenes::scene.view<Direction, Position_X, Position_Y, Actions, Attack, Velocity>();
+		auto view = Scenes::scene.view<Direction, Position, Actions, Attack, Velocity>();
 		for (auto entity : view) {
 		//	act.action = slash;
 			auto& act = view.get<Actions>(entity);
 			act.action = slash;
 			act.frameCount[act.action].currentFrame = 0;
 			auto& dir = view.get<Direction>(entity);
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Position>(entity);
+			auto& y = view.get<Position>(entity);
 			auto& angle = view.get<Velocity>(entity).angle;
 			auto& target = view.get<Attack>(entity);
 

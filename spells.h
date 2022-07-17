@@ -58,8 +58,8 @@ namespace Spells {
 		Scenes::scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
 		
 		//positon data
-		Scenes::scene.emplace<Position_X>(spell, spelldir.fX, spelldir.fX); 
-		Scenes::scene.emplace<Position_Y>(spell, spelldir.fY, spelldir.fY); 
+		Scenes::scene.emplace<Position>(spell, spelldir.fX, spelldir.fY); 
+		Scenes::scene.emplace<Potential_Position>(spell, spelldir.fX, spelldir.fY);
 
 		//spell data
 		Scenes::scene.emplace<Radius>(spell, data.radius * scale);
@@ -88,7 +88,7 @@ namespace Spells {
 
 
 	void cast_fireball() {
-		auto view = Scenes::scene.view<Direction, Actions, Position_X, Position_Y, Cast, Spell_Name, Velocity>();
+		auto view = Scenes::scene.view<Direction, Actions, Position, Cast, Spell_Name, Velocity>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			act.action = cast;
@@ -96,8 +96,8 @@ namespace Spells {
 			auto& target = view.get<Cast>(entity);
 
 			auto& direction = view.get<Direction>(entity).eDirection;
-			auto& x = view.get<Position_X>(entity).fX;
-			auto& y = view.get<Position_Y>(entity).fY;
+			auto& x = view.get<Position>(entity).fX;
+			auto& y = view.get<Position>(entity).fY;
 			auto& angle = view.get<Velocity>(entity).angle;
 	
 			auto& name = view.get<Spell_Name>(entity).spell;
@@ -119,8 +119,8 @@ namespace Spells {
 	void Create_Explosion(float& x, float y) { //creates the explosion for fireballs
 		auto explosion = Scenes::scene.create();
 
-		Scenes::scene.emplace<Position_X>(explosion, x, x);
-		Scenes::scene.emplace<Position_Y>(explosion, y, y);
+		Scenes::scene.emplace<Position>(explosion, x, y);
+		Scenes::scene.emplace<Potential_Position>(explosion, x, y);
 		Scenes::scene.emplace<Sprite_Frames>(explosion, 63, 0, 0, 0);
 		Scenes::scene.emplace<Texture>(explosion, Graphics::fireball_explosion_0, 0, 0, 128, 128);
 		Scenes::scene.emplace<Frame_Delay>(explosion, 16.0f, 0.0f);
@@ -129,10 +129,10 @@ namespace Spells {
 
 
 	void Destroy_NonMoving_Spells() {
-		auto view = Scenes::scene.view<Spell, Position_X, Position_Y>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
+		auto view = Scenes::scene.view<Spell, Position>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
 		for (auto entity : view) {
-			auto& x = view.get<Position_X>(entity).fX;
-			auto& y = view.get<Position_Y>(entity).fY;
+			auto& x = view.get<Position>(entity).fX;
+			auto& y = view.get<Position>(entity).fY;
 			
 			//create explosion
 			Create_Explosion(x, y);
@@ -142,11 +142,11 @@ namespace Spells {
 	}
 
 	void Clear_Collided_Spells() {
-		auto view = Scenes::scene.view<Spell, Position_X, Position_Y, Alive>();
+		auto view = Scenes::scene.view<Spell, Position, Alive>();
 		for (auto entity : view)
 		if (view.get<Alive>(entity).bIsAlive == false) {
-			auto& x = view.get<Position_X>(entity).fX;
-			auto& y = view.get<Position_Y>(entity).fY;
+			auto& x = view.get<Position>(entity).fX;
+			auto& y = view.get<Position>(entity).fY;
 
 			//create explosion
 			Create_Explosion(x, y);

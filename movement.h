@@ -30,7 +30,7 @@ namespace Movement {
 	}
 	
 	void Update_Position() {
-		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity>();
+		auto view = Scenes::scene.view<Potential_Position, Velocity>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
 		float angleY = 0.0f;
@@ -38,8 +38,8 @@ namespace Movement {
 		if (Update_Position_Poll >= 20) {
 			for (auto entity : view) {
 				auto& vel = view.get<Velocity>(entity);
-				auto& pX = view.get<Position_X>(entity);
-				auto& pY = view.get<Position_Y>(entity);
+				auto& pX = view.get<Potential_Position>(entity);
+				auto& pY = view.get<Potential_Position>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
 					number_of_units++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
@@ -96,10 +96,10 @@ namespace Movement {
 		Player_Move_Poll += Timer::timeStep;
 		if (Player_Move_Poll >= 200) {
 			Player_Move_Poll = 0;
-			auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Mouse_Move, Actions, Moving>();
+			auto view = Scenes::scene.view<Potential_Position, Velocity, Mouse_Move, Actions, Moving>();
 			for (auto entity : view) {	
-				auto& x = view.get<Position_X>(entity);
-				auto& y = view.get<Position_Y>(entity);
+				auto& x = view.get<Potential_Position>(entity);
+				auto& y = view.get<Potential_Position>(entity);
 				auto& act = view.get<Actions>(entity);
 				auto& v = view.get<Velocity>(entity);
 				auto& mov = view.get<Mouse_Move>(entity);				
@@ -125,12 +125,12 @@ namespace Movement {
 	}
 		
 	void Mouse_Move_Arrived() {
-		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
+		auto view = Scenes::scene.view<Potential_Position, Velocity, Actions, Mouse_Move>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			auto& v = view.get<Velocity>(entity);
-			auto& x = view.get<Position_X>(entity);
-			auto& y = view.get<Position_Y>(entity);
+			auto& x = view.get<Potential_Position>(entity);
+			auto& y = view.get<Potential_Position>(entity);
 			auto& mov = view.get<Mouse_Move>(entity);
 			if (Check_If_Arrived(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination)) {
 				v.magnitude.fX = 0.0f;
@@ -148,10 +148,10 @@ namespace Movement {
 	void Linear_Move_To() {
 		linearMovePoll += Timer::timeStep;
 		if (linearMovePoll >= 50) {
-			auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
+			auto view = Scenes::scene.view<Potential_Position, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
 			for (auto entity : view) {
-				auto& x = view.get<Position_X>(entity);
-				auto& y = view.get<Position_Y>(entity);
+				auto& x = view.get<Potential_Position>(entity);
+				auto& y = view.get<Potential_Position>(entity);
 				auto& act = view.get<Actions>(entity);
 				auto& v = view.get<Velocity>(entity);
 				auto& mov = view.get<Linear_Move>(entity);

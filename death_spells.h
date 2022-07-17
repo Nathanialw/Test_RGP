@@ -34,8 +34,8 @@ namespace Death_Spells {
 		Scenes::scene.emplace<Components::Actions>(skeleton0, Components::idle);
 		Scenes::scene.get<Components::Actions>(skeleton0).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4,0}, {2,0}, {5,0}, {4,0} };
 
-		Scenes::scene.emplace<Components::Position_X>(skeleton0, 0.0f, x);
-		Scenes::scene.emplace<Components::Position_Y>(skeleton0, 0.0f, y);
+		Scenes::scene.emplace<Components::Position>(skeleton0, x, y);
+		Scenes::scene.emplace<Components::Potential_Position>(skeleton0, x, y);
 		Scenes::scene.emplace<Components::Radius>(skeleton0, data.radius);
 		Scenes::scene.emplace<Components::Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
 

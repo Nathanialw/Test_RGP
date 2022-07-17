@@ -37,14 +37,14 @@ namespace AI {
 
 	void Check_For_Targets() {
 		auto view = Scenes::scene.view<Sight_Range, Alive, Spellbook>();
-		auto view2 = Scenes::scene.view<Position_X, Position_Y, Input>();
+		auto view2 = Scenes::scene.view<Position, Input>();
 
 		for (auto entity : view) {
 			auto sight = view.get<Sight_Range>(entity).sightBox;
 
 			for (auto target : view2) {
-				auto& x = view2.get<Position_X>(target).fX;
-				auto& y = view2.get<Position_Y>(target).fY;
+				auto& x = view2.get<Position>(target).fX;
+				auto& y = view2.get<Position>(target).fY;
 				SDL_FPoint point = { x, y };
 				if (Utilities::bPoint_RectIntersect(point, sight)) {
 					Move_Toward_Target(entity, x, y);
@@ -55,11 +55,11 @@ namespace AI {
 	}
 
 	void Update_Sight_Box() {
-		auto view = Scenes::scene.view<Sight_Range, Position_X, Position_Y, Alive>();
+		auto view = Scenes::scene.view<Sight_Range, Position, Alive>();
 		for (auto entity : view) {
 			auto& sight = view.get<Sight_Range>(entity).sightBox;
-			auto& x = view.get<Position_X>(entity).fX;
-			auto& y = view.get<Position_Y>(entity).fY;
+			auto& x = view.get<Position>(entity).fX;
+			auto& y = view.get<Position>(entity).fY;
 
 			sight = { x - 250.0f, y - 250.0f, 500.0f, 500.0f };
 		}

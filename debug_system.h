@@ -63,12 +63,11 @@ namespace Debug_System {
 	}
 
 	void Framerate() {		
-		auto view = Scenes::scene.view<Camera, Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Camera>();
 
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
-			auto& x = view.get<Position_X>(focus);
-			auto& y = view.get<Position_Y>(focus);
+			
 
 			iFramePollRate += Timer::timeStep;
 			if (iFramePollRate >= 500) {

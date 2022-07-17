@@ -6,10 +6,10 @@
 namespace Camera_Control {
 
 	void Update_Camera() {
-		auto view = Scenes::scene.view<Camera, Position_X, Position_Y>();
+		auto view = Scenes::scene.view<Camera, Position>();
 		for (auto focus : view) {
-			auto& x = view.get<Position_X>(focus);
-			auto& y = view.get<Position_Y>(focus);
+			auto& x = view.get<Position>(focus);
+			auto& y = view.get<Position>(focus);
 			auto& componentCamera = view.get<Camera>(focus);
 
 			//center camera on the entity with the component

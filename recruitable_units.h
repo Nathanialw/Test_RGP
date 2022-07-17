@@ -30,8 +30,9 @@ namespace Units {
 			Scenes::scene.emplace<Components::Actions>(archer, Components::idle);
 			Scenes::scene.get<Components::Actions>(archer).frameCount = { {0, 0}, { 4, 0}, {8, 0}, {4, 0}, {0, 0}, {2,0}, {5,0}, {4,0}, {4,0} };
 
-			Scenes::scene.emplace<Components::Position_X>(archer, 0.0f, 150.0f);
-			Scenes::scene.emplace<Components::Position_Y>(archer, 0.0f, 200.0f);
+			Scenes::scene.emplace<Components::Position>(archer, 0.0f, 0.0f);
+			Scenes::scene.emplace<Components::Potential_Position>(archer, 150.0f, 200.0f);
+			
 			Scenes::scene.emplace<Components::Radius>(archer, 15.0f);
 			Scenes::scene.emplace<Components::Velocity>(archer, 0.f, 0.0f, 0.f, 0.0f, 0.175f);
 								  

@@ -41,12 +41,12 @@ namespace Items {
 		Scenes::scene.emplace<Actions>(item, isStatic);
 		Scenes::scene.emplace<Direction>(item, W);
 
-		auto& x = Scenes::scene.emplace<Position_X>(item, xDrop, xDrop);
-		auto& y = Scenes::scene.emplace<Position_Y>(item, yDrop, yDrop);
+		auto& position = Scenes::scene.emplace<Position>(item, xDrop, yDrop);
+		Scenes::scene.emplace<Potential_Position>(item, xDrop, yDrop);
 	
 		Scenes::scene.emplace<Ground_Item>(item, 
-			x.fX - (32.0f * scale), 
-			y.fY - (32.0f * scale),
+			position.fX - (32.0f * scale), 
+			position.fY - (32.0f * scale),
 			64.0f * scale,
 			64.0f * scale);
 		//Scenes::scene.emplace<Assigned>(item);	//stores the entity holding the item	
@@ -56,12 +56,12 @@ namespace Items {
 
 	void Pick_Up_Item() {
 		//check if input unit it close enough to item
-		auto itemView = Scenes::scene.view<Position_X, Position_Y, Renderable, Ground_Item>();
-		auto mouseInput = Scenes::scene.view<Position_X, Position_Y, Input, Radius>();
+		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
+		auto mouseInput = Scenes::scene.view<Position, Input, Radius>();
 		
 		for (auto entity : mouseInput) {
-			auto &x = mouseInput.get<Position_X>(entity).fX;
-			auto &y = mouseInput.get<Position_Y>(entity).fY;
+			auto &x = mouseInput.get<Position>(entity).fX;
+			auto &y = mouseInput.get<Position>(entity).fY;
 			auto &radius = mouseInput.get<Radius>(entity).fRadius;
 			for (auto item : itemView) {
 				auto &itemBox = itemView.get<Ground_Item>(item).box;

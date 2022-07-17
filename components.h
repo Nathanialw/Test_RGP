@@ -40,13 +40,13 @@ namespace Components {
 
 
 	//Position		
-	struct Position_X {
+	struct Position {
 		float fX;
-		float fPX;
+		float fY;
 	};	
 	
-	struct Position_Y {
-		float fY;
+	struct Potential_Position {
+		float fPX;
 		float fPY;
 	};
 

@@ -108,10 +108,10 @@ namespace User_Mouse_Input {
 
 	bool Select_Soldier() {
 		bool bSelected = false;
-		auto soldier_view = Scenes::scene.view<Position_X, Position_Y, Radius, Soldier, Commandable>();
+		auto soldier_view = Scenes::scene.view<Potential_Position, Radius, Soldier, Commandable>();
 		for (auto soldiers : soldier_view) {
-			auto& x = soldier_view.get<Position_X>(soldiers);
-			auto& y = soldier_view.get<Position_Y>(soldiers);
+			auto& x = soldier_view.get<Potential_Position>(soldiers);
+			auto& y = soldier_view.get<Potential_Position>(soldiers);
 			auto& r = soldier_view.get<Radius>(soldiers);
 			if (Mouse::Mouse_Selection_Box({ x.fPX - r.fRadius, y.fPY - r.fRadius, r.fRadius * 2, r.fRadius * 2 })) {
 				Scenes::scene.emplace_or_replace<Selected>(soldiers);
@@ -334,7 +334,7 @@ namespace User_Mouse_Input {
 	};
 
 	void Add_Soldiers_To_Squad() {			
-		auto view = Scenes::scene.view<Position_X, Position_Y, Selected, Radius, Mass, Soldier>(entt::exclude<Assigned>);
+		auto view = Scenes::scene.view<Potential_Position, Selected, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		
 		int iUnit = 0;
 		
@@ -343,8 +343,8 @@ namespace User_Mouse_Input {
 
 		for (auto entity : view) {
 			if (iUnit < squad.size) { // caps number of units per squad				
-				auto& x = view.get<Position_X>(entity);
-				auto& y = view.get<Position_Y>(entity);
+				auto& x = view.get<Potential_Position>(entity);
+				auto& y = view.get<Potential_Position>(entity);
 				auto& m = view.get<Mass>(entity);
 				auto& r = view.get<Radius>(entity);
 				auto& soldier = Scenes::scene.emplace_or_replace<Assigned>(entity, 0, squad_ID);
@@ -422,7 +422,7 @@ namespace User_Mouse_Input {
 
 
 	void Create_Squads() {
-		auto view = Scenes::scene.view<Position_X, Position_Y, Radius, Mass, Soldier>(entt::exclude<Assigned>);
+		auto view = Scenes::scene.view<Potential_Position, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		for (auto entity2 : view) {
 			int iUnit = 0;
 			auto squad_ID = Scenes::scene.create();
@@ -433,8 +433,8 @@ namespace User_Mouse_Input {
 
 			for (auto entity : view) {
 				if (iUnit < squad.size) { // caps number of units per squad				
-					auto& x = view.get<Position_X>(entity);
-					auto& y = view.get<Position_Y>(entity);
+					auto& x = view.get<Potential_Position>(entity);
+					auto& y = view.get<Potential_Position>(entity);
 					auto& m = view.get<Mass>(entity);
 					auto& r = view.get<Radius>(entity);
 					auto& soldier = Scenes::scene.emplace_or_replace<Assigned>(entity, 0, squad_ID);
