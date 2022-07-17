@@ -109,6 +109,20 @@ namespace Movement {
 			}
 		}
 	}
+
+	//takes in the x,y of the unit and checks if it is within the destination x,y within an accuracy of the set variable
+	bool Check_If_Arrived(float &unitX, float &unitY, float &destinationX, float &destinationY) {
+		float accuracy = 5.0f;
+		if (unitX + accuracy > destinationX &&
+			unitX - accuracy < destinationX &&
+			unitY - accuracy < destinationY &&
+			unitY + accuracy > destinationY) {
+			return true;			
+		}
+		else {
+			return false;
+		}
+	}
 		
 	void Mouse_Move_Arrived() {
 		auto view = Scenes::scene.view<Position_X, Position_Y, Velocity, Actions, Mouse_Move>();
@@ -118,7 +132,7 @@ namespace Movement {
 			auto& x = view.get<Position_X>(entity);
 			auto& y = view.get<Position_Y>(entity);
 			auto& mov = view.get<Mouse_Move>(entity);
-			if (Mouse::Inside_Cursor(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination, Mouse::Cursor_Size)) {
+			if (Check_If_Arrived(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination)) {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;

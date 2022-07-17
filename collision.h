@@ -157,13 +157,13 @@ namespace collision {
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
-					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
+					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
 							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
-							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
+							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
 									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
-									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
+									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
 												float fx = squad.fPX.at(i) - x.fPX;
@@ -203,19 +203,19 @@ namespace collision {
 				for (auto companies : company_view) { 
 					auto& company2 = company_view.get<Company>(companies);
 					iCompany_Check++;
-					if (Utilities::bRect_Intersect(company1.sCollide_Box, company2.sCollide_Box)) {
+					if (Utilities::bFRect_Intersect(company1.sCollide_Box, company2.sCollide_Box)) {
 						for (int c1 = 0; c1 < company1.iSub_Units.size(); c1++) {
 							for (int c2 = 0; c2 < company2.iSub_Units.size(); c2++) {
 								auto& platoon1 = Scenes::scene.get<Platoon>(company1.iSub_Units[c1]);
 								auto& platoon2 = Scenes::scene.get<Platoon>(company2.iSub_Units[c2]);
 								iPlatoon_Check++;
-								if (Utilities::bRect_Intersect(platoon1.sCollide_Box, platoon2.sCollide_Box)) {
+								if (Utilities::bFRect_Intersect(platoon1.sCollide_Box, platoon2.sCollide_Box)) {
 									for (int s1 = 0; s1 < platoon1.iSub_Units.size(); s1++) {
 										for (int s2 = 0; s2 < platoon2.iSub_Units.size(); s2++) {
 											auto& squad1 = Scenes::scene.get<Squad>(platoon1.iSub_Units[s1]);
 											auto& squad2 = Scenes::scene.get<Squad>(platoon2.iSub_Units[s2]);
 											iSquad_Check++;							
-											if (Utilities::bRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
+											if (Utilities::bFRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
 												for (int i = 0; i < squad1.iSub_Units.size(); i++) {
 													for (int j = 0; j < squad2.iSub_Units.size(); j++) {
 														if (squad1.bAlive.at(i) == true && squad2.bAlive.at(j) == true) {
@@ -271,13 +271,13 @@ namespace collision {
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
-					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
+					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
 							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
-							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
+							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
 								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
-									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
+									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
 												float fx = squad.fPX.at(i) - x.fPX;
@@ -370,13 +370,13 @@ namespace collision {
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
-					if (Utilities::bRect_Intersect(company.sCollide_Box, spell_collider)) {
+					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
 							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
-							if (Utilities::bRect_Intersect(platoon.sCollide_Box, spell_collider)) {
+							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
 									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
-									if (Utilities::bRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
+									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
 												float fx = squad.fPX.at(i) - x.fPX;
@@ -419,15 +419,15 @@ namespace collision {
 	//	std::cout << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x << "--------" << map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y << std::endl;
 
 		//	SDL_FRect port;
-		if (Utilities::bRect_Intersect(unit_box, map.sCollide_Box)) {
+		if (Utilities::bFRect_Intersect(unit_box, map.sCollide_Box)) {
 			for (int i = 0; i < Map::size; i++) {
-				if (Utilities::bRect_Intersect(unit_box, map.nodes[i].sCollide_Box)) {
+				if (Utilities::bFRect_Intersect(unit_box, map.nodes[i].sCollide_Box)) {
 					for (int j = 0; j < Map::size; j++) {
-						if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].sCollide_Box)) {
+						if (Utilities::bFRect_Intersect(unit_box, map.nodes[i].nodes[j].sCollide_Box)) {
 							for (int k = 0; k < Map::size; k++) {
-								if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+								if (Utilities::bFRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 									for (int l = 0; l < Map::size; l++) {
-										if (Utilities::bRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+										if (Utilities::bFRect_Intersect(unit_box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											//port.x = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.x - offset.screen.x;
 											//port.y = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.y - offset.screen.y;
 											//port.w = map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box.w;
@@ -566,21 +566,21 @@ namespace collision {
 		
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
-			if (Utilities::bRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
+			if (Utilities::bFRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
 				for (int b = 0; b < company.iSub_Units.size(); b++) {
 					for (int i = 0; i < Map::size; i++) {
 						for (int j = 0; j < Map::size; j++) {
 
-							if (Utilities::bRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
+							if (Utilities::bFRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
 								auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[b]);
 								for (int c = 0; c < platoon.iSub_Units.size(); c++) {
 									for (int k = 0; k < Map::size; k++) {
 
-										if (Utilities::bRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+										if (Utilities::bFRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 											auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[c]);
 											for (int l = 0; l < Map::size; l++) {
 
-												if (Utilities::bRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+												if (Utilities::bFRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int d = 0; d < squad.iSub_Units.size(); d++) {
 														if (squad.bAlive.at(d) != false) {
 															for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {

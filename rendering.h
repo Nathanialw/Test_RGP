@@ -396,6 +396,7 @@ namespace Rendering {
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
+		Items::Pick_Up_Item();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_RenderPresent(Graphics::renderer);
 		//std::cout << "SDL_RenderPresent = Good" << std::endl;

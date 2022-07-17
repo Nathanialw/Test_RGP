@@ -3,21 +3,25 @@
 
 
 namespace Mouse {
-
-	float Cursor_Size = 5.0f;
+	namespace {
+		float cursorSize = 5.0f;
+		int Mouse_Selection_Box_x;
+		int Mouse_Selection_Box_y;
+	}
 	bool bRight_Mouse_Pressed = false;
 	bool bLeft_Mouse_Pressed = false;
 	float iXMouse;
 	float iYMouse;
 	float iXWorld_Mouse;
 	float iYWorld_Mouse;
-	int Mouse_Selection_Box_x;
-	int Mouse_Selection_Box_y;
 	int Mouse_Selection_Box_x_Display;
 	int Mouse_Selection_Box_y_Display;
 
-	bool Inside_Cursor(float aX, float aY, float bX, float bY, float squareRadius) { //a is mouse, b is target of the mouse
-		if (aX > bX - squareRadius && aX < bX + squareRadius && aY < bY + squareRadius && aY > bY - squareRadius) {
+	bool Inside_Cursor(float targetX, float targetY) { 
+		if (iXMouse + cursorSize > targetX &&
+			iXMouse - cursorSize < targetX &&
+			iYMouse - cursorSize < targetY &&
+			iYMouse + cursorSize > targetY) {
 			return true;
 		}
 		else return false;

@@ -16,7 +16,7 @@ namespace Utilities {
 	}
 
 
-	bool bRect_Intersect(SDL_FRect &entity, SDL_FRect &target) {
+	bool bFRect_Intersect(SDL_FRect &entity, SDL_FRect &target) {
 		if ((entity.y <= target.y + target.h) &&
 			(entity.x <= target.x + target.w) &&
 			(entity.y + entity.h >= target.y) &&
@@ -54,6 +54,16 @@ namespace Utilities {
 		float b = targetY - sourceY;
 
 		return atan2f(a, b);
+	}
+
+	SDL_FRect Get_FRect_From_Point_Radius(float &radius, float &x, float &y) {
+		float rectX = x - radius;
+		float rectY = y - radius;
+		float width = radius * 2.0f;
+		float height = radius * 2.0f;
+
+		SDL_FRect rect = { rectX, rectY, width , height };
+		return rect;
 	}
 
 }
