@@ -203,6 +203,7 @@
   <ItemGroup>
     <ClInclude Include="ai_control.h" />
     <ClInclude Include="base_structs.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="classes.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="components.h" />

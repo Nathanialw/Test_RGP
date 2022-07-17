@@ -8,42 +8,13 @@
 #include "items.h"
 #include <vector>
 #include "ui.h"
+#include "camera.h"
 
-
-namespace Camera_Control {
-
-	void Update_Camera() {
-		auto view = Scenes::scene.view<Camera, Position_X, Position_Y>();
-		for (auto focus : view) {
-			auto& x = view.get<Position_X>(focus);
-			auto& y = view.get<Position_Y>(focus);
-			auto& componentCamera = view.get<Camera>(focus);
-			//center camera on the entity with the component
-			componentCamera.screen.w = Graphics::resolution.w / componentCamera.scale.fX;
-			componentCamera.screen.h = Graphics::resolution.h / componentCamera.scale.fY;
-			componentCamera.screen.x = ((x.fX) - (componentCamera.screen.w / 2));
-			componentCamera.screen.y = ((y.fY) - (componentCamera.screen.h / 2));
-
-			//std::cout << componentCamera.screen.x << std::endl;
-			//updates the global variable that may be useful for getting scrren/world positions
-			Graphics::Screen = componentCamera.screen;
-			//update mouse
-			int mx, my;
-			SDL_GetMouseState(&mx, &my);
-			Mouse::iXMouse = (float)mx;
-			Mouse::iYMouse = (float)my;
-			Mouse::iXWorld_Mouse = (Mouse::iXMouse / componentCamera.scale.fX) + componentCamera.screen.x;//getting mouse world Position corrected for scale
-			Mouse::iYWorld_Mouse = (Mouse::iYMouse / componentCamera.scale.fY) + componentCamera.screen.y;//getting mouse world Position corrected for scale
-			Mouse::iXMouse = Mouse::iXMouse / componentCamera.scale.fX;  // getting the screen mouse position corrected for scale
-			Mouse::iYMouse = Mouse::iYMouse / componentCamera.scale.fY;  // getting the screen mouse position corrected for scale	
-		}
-	}
-}
 
 namespace Rendering {
 
 	namespace {
-		bool showSpriteBox = true;
+		bool showSpriteBox = false;
 		bool renderType = true;
 		bool debug = false;
 		float fRenderable = 0.0f;
@@ -380,9 +351,6 @@ namespace Rendering {
 		}
 		Camera_Control::Update_Camera();
 		if (debug) {
-			std::cout << "Update_Camera = Good" << std::endl;
-		}
-		if (debug) {
 			std::cout << "Check_Renderable = Good" << std::endl;
 		}
 		SDL_RenderClear(Graphics::renderer);
@@ -398,6 +366,7 @@ namespace Rendering {
 		Interface::Run_Interface();
 		Items::Pick_Up_Item();
 		///std::cout << "Run_Interface = Good" << std::endl;
+		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);
 		//std::cout << "SDL_RenderPresent = Good" << std::endl;
 		//SDL_SetRenderDrawColor(Graphics::renderer, 12, 20, 20, SDL_ALPHA_OPAQUE);

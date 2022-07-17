@@ -17,11 +17,20 @@ namespace Mouse {
 	int Mouse_Selection_Box_x_Display;
 	int Mouse_Selection_Box_y_Display;
 
-	bool Inside_Cursor(float targetX, float targetY) { 
-		if (iXMouse + cursorSize > targetX &&
-			iXMouse - cursorSize < targetX &&
-			iYMouse - cursorSize < targetY &&
-			iYMouse + cursorSize > targetY) {
+
+
+
+	bool FRect_inside_Cursor(SDL_FRect &rect) {
+		SDL_FRect cursor = { iXWorld_Mouse, iYWorld_Mouse, cursorSize, cursorSize };
+		return Utilities::bFRect_Intersect(cursor, rect);
+	}
+
+
+	bool Point_Inside_Cursor(float targetX, float targetY) { 
+		if (iXWorld_Mouse + cursorSize > targetX &&
+			iXWorld_Mouse - cursorSize < targetX &&
+			iYWorld_Mouse - cursorSize < targetY &&
+			iYWorld_Mouse + cursorSize > targetY) {
 			return true;
 		}
 		else return false;
