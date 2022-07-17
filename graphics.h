@@ -8,14 +8,20 @@
 
 namespace Graphics {
 
-	SDL_Renderer* renderer;
-	SDL_Window* window;
-	bool running;
+	namespace {
+		bool running;
+		SDL_FRect resolution = { 0, 0, 1920, 1200 };
+		SDL_Window* window;
+		SDL_FRect Screen;
+		TTF_Font* font;
 
-	SDL_FRect resolution = { 0, 0, 1920, 1200 };
-	SDL_FRect Screen;
-	
-	TTF_Font* font;
+		struct Surface_Data {
+			SDL_Texture* pTexture;
+			SDL_Rect k;
+		};
+	}
+
+	SDL_Renderer* renderer;	
 	
 	SDL_Texture* skeleton_0;
 	SDL_Texture* skeleton_1;
@@ -32,10 +38,13 @@ namespace Graphics {
 	SDL_Texture* itsmars_Inventory;
 	SDL_Texture* cursor_0;
 
-	struct Surface_Data {
-		SDL_Texture* pTexture;
-		SDL_Rect k;
-	};
+	void Render_Rect(SDL_Texture *texture, const SDL_Rect *sourceRect, const SDL_Rect *targetRect) {
+		SDL_RenderCopy(renderer, texture, sourceRect, targetRect);
+	}
+
+	void Render_FRect(SDL_Texture* texture, const SDL_Rect* sourceRect, const SDL_FRect* targetRect) {
+		SDL_RenderCopyF(renderer, texture, sourceRect, targetRect);
+	}
 
 	Surface_Data Load_Text_Texture(std::string text, SDL_Color fontColor) {
 		SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), fontColor);		//convert font to Surface

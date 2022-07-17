@@ -40,7 +40,7 @@ namespace Rendering {
 				sy = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = (int)(sx - position.offset.fX);
 				anim.renderPosition.y = (int)(sy - position.offset.fY);
-				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 			}
 		}
 	}
@@ -145,13 +145,12 @@ namespace Rendering {
 				sx = x.fX - camera_offset.x;
 				sy = y.fY - camera_offset.y;
 								
-				anim.renderPosition.x = sx - offset.fX;
-				anim.renderPosition.y = sy - offset.fY;
-
+				anim.renderPosition.x = (int)(sx - offset.fX);
+				anim.renderPosition.y = (int)(sy - offset.fY);
 				
 				SDL_SetTextureAlphaMod(anim.pTexture, alpha);
 
-				SDL_RenderCopy(Graphics::renderer, anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 				if (showSpriteBox) {
 					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);					
 				}
