@@ -11,7 +11,7 @@ using namespace Scene;
 
 namespace Debug_System {
 
-	int iFramePollRate = 0;
+	int64_t iFramePollRate = 0;
 	
 
 
@@ -31,10 +31,10 @@ namespace Debug_System {
 		//SDL_RenderDrawRect(renderer, &e);
 		////SDL_RenderCopy(renderer, mass.pTexture, , );
 
-		SDL_Rect a = {sx+25, sy-20, 15, 15};
-		SDL_RenderCopy(Graphics::renderer, x_Position.pTexture, &x_Position.k, &a);
-		SDL_Rect b = { sx+25, sy-10, 15, 15 };
-		SDL_RenderCopy(Graphics::renderer, y_Position.pTexture, &y_Position.k,  &b);
+		SDL_FRect a = {sx+25, sy-20, 15, 15};
+		SDL_RenderCopyF(Graphics::renderer, x_Position.pTexture, &x_Position.k, &a);
+		SDL_FRect b = { sx+25, sy-10, 15, 15 };
+		SDL_RenderCopyF(Graphics::renderer, y_Position.pTexture, &y_Position.k,  &b);
 		//SDL_Rect c = { sx, sy+20, 15, 10 };
 		//SDL_RenderCopy(renderer, collision_Radius.pTexture, &collision_Radius.k, &c);
 		//SDL_Rect d = { sx, sy+30, 15, 10 };
@@ -82,12 +82,12 @@ namespace Debug_System {
 					timeStep = Graphics::Load_Text_Texture(std::to_string(float(Timer::timeStep) / 1000), { 133,255,133 });
 				}
 			}
-			SDL_Rect c = { 0, 0, 200 / componentCamera.scale.fX, 100 / componentCamera.scale.fY };
+			SDL_FRect c = { 0.0f, 0.0f, 200.0f / componentCamera.scale.fX, 100.0f / componentCamera.scale.fY };
 			if (frameRateMode) {
-				SDL_RenderCopy(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
+				SDL_RenderCopyF(Graphics::renderer, framerate.pTexture, &framerate.k, &c);
 			}
 			if (frameTimeMode) {
-				SDL_RenderCopy(Graphics::renderer, timeStep.pTexture, &timeStep.k, &c);
+				SDL_RenderCopyF(Graphics::renderer, timeStep.pTexture, &timeStep.k, &c);
 			}
 		}
 	}

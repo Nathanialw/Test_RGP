@@ -88,8 +88,8 @@ namespace Interface {
 	void Display_Selection_Box() {
 		if (Mouse::bLeft_Mouse_Pressed) {
 			SDL_SetRenderDrawColor(Graphics::renderer, 55, 255, 55, 255);
-			SDL_Rect p = { Mouse::Mouse_Selection_Box_x_Display, Mouse::Mouse_Selection_Box_y_Display, Mouse::iXMouse - Mouse::Mouse_Selection_Box_x_Display, Mouse::iYMouse - Mouse::Mouse_Selection_Box_y_Display };
-			SDL_RenderDrawRect(Graphics::renderer, &p);
+			SDL_FRect p = { Mouse::Mouse_Selection_Box_x_Display, Mouse::Mouse_Selection_Box_y_Display, Mouse::iXMouse - Mouse::Mouse_Selection_Box_x_Display, Mouse::iYMouse - Mouse::Mouse_Selection_Box_y_Display };
+			SDL_RenderDrawRectF(Graphics::renderer, &p);
 		}
 	}
 
@@ -100,9 +100,9 @@ namespace Interface {
 			auto& componentCamera = view.get<Camera>(focus);
 
 			SDL_Rect srcRect = { 0, 0 , 32, 32 };
-			SDL_Rect d = { Mouse::iXMouse, Mouse::iYMouse, 32 / componentCamera.scale.fX, 32 / componentCamera.scale.fY };
+			SDL_FRect d = { Mouse::iXMouse, Mouse::iYMouse, 32.0f / componentCamera.scale.fX, 32.0f / componentCamera.scale.fY };
 			
-			SDL_RenderCopy(Graphics::renderer, Graphics::cursor_0, &srcRect, &d);
+			SDL_RenderCopyF(Graphics::renderer, Graphics::cursor_0, &srcRect, &d);
 			
 		}
 	}
@@ -124,43 +124,43 @@ namespace Interface {
 			for (auto id : view) {
 				auto& camera = view.get<Camera>(id);
 				SDL_FRect offset = camera.screen;
-				SDL_FRect screen = { camera.screen.x - (camera.screen.w * 0.5),camera.screen.y - (camera.screen.h * 0.5), camera.screen.w * 2, camera.screen.h * 2 };
+				SDL_FRect screen = { camera.screen.x - (camera.screen.w * 0.5f),camera.screen.y - (camera.screen.h * 0.5f), camera.screen.w * 2.0f, camera.screen.h * 2.0f };
 				//SDL_FRect debug;
 
 
 				if (Utilities::bFRect_Intersect(screen, terrain.sCollide_Box)) {// checks terrain for visibility like grass and such	
 					for (int i = 0; i < Map::size; i++) {
 						if (gridDepth == 0) {
-							SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.sCollide_Box);
+							SDL_FRect o = terrain.sCollide_Box;
 							o.x -= offset.x;
 							o.y -= offset.y;
-							SDL_RenderDrawRect(Graphics::renderer, &o);
+							SDL_RenderDrawRectF(Graphics::renderer, &o);
 						}
 						if (Utilities::bFRect_Intersect(screen, terrain.nodes[i].sCollide_Box)) {
 							for (int j = 0; j < Map::size; j++) {
 								if (gridDepth == 1) {
-									SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].sCollide_Box);
+									SDL_FRect o = terrain.nodes[i].sCollide_Box;
 									o.x -= offset.x;
 									o.y -= offset.y;
-									SDL_RenderDrawRect(Graphics::renderer, &o);
+									SDL_RenderDrawRectF(Graphics::renderer, &o);
 								}
 								if (Utilities::bFRect_Intersect(screen, terrain.nodes[i].nodes[j].sCollide_Box)) {
 									for (int k = 0; k < Map::size; k++) {
 										if (Utilities::bFRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 											for (int l = 0; l < Map::size; l++) {
 												if (gridDepth == 2) {
-													SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].nodes[j].nodes[k].sCollide_Box);
+													SDL_FRect o = terrain.nodes[i].nodes[j].nodes[k].sCollide_Box;
 													o.x -= offset.x;
 													o.y -= offset.y;
-													SDL_RenderDrawRect(Graphics::renderer, &o);
+													SDL_RenderDrawRectF(Graphics::renderer, &o);
 												}
 												if (Utilities::bFRect_Intersect(screen, terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int a = 0; a < terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); a++) {
 														if (gridDepth == 3) {
-															SDL_Rect o = Utilities::SDL_FRect_To_SDL_Rect(terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box);
+															SDL_FRect o = terrain.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box;
 															o.x -= offset.x;
 															o.y -= offset.y;
-															SDL_RenderDrawRect(Graphics::renderer, &o);
+															SDL_RenderDrawRectF(Graphics::renderer, &o);
 														}
 													}
 													//std::cout << terrain.nodes[i].nodes[j].nodes[k].cells[l].entities.size() << std::endl;
@@ -186,10 +186,10 @@ namespace Interface {
 			SDL_FRect offset = cam.screen;
 			for (auto entity : weapon_view) {
 				auto& o = weapon_view.get<Weapon_Size>(entity).attackArea;
-				SDL_Rect c = Utilities::SDL_FRect_To_SDL_Rect(o);
-				c.x -= offset.x;
-				c.y -= offset.y;
-				SDL_RenderDrawRect(Graphics::renderer, &c);
+				
+				o.x -= offset.x;
+				o.y -= offset.y;
+				SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 		}
 	}
@@ -201,9 +201,9 @@ namespace Interface {
 			auto& cam = view2.get<Camera>(camera);
 			for (auto entity : view) {
 				auto& mov = view.get<Mouse_Move>(entity);
-				SDL_Rect o = { (mov.fX_Destination - 15) -  cam.screen.x, (mov.fY_Destination - 15) - cam.screen.y, 30, 30 };				
+				SDL_FRect o = { (mov.fX_Destination - 15.0f) -  cam.screen.x, (mov.fY_Destination - 15.0f) - cam.screen.y, 30.0f, 30.0f };
 				SDL_SetRenderDrawColor(Graphics::renderer, 155, 155, 255, 255);				
-				SDL_RenderFillRect(Graphics::renderer, &o);
+				SDL_RenderFillRectF(Graphics::renderer, &o);
 			}
 		}
 	}

@@ -35,6 +35,7 @@ namespace Camera_Control {
 
 	SDL_FRect Convert_Rect_To_Screen_Coods(SDL_FRect& frect) {
 		auto view = Scenes::scene.view<Camera>();
+		
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
 
@@ -46,5 +47,6 @@ namespace Camera_Control {
 			screenRect.h = frect.h;
 			return screenRect;
 		}
+		
 	}
 }

@@ -14,8 +14,8 @@ namespace Mouse {
 	float iYMouse;
 	float iXWorld_Mouse;
 	float iYWorld_Mouse;
-	int Mouse_Selection_Box_x_Display;
-	int Mouse_Selection_Box_y_Display;
+	float Mouse_Selection_Box_x_Display;
+	float Mouse_Selection_Box_y_Display;
 
 
 
