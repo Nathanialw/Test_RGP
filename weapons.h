@@ -89,17 +89,6 @@ namespace Weapons {
 		}
 	}
 
-	//void Attacking_Updater() {
-	//	auto view = Scenes::scene.view<Attacking, Actions>();
-	//	for (auto entity : view) {
-	//		auto &act = view.get<Actions>(entity);
-	//		//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
-	//		if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
-	//			act.action = idle;
-	//			Scenes::scene.remove<Attacking>(entity);
-	//		}
-	//	}
-	//}
 
 	void Attacking_Updater() {
 		auto view = Scenes::scene.view<Attacking, Actions>();
