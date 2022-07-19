@@ -2,7 +2,7 @@
 #include "scene.h"
 #include "mouse_control.h"
 #include "timer.h"
-#include "spells.h"
+
 
 
 namespace AI {
@@ -63,10 +63,6 @@ namespace AI {
 
 			sight = { x - 250.0f, y - 250.0f, 500.0f, 500.0f };
 		}
-	}
-
-	void AI_Melee_Attack(entt::entity& entity) {
-		Scenes::scene.emplace_or_replace<Attack>(entity);
 	}
 
 	float time = 0.0f;

@@ -363,7 +363,7 @@ namespace Rendering {
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
-		Items::Pick_Up_Item();
+		
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);

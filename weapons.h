@@ -20,7 +20,21 @@ namespace Weapons {
 		}
 		std::cout << "Weapons::Attack_Direction() passthrough error" << std::endl;
 		return {0,0,0,0};
+	}
 
+	SDL_FRect Check_For_Target(float &x, float &y, Components::Compass& direction, float &radius) {
+		switch (direction) {
+		case N: return { x - radius, y - 55,    30, 40 };
+		case S: return { x - radius, y + radius, 30, 40 };
+		case E: return { x + radius, y - radius, 40, 30 };
+		case W: return { x - 55,     y - radius, 40, 30 };
+		case NW:return { x - 45,     y - 45,    30, 30 };
+		case NE:return { x + radius, y - 45,    30, 30 };
+		case SW:return { x - 45,     y + radius, 30, 30 };
+		case SE:return { x + radius, y + radius, 30, 30 };
+		}
+		std::cout << "Weapons::Check_For_Target() passthrough error" << std::endl;
+		return { 0,0,0,0 };
 	}
 
 	void create_attack(DataTypes::f2d& pos, Components::Compass& direction) {
@@ -47,14 +61,14 @@ namespace Weapons {
 			act.action = slash;
 			act.frameCount[act.action].currentFrame = 0;
 			auto& dir = view.get<Direction>(entity);
-			auto& x = view.get<Position>(entity);
-			auto& y = view.get<Position>(entity);
+			auto& x = view.get<Position>(entity).fX;
+			auto& y = view.get<Position>(entity).fY;
 			auto& angle = view.get<Velocity>(entity).angle;
 			auto& target = view.get<Attack>(entity);
-
-			DataTypes::f2d pos = { x.fX, y.fY };
 			
-			dir.eDirection = Movement::Look_At_Target(x.fX, y.fY, target.targetX, target.targetY, angle);
+			DataTypes::f2d pos = { x, y };
+			
+			dir.eDirection = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle);
 			create_attack(pos, dir.eDirection);	
 			//std::cout << dir.eDirection << std::endl;
 			Scenes::scene.emplace_or_replace<Attacking>(entity);

@@ -102,6 +102,7 @@ namespace Spells {
 	
 			auto& name = view.get<Spell_Name>(entity).spell;
 			//look at target
+			
 			direction = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle);
 			//cast Fireball
 			create_fireball(x, y, direction, name, target.targetX, target.targetY);		

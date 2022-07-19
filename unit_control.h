@@ -19,6 +19,15 @@ namespace User_Mouse_Input {
 
 	Unit_Selection eUnit_Selection;
 
+
+	void Order_Move() {
+		auto view = Scenes::scene.view<Selected, Commandable, Soldier>();
+		for (auto entity : view) {
+			Scenes::scene.emplace_or_replace<Mouse_Move>(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+			Scenes::scene.emplace_or_replace<Moving>(entity);
+		}
+	}
+
 	void Selection_Soldiers () {
 		eUnit_Selection = soldiers;
 	}
@@ -151,13 +160,6 @@ namespace User_Mouse_Input {
 
 	}
 
-	void Order_Move() {
-		auto view = Scenes::scene.view<Selected, Commandable, Soldier>();
-		for (auto entity : view) {
-			Scenes::scene.emplace_or_replace<Mouse_Move>(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
-			Scenes::scene.emplace_or_replace<Moving>(entity);
-		}
-	}
 
 	void Command_Unit() {
 		if (!Scenes::scene.empty<Selected>()) {

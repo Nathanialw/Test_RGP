@@ -399,7 +399,6 @@ namespace collision {
 													y.fPY -= (resolver.fY * fNomalizedMassA);
 													squad.iStruck.at(i)++;
 													alive.bIsAlive = false;
-													std::cout << "Hit!" << std::endl;
 												}
 											}
 										}

@@ -54,7 +54,11 @@ namespace Items {
 		//Scenes::scene.emplace<Item_Type>(item, weapon);
 	}
 
-	void Pick_Up_Item() {
+	void Pick_Up_Item(entt::entity item) {
+		
+	}
+
+	void Check_For_Item_Up_Item(DataTypes::f2d position) {
 		//check if input unit it close enough to item
 		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
 		auto mouseInput = Scenes::scene.view<Position, Input, Radius>();
@@ -63,35 +67,27 @@ namespace Items {
 			auto &x = mouseInput.get<Position>(entity).fX;
 			auto &y = mouseInput.get<Position>(entity).fY;
 			auto &radius = mouseInput.get<Radius>(entity).fRadius;
-			for (auto item : itemView) {
-				auto &itemBox = itemView.get<Ground_Item>(item).box;
-				SDL_FRect rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
-				SDL_FRect screenItemBox = Camera_Control::Convert_Rect_To_Screen_Coods(itemBox);
-				SDL_FRect screenRect = Camera_Control::Convert_Rect_To_Screen_Coods(rect);
+			// rect surrounding unit
+			SDL_FRect rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
+			// looks at every ground item in the scene 
+			for (auto itemID : itemView) {
+				auto &itemBox = itemView.get<Ground_Item>(itemID).box;
+				// rect surrounding item
+				SDL_FRect screenItemBox = Camera_Control::Convert_Rect_To_Screen_Coods(itemBox);			
 
-				if (pick_up_debug) {
-					SDL_SetRenderDrawColor(Graphics::renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
-					SDL_RenderDrawRectF(Graphics::renderer, &screenItemBox);
-					SDL_RenderDrawRectF(Graphics::renderer, &screenRect);
-				}
-				//check if next to item
+				// check if next to item
 				if (Utilities::bFRect_Intersect(itemBox, rect)) {
-					if (pick_up_debug) {
-						SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-						SDL_RenderDrawRectF(Graphics::renderer, &screenItemBox);
-						SDL_RenderDrawRectF(Graphics::renderer, &screenRect);
-					}
-					//check if mouse is inside item box					
+					// check if mouse is inside item box					
 					if (Mouse::FRect_inside_Cursor(itemBox)) {
-						if (pick_up_debug) {
-							SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
-							SDL_RenderDrawRectF(Graphics::renderer, &screenItemBox);
-							SDL_RenderDrawRectF(Graphics::renderer, &screenRect);
-						}
-						//place item in mouse array on click and 
+						
+						Pick_Up_Item(itemID);
+
+					
+						
+							//place item in mouse array on click and 
 							//remove ground item component, 
-						Scenes::scene.remove<Ground_Item>(item);
-						Scenes::scene.remove<animation>(item);
+						//Scenes::scene.remove<Ground_Item>(item);
+						//Scenes::scene.remove<animation>(item);
 							//replace  x and y coords with mouse coords, update every frame
 
 							// add ground item component and replace x and y with mouse coords on click
