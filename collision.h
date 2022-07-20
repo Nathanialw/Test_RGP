@@ -173,7 +173,7 @@ namespace collision {
 		}
 	}
 
-	void Check_For_Unit_Collision(entt::entity& entity, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget, bool& aliveUnit, bool aliveTarget) {
+	void Check_For_Unit_Collision_Rect(entt::entity& entity, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget, bool& aliveUnit, bool aliveTarget) {
 		if (aliveTarget != false) {
 			float fx = xTarget - xUnit;
 			float fy = yTarget - yUnit;
@@ -182,7 +182,44 @@ namespace collision {
 			if (fDistance != 0.0f) {
 				SDL_FPoint target = { xTarget, yTarget };
 				if (Utilities::bPoint_RectIntersect(target, attackRect)) {
-					//if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+				//if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+					//fDistance = sqrtf(fDistance);
+					//float fOverlap = fDistance - (radiusTarget + radiusUnit);
+					//DataTypes::f2d resolver = {};
+					//resolver.fX = fOverlap * (xUnit - xTarget) / fDistance;
+					//resolver.fY = fOverlap * (yUnit - yTarget) / fDistance;
+					//float fTotalmass = massTarget + massUnit;
+					//float fNomalizedMassA = (massTarget / massUnit);
+					//float fNomalizedMassB = (massUnit / fTotalmass);
+					//xTarget += (resolver.fX * fNomalizedMassB); // * normalized mass
+					//xUnit -= (resolver.fX * fNomalizedMassA);
+					//yTarget += (resolver.fY * fNomalizedMassB);
+					//yUnit -= (resolver.fY * fNomalizedMassA);
+					//aliveUnit = false;
+
+					if (Scenes::scene.any_of<Struck>(entity)) {
+						auto& struck = Scenes::scene.get<Struck>(entity).struck;
+						struck++;
+					}
+					else {
+						Scenes::scene.emplace<Struck>(entity, 1);
+					}
+					std::cout << "Hit!!!" << std::endl;
+				}
+			}
+		}
+	}
+
+	void Check_For_Unit_Collision_Circle(entt::entity& entity, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget, bool& aliveUnit, bool aliveTarget) {
+		if (aliveTarget != false) {
+			float fx = xTarget - xUnit;
+			float fy = yTarget - yUnit;
+			float fDistance = (fx * fx) + (fy * fy);
+			// if the distance is zero it means they are the same unit or directly on top of each other
+			if (fDistance != 0.0f) {
+				//SDL_FPoint target = { xTarget, yTarget };
+				//if (Utilities::bPoint_RectIntersect(target, attackRect)) {
+				if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 					fDistance = sqrtf(fDistance);
 					float fOverlap = fDistance - (radiusTarget + radiusUnit);
 					DataTypes::f2d resolver = {};
@@ -345,7 +382,7 @@ namespace collision {
 								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											Check_For_Unit_Collision(squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
+											Check_For_Unit_Collision_Circle(squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
 										}
 									}
 								}
@@ -421,7 +458,7 @@ namespace collision {
 				auto& playerMass = players.get<Mass>(player).fKilos;
 				auto& playerAlive = players.get<Alive>(player).bIsAlive;
 
-				Check_For_Unit_Collision(player, attackArea, attackXPos, attackYPos, playerXPos, playerYPos, attackRadius, playerRadius, attackMass, playerMass, attackAlive, playerAlive);
+				Check_For_Unit_Collision_Rect(player, attackArea, attackXPos, attackYPos, playerXPos, playerYPos, attackRadius, playerRadius, attackMass, playerMass, attackAlive, playerAlive);
 			}
 		}
 	}
@@ -453,7 +490,7 @@ namespace collision {
 									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											Check_For_Unit_Collision(squad.iSub_Units.at(i), attackArea, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
+											Check_For_Unit_Collision_Rect(squad.iSub_Units.at(i), attackArea, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
 										}
 									}
 								}
