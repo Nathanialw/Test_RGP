@@ -74,11 +74,8 @@ namespace collision {
 		}
 	}
 
-
-
-
 	void Update_Collided_Unit() {
-		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier, Health, Alive>();
+		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Potential_Position>(entity);
 			auto& y = view.get<Potential_Position>(entity);
@@ -86,22 +83,52 @@ namespace collision {
 			auto& soldier = view.get<Assigned>(entity);
 			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			x.fPX = squad.fPX.at(soldier.iIndex);
-			y.fPY = squad.fPY.at(soldier.iIndex);
-			
+			y.fPY = squad.fPY.at(soldier.iIndex);		
+
+		}
+	}
+	
+	void Update_Health() {
 			//reduces health if Struck
-			if (squad.iStruck.at(soldier.iIndex) > 0) {
-				auto& h = view.get<Health>(entity).iHealth;
-				auto& a = view.get<Alive>(entity).bIsAlive;
-				h -= squad.iStruck.at(soldier.iIndex);
-				squad.iStruck.at(soldier.iIndex) = 0;
-				if (h <= 0) {
-					squad.bAlive.at(soldier.iIndex) = false;
-					a = false;					
+
+		//auto view = Scenes::scene.view<Assigned, Soldier, Health, Alive>();
+		//for (auto entity : view) {
+		//	auto& soldier = view.get<Assigned>(entity);
+		//	auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
+
+		//	if (squad.iStruck.at(soldier.iIndex) > 0) {
+		//		auto& h = view.get<Health>(entity).iHealth;
+		//		auto& a = view.get<Alive>(entity).bIsAlive;
+		//		h -= squad.iStruck.at(soldier.iIndex);
+		//		squad.iStruck.at(soldier.iIndex) = 0;
+
+		//		if (h <= 0) {
+		//			squad.bAlive.at(soldier.iIndex) = false;
+		//			a = false;
+		//		}
+		//	}
+		//}
+		
+		auto view2 = Scenes::scene.view<Health, Struck>();
+		
+		for (auto entity : view2) {
+			auto& struck = view2.get<Struck>(entity).struck;
+			auto& health = view2.get<Health>(entity).iHealth;
+			std::cout << "health = " << health << std::endl;
+			health -= struck;
+			Scenes::scene.remove<Struck>(entity);
+
+			//if the soldier is in the assignment vector it will be set as dead if it dies
+			if (health == 0) {
+				if (Scenes::scene.any_of<Assigned>(entity)) {
+					auto& assignment = Scenes::scene.get<Assigned>(entity);
+					auto& squad = Scenes::scene.get<Squad>(assignment.iUnit_Assigned_To);
+					squad.bAlive.at(assignment.iIndex) = false;
 				}
 			}
 		}
 	}
-	
+
 ////////////////////////////////////////////////////////////////////////////////////	
 	void Update_Squad_Box() {
 		auto view = Scenes::scene.view<Squad>();
@@ -142,6 +169,43 @@ namespace collision {
 				float wMax = *std::max_element(company.fPW.begin(), company.fPW.end());
 				float hMax = *std::max_element(company.fPH.begin(), company.fPH.end());
 				company.sCollide_Box = { xMin, yMin, wMax - xMin, hMax - yMin };
+			}
+		}
+	}
+
+	void Check_For_Unit_Collision(entt::entity& entity, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget, bool& aliveUnit, bool aliveTarget) {
+		if (aliveTarget != false) {
+			float fx = xTarget - xUnit;
+			float fy = yTarget - yUnit;
+			float fDistance = (fx * fx) + (fy * fy);
+			// if the distance is zero it means they are the same unit or directly on top of each other
+			if (fDistance != 0.0f) {
+				SDL_FPoint target = { xTarget, yTarget };
+				if (Utilities::bPoint_RectIntersect(target, attackRect)) {
+					//if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+					fDistance = sqrtf(fDistance);
+					float fOverlap = fDistance - (radiusTarget + radiusUnit);
+					DataTypes::f2d resolver = {};
+					resolver.fX = fOverlap * (xUnit - xTarget) / fDistance;
+					resolver.fY = fOverlap * (yUnit - yTarget) / fDistance;
+					float fTotalmass = massTarget + massUnit;
+					float fNomalizedMassA = (massTarget / massUnit);
+					float fNomalizedMassB = (massUnit / fTotalmass);
+					xTarget += (resolver.fX * fNomalizedMassB); // * normalized mass
+					xUnit -= (resolver.fX * fNomalizedMassA);
+					yTarget += (resolver.fY * fNomalizedMassB);
+					yUnit -= (resolver.fY * fNomalizedMassA);
+					aliveUnit = false;
+
+					if (Scenes::scene.any_of<Struck>(entity)) {
+						auto& struck = Scenes::scene.get<Struck>(entity).struck;
+						struck++;
+					}
+					else {
+						Scenes::scene.emplace<Struck>(entity, 1);
+					}
+					std::cout << "Hit!!!" << std::endl;
+				}
 			}
 		}
 	}
@@ -263,12 +327,12 @@ namespace collision {
 		if (1) {
 			auto spells = Scenes::scene.view<Spell, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
-				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Potential_Position>(spell);
-				auto& y = spells.get<Potential_Position>(spell);
-				auto& mass = spells.get<Mass>(spell);
-				auto& alive = spells.get<Alive>(spell);
-				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				auto& radius = spells.get<Radius>(spell).fRadius;
+				auto& x = spells.get<Potential_Position>(spell).fPX;
+				auto& y = spells.get<Potential_Position>(spell).fPY;
+				auto& mass = spells.get<Mass>(spell).fKilos;
+				auto& alive = spells.get<Alive>(spell).bIsAlive;
+				SDL_FRect spell_collider = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
@@ -281,27 +345,7 @@ namespace collision {
 								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											if (squad.bAlive.at(i) != false) {
-												float fx = squad.fPX.at(i) - x.fPX;
-												float fy = squad.fPY.at(i) - y.fPY;
-												float fDistance = (fx * fx) + (fy * fy);
-												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-													fDistance = sqrtf(fDistance);
-													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-													DataTypes::f2d resolver = {};
-													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
-													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
-													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
-													float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
-													float fNomalizedMassB = (mass.fKilos / fTotalmass);
-													squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-													x.fPX -= (resolver.fX * fNomalizedMassA);
-													squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-													y.fPY -= (resolver.fY * fNomalizedMassA);
-													squad.iStruck.at(i)++;
-													alive.bIsAlive = false;
-												}
-											}
+											Check_For_Unit_Collision(squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
 										}
 									}
 								}
@@ -346,7 +390,7 @@ namespace collision {
 					playerXPos.fPX -= (resolver.fX * fNomalizedMassA);
 					spellYPos.fPY += (resolver.fY * fNomalizedMassB);
 					playerYPos.fPY -= (resolver.fY * fNomalizedMassA);
-					std::cout << "Hit!!!" << std::endl; 
+					//std::cout << "Hit!!!" << std::endl; 
 					//trigger hit
 					// -1 HP
 					playerHealth.iHealth -= 1;
@@ -357,17 +401,46 @@ namespace collision {
 		}
 	}
 
+
+
+	void Melee_Unit_Player_Collision() {
+		auto spells = Scenes::scene.view<Radius, Potential_Position, Weapon_Size, Mass, Melee, Alive>();
+		auto players = Scenes::scene.view<Radius, Potential_Position, Mass, Input, Alive>();
+
+		for (auto spell : spells) {
+			auto& attackRadius = spells.get<Radius>(spell).fRadius;
+			auto& attackArea = spells.get<Weapon_Size>(spell).attackArea;
+			auto& attackXPos = spells.get<Potential_Position>(spell).fPX;
+			auto& attackYPos = spells.get<Potential_Position>(spell).fPY;
+			auto& attackMass = spells.get<Mass>(spell).fKilos;
+			auto& attackAlive = spells.get<Alive>(spell).bIsAlive;
+			for (auto player : players) {
+				auto& playerRadius = players.get<Radius>(player).fRadius;
+				auto& playerXPos = players.get<Potential_Position>(player).fPX;
+				auto& playerYPos = players.get<Potential_Position>(player).fPY;
+				auto& playerMass = players.get<Mass>(player).fKilos;
+				auto& playerAlive = players.get<Alive>(player).bIsAlive;
+
+				Check_For_Unit_Collision(player, attackArea, attackXPos, attackYPos, playerXPos, playerYPos, attackRadius, playerRadius, attackMass, playerMass, attackAlive, playerAlive);
+			}
+		}
+	}
+
+
+
+
 	//change to use weapon size instead of weapon radius
 	void MeleeAttack_unit_Collision() { //seems to work 
 		if (1) {
-			auto spells = Scenes::scene.view<Melee, Radius, Potential_Position, Mass, Alive>();
+			auto spells = Scenes::scene.view<Melee, Weapon_Size, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
-				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Potential_Position>(spell);
-				auto& y = spells.get<Potential_Position>(spell);
-				auto& mass = spells.get<Mass>(spell);
-				auto& alive = spells.get<Alive>(spell);
-				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				auto& radius = spells.get<Radius>(spell).fRadius;
+				auto& attackArea = spells.get<Weapon_Size>(spell).attackArea;
+				auto& x = spells.get<Potential_Position>(spell).fPX;
+				auto& y = spells.get<Potential_Position>(spell).fPY;
+				auto& mass = spells.get<Mass>(spell).fKilos;
+				auto& alive = spells.get<Alive>(spell).bIsAlive;
+				SDL_FRect spell_collider = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 
 				auto company_view = Scenes::scene.view<Company>();
 				for (auto companies : company_view) {
@@ -380,27 +453,7 @@ namespace collision {
 									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											if (squad.bAlive.at(i) != false) {
-												float fx = squad.fPX.at(i) - x.fPX;
-												float fy = squad.fPY.at(i) - y.fPY;
-												float fDistance = (fx * fx) + (fy * fy);
-												if (fDistance <= ((squad.fRadius.at(i) + radius.fRadius) * (squad.fRadius.at(i) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-													fDistance = sqrtf(fDistance);
-													float fOverlap = fDistance - (squad.fRadius.at(i) + radius.fRadius);
-													DataTypes::f2d resolver = {};
-													resolver.fX = fOverlap * (x.fPX - squad.fPX.at(i)) / fDistance;
-													resolver.fY = fOverlap * (y.fPY - squad.fPY.at(i)) / fDistance;
-													float fTotalmass = squad.fMass.at(i) + mass.fKilos;
-													float fNomalizedMassA = (squad.fMass.at(i) / fTotalmass);
-													float fNomalizedMassB = (mass.fKilos / fTotalmass);
-													squad.fPX.at(i) += (resolver.fX * fNomalizedMassB); // * normalized mass
-													x.fPX -= (resolver.fX * fNomalizedMassA);
-													squad.fPY.at(i) += (resolver.fY * fNomalizedMassB);
-													y.fPY -= (resolver.fY * fNomalizedMassA);
-													squad.iStruck.at(i)++;
-													alive.bIsAlive = false;
-												}
-											}
+											Check_For_Unit_Collision(squad.iSub_Units.at(i), attackArea, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
 										}
 									}
 								}
@@ -668,11 +721,13 @@ namespace collision {
 		
 		Spell_Player_Collision();
 		Spell_unit_Collision();		
+		Melee_Unit_Player_Collision();
 		MeleeAttack_unit_Collision();
 
 		Update_Collided_Unit();
 		resolveCollisons();
-	
+		Update_Health();
+
 		//CollisionsT();
 	}
 }

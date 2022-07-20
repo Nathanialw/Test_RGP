@@ -100,7 +100,7 @@ namespace Event_Handler {
 			if (event.button.button == SDL_BUTTON_RIGHT) {
 				Mouse::bRight_Mouse_Pressed = true;
 				User_Mouse_Input::Order_Unit(); //if units are currently selected
-				//Movement::Mouse_Attack_Move;
+				
 			}
 		}
 

@@ -3,12 +3,22 @@
 
 namespace Utilities {
 
-	void worldToScreen() {
+	SDL_FRect worldToScreen(SDL_FRect& Rect, SDL_FRect &camera) {
+		SDL_FRect screenRect = {};
 
+		screenRect.x = Rect.x + camera.x;
+		screenRect.y = Rect.y + camera.y;
+		
+		return screenRect;
 	}
 
-	void screenToWorld() {
-
+	SDL_FRect screenToWorld(SDL_FRect &Rect, SDL_FRect &camera) {
+		SDL_FRect screenRect = {};
+	
+		screenRect.x = Rect.x - camera.x;
+		screenRect.y = Rect.y - camera.y;
+	
+		return screenRect;
 	}
 
 	float Get_Hypotenuse(float& x, float &y) {
@@ -32,7 +42,7 @@ namespace Utilities {
 	
 
 	SDL_Rect SDL_FRect_To_SDL_Rect(SDL_FRect& a) {
-		SDL_Rect b;
+		SDL_Rect b = {};
 		b.x = (int)a.x;
 		b.y = (int)a.y;
 		b.w = (int)a.w;
@@ -41,7 +51,7 @@ namespace Utilities {
 	}
 
 	SDL_FRect SDL_Rect_To_SDL_FRect(SDL_Rect& a) {
-		SDL_FRect b;
+		SDL_FRect b = {};
 		b.x = (float)a.x;
 		b.y = (float)a.y;
 		b.w = (float)a.w;

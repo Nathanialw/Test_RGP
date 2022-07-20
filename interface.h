@@ -212,7 +212,7 @@ namespace Interface {
 		Show_Grid(Map::terrain);
 		Display_Military_Groups();
 		Debug_System::Debugger();
-		Unit_Arrive_UI();
+		//Unit_Arrive_UI();
 		Display_Selected();
 		Display_Mouse();
 		Display_Selection_Box();

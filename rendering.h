@@ -133,7 +133,7 @@ namespace Rendering {
 				auto& x = view1.get<Position>(entity);
 				auto& y = view1.get<Position>(entity);
 				auto& act = view1.get<Actions>(entity);
-				auto& offset = view1.get<Sprite_Offset>(entity).offset;
+				auto& spriteOffset = view1.get<Sprite_Offset>(entity).offset;
 				//only fire this at 60 frames/sec
 				anim.sheet[act.action].currentFrameTime += Timer::timeStep;
 				if (anim.sheet[act.action].currentFrameTime >= anim.sheet[act.action].timeBetweenFrames) {
@@ -144,19 +144,30 @@ namespace Rendering {
 				}
 				sx = x.fX - camera_offset.x;
 				sy = y.fY - camera_offset.y;
-								
-				anim.renderPosition.x = (int)(sx - offset.fX);
-				anim.renderPosition.y = (int)(sy - offset.fY);
-				
+
+				anim.renderPosition.x = (int)(sx - spriteOffset.fX);
+				anim.renderPosition.y = (int)(sy - spriteOffset.fY);
+
 				SDL_SetTextureAlphaMod(anim.pTexture, alpha);
 
 				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 				if (showSpriteBox) {
-					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);					
+					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);
 				}
-				
+
+			}
+
+			auto view3 = Scenes::scene.view<Weapon_Size>();
+
+			SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+
+			for (auto entity : view3) {
+				auto& x = view3.get<Weapon_Size>(entity).attackArea;
+				SDL_FRect attackRect = Utilities::worldToScreen(x, camera_offset);
+				SDL_RenderDrawRectF(Graphics::renderer, &attackRect);
 			}
 		}
+
 	}
 
 	SDL_Rect Explosion_Frame_Update(Sprite_Frames &frame, SDL_Rect frameToUpdateClipOf) {
@@ -236,9 +247,9 @@ namespace Rendering {
 			if (health.iHealth <= 0) {
 				view.get<Actions>(entity).action = dead;
 				view.get<Actions>(entity).frameCount[view.get<Actions>(entity).action].currentFrame = 0;
-				view.get<Velocity>(entity).magnitude.fX = 0.0f;
-				view.get<Velocity>(entity).magnitude.fY = 0.0f;
 
+
+				Scenes::scene.get<Alive>(entity).bIsAlive = false;
 				Scenes::scene.remove<Commandable>(entity);
 				Scenes::scene.remove<Selected>(entity);
 				Scenes::scene.remove<Moving>(entity);
@@ -246,6 +257,8 @@ namespace Rendering {
 				Scenes::scene.remove<Velocity>(entity);
 				Scenes::scene.remove<Spellbook>(entity);
 				Scenes::scene.remove<Mass>(entity);
+				Scenes::scene.remove<Sight_Range>(entity);
+				Scenes::scene.remove<Radius>(entity);
 			}
 		}
 	}

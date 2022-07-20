@@ -293,6 +293,10 @@ namespace Components {
 		int64_t count;
 	};
 
+	struct Struck {
+		int struck;
+	};
+
 	//AI
 
 	struct Sight_Range {

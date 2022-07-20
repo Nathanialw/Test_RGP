@@ -69,6 +69,26 @@ namespace AI {
 		}
 	}
 
+	bool Player_In_Melee_Range(float& radius, float &x, float &y) {
+		
+		SDL_FRect unit_collide_rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
+		
+		auto units = Scenes::scene.view<Input, Position, Radius>();		
+		for (auto unit : units) {
+			float tarx = units.get<Position>(unit).fX;
+			float tary = units.get<Position>(unit).fY;
+			float tarradius = units.get<Radius>(unit).fRadius;
+			
+			SDL_FRect target_collide_rect = Utilities::Get_FRect_From_Point_Radius(tarradius, tarx, tary);
+			
+			if (Utilities::bFRect_Intersect(unit_collide_rect, target_collide_rect)) {
+				std::cout << "attacking" << std::endl;
+				return true;
+			}
+		}
+
+	}
+
 	void Mouse_Attack_Move() { // maybe change to move and attack?
 		if (Scenes::scene.empty<Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
@@ -95,20 +115,20 @@ namespace AI {
 	}
 
 
-	void Attack_Move(entt::entity &entity, float &radius, float &x, float &y) { // maybe change to move and attack?
+	void Attack_Move(entt::entity &entity, float &radius, Position &unitPosition, Position &targetPosition) { // maybe change to move and attack?
 		if (Scenes::scene.any_of<Attacking>(entity) == true) {
 			return;
 		}
 		if (Scenes::scene.any_of<Attacking>(entity) == false) {
-			if (In_Range(radius, x, y)) { //check if center of attack rect is in the target
-				Melee_Attack(entity, x, y);
+			if (Player_In_Melee_Range(radius, unitPosition.fX, unitPosition.fY)) { //check if center of attack rect is in the target
+				Melee_Attack(entity, targetPosition.fX, targetPosition.fY);
 				return;
 			}
 						
 		}
 			//else move to cursor
 		if (Scenes::scene.any_of<Attacking>(entity) == false) {
-			Move_Order(entity, x, y);
+			Move_Order(entity, targetPosition.fX, targetPosition.fY);
 		}
 	}
 		
@@ -116,22 +136,21 @@ namespace AI {
 
 
 	void Check_For_Targets() {
-		auto units = Scenes::scene.view<Sight_Range, Radius, Potential_Position, Alive>();
+		auto units = Scenes::scene.view<Sight_Range, Radius, Position, Alive>();
 		auto targets = Scenes::scene.view<Position, Input>();
 
 		for (auto unit : units) {
-			auto sight = units.get<Sight_Range>(unit).sightBox;
+			auto sightBox = units.get<Sight_Range>(unit).sightBox;
 			auto& radius = units.get<Radius>(unit).fRadius;
-			auto& x = units.get<Potential_Position>(unit).fPX;
-			auto& y = units.get<Potential_Position>(unit).fPY;
+			auto& position = units.get<Position>(unit);
 
 			for (auto target : targets) {
-				auto& x = targets.get<Position>(target).fX;
-				auto& y = targets.get<Position>(target).fY;
-				SDL_FPoint point = { x, y };
-				if (Utilities::bPoint_RectIntersect(point, sight)) {
-					Attack_Move(unit, radius, x, y);
-					Spell_Attack(unit, x, y, "'fireball'");					
+				auto& targetPosition = targets.get<Position>(target);
+				
+				SDL_FPoint targetPoint = { targetPosition.fX, targetPosition.fY };
+				if (Utilities::bPoint_RectIntersect(targetPoint, sightBox)) {
+					Attack_Move(unit, radius, position, targetPosition);
+					//Spell_Attack(unit, tarx, tary, "'fireball'");					
 					
 				}
 			}
@@ -149,7 +168,7 @@ namespace AI {
 		}
 	}
 
-	float time = 0.0f;
+	int64_t time = 0.0f;
 	bool on = false;
 
 	void Turn_On() {
@@ -164,9 +183,9 @@ namespace AI {
 	void Run_AI() {
 		time += Timer::timeStep;
 		//std::cout << time << std::endl;
-		if (time >= 1000.0f) {
+		if (time >= 1000) {
 			if (on) {
-				time = 0.0f;
+				time = 0;
 				Update_Sight_Box();
 				Check_For_Targets();
 			}
