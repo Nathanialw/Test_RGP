@@ -85,8 +85,9 @@ namespace AI {
 			if (Utilities::bFRect_Intersect(unit_collide_rect, target_collide_rect)) {
 				return true;
 			}
-		}
 
+		}
+		return false;
 	}
 
 	void Mouse_Attack_Move() { // maybe change to move and attack?
@@ -100,15 +101,16 @@ namespace AI {
 					auto& y = units.get<Position>(unit).fY;
 					
 					if (Scenes::scene.any_of<Attacking>(unit) == false) {
+						//attack target if it is next to you
 						if (In_Range(radius, x, y)) { //check if center of attack rect is in the target
  							Melee_Attack(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 							return;
 						}
+						//else move to cursor
 						else {
 							Move_Order(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 						}
 					}
-					//else move to cursor
 					
 				}
 			}

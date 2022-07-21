@@ -148,6 +148,7 @@ namespace Rendering {
 				anim.renderPosition.x = (int)(sx - spriteOffset.fX);
 				anim.renderPosition.y = (int)(sy - spriteOffset.fY);
 
+				//fade rendering objects at bottom of screen
 				SDL_SetTextureAlphaMod(anim.pTexture, alpha);
 
 				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
@@ -241,23 +242,33 @@ namespace Rendering {
 	}
 
 	void isDead() {
-		auto view = Scenes::scene.view<Actions, Health, Velocity>(entt::exclude<Spell>);
+		auto view = Scenes::scene.view<Actions, Health, Position, Sprite_Offset>(entt::exclude<Spell>);
 		for (auto entity : view) {
 			auto& health = view.get<Health>(entity);
 			if (health.iHealth <= 0) {
 				view.get<Actions>(entity).action = dead;
 				view.get<Actions>(entity).frameCount[view.get<Actions>(entity).action].currentFrame = 0;
+				auto& position = view.get<Position>(entity);
+				auto& offset = view.get<Sprite_Offset>(entity).offset;
 
+
+				//sets the sprite to render so that it is always rendered behind living sprites
+				position.fX -= offset.fX;
+				position.fY -= offset.fY;				
+				offset.fX = 0.0f;
+				offset.fY = 0.0f;
 
 				Scenes::scene.get<Alive>(entity).bIsAlive = false;
 				Scenes::scene.remove<Commandable>(entity);
 				Scenes::scene.remove<Selected>(entity);
 				Scenes::scene.remove<Moving>(entity);
+				Scenes::scene.remove<Potential_Position>(entity);
 				Scenes::scene.remove<Mouse_Move>(entity);
 				Scenes::scene.remove<Velocity>(entity);
 				Scenes::scene.remove<Spellbook>(entity);
 				Scenes::scene.remove<Mass>(entity);
 				Scenes::scene.remove<Sight_Range>(entity);
+				Scenes::scene.remove<Health>(entity);
 				Scenes::scene.remove<Radius>(entity);
 			}
 		}
