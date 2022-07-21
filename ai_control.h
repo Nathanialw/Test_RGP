@@ -56,7 +56,7 @@ namespace AI {
 										float tarradius = squad.fRadius.at(i);
 										SDL_FRect target_collide_rect = Utilities::Get_FRect_From_Point_Radius(tarradius, tarx, tary);
 										if (Utilities::bFRect_Intersect(unit_collide_rect, target_collide_rect)) {
-											std::cout << "attacking" << std::endl;
+											//std::cout << "attacking" << std::endl;
 											return true;
 										}
 									}
@@ -67,6 +67,7 @@ namespace AI {
 				}
 			}
 		}
+		return false;
 	}
 
 	bool Player_In_Melee_Range(float& radius, float &x, float &y) {
@@ -82,7 +83,6 @@ namespace AI {
 			SDL_FRect target_collide_rect = Utilities::Get_FRect_From_Point_Radius(tarradius, tarx, tary);
 			
 			if (Utilities::bFRect_Intersect(unit_collide_rect, target_collide_rect)) {
-				std::cout << "attacking" << std::endl;
 				return true;
 			}
 		}
@@ -101,14 +101,15 @@ namespace AI {
 					
 					if (Scenes::scene.any_of<Attacking>(unit) == false) {
 						if (In_Range(radius, x, y)) { //check if center of attack rect is in the target
-							Melee_Attack(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+ 							Melee_Attack(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 							return;
+						}
+						else {
+							Move_Order(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 						}
 					}
 					//else move to cursor
-					if (Scenes::scene.any_of<Attacking>(unit) == false) {
-						Move_Order(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
-					}
+					
 				}
 			}
 		}
@@ -124,12 +125,11 @@ namespace AI {
 				Melee_Attack(entity, targetPosition.fX, targetPosition.fY);
 				return;
 			}
-						
+			else {
+				Move_Order(entity, targetPosition.fX, targetPosition.fY);
+			}
 		}
 			//else move to cursor
-		if (Scenes::scene.any_of<Attacking>(entity) == false) {
-			Move_Order(entity, targetPosition.fX, targetPosition.fY);
-		}
 	}
 		
 	
