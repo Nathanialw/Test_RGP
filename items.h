@@ -72,6 +72,8 @@ namespace Items {
 		}
 	}
 
+	//maybe change to take in the mouse data as arguements so I don't have to include mouse_control.h, also can break out of check faster maybe
+	//void Check_For_Item_Up_Item(float &xMouse, float &yMouse, bool &isItemCurrentlyHeld) {
 	void Check_For_Item_Up_Item() {
 		//check if input unit it close enough to item
 		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
