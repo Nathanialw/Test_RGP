@@ -175,13 +175,13 @@ namespace Rendering {
 
 			}
 
-			auto view3 = Scenes::scene.view<Weapon_Size>();
+			auto view3 = Scenes::scene.view<Ground_Item>();
 
-			SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 
 			for (auto entity : view3) {
-				auto& x = view3.get<Weapon_Size>(entity).attackArea;
+				auto& x = view3.get<Ground_Item>(entity).box;
 				SDL_FRect attackRect = Utilities::worldToScreen(x, camera_offset);
+				SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 				SDL_RenderDrawRectF(Graphics::renderer, &attackRect);
 			}
 		}
@@ -270,10 +270,12 @@ namespace Rendering {
 
 
 				//sets the sprite to render so that it is always rendered behind living sprites
+				Items::Create_And_Drop_Item(position);
 				position.fX -= offset.fX;
 				position.fY -= offset.fY;				
 				offset.fX = 0.0f;
 				offset.fY = 0.0f;
+
 
 				Scenes::scene.get<Alive>(entity).bIsAlive = false;
 				Scenes::scene.remove<Commandable>(entity);
@@ -404,7 +406,7 @@ namespace Rendering {
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
-		
+		Items::Update_Mouse_Slot_Position();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);

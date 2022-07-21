@@ -27,7 +27,7 @@ namespace Items {
 	}
 
 
-	void Create_And_Drop_Item(float& xDrop, float& yDrop) {
+	void Create_And_Drop_Item(Position position) {
 		float scale = 0.5f;
 		
 		auto item = Scenes::scene.create();
@@ -41,12 +41,12 @@ namespace Items {
 		Scenes::scene.emplace<Actions>(item, isStatic);
 		Scenes::scene.emplace<Direction>(item, W);
 
-		auto& position = Scenes::scene.emplace<Position>(item, xDrop, yDrop);
-		Scenes::scene.emplace<Potential_Position>(item, xDrop, yDrop);
+		auto& position2 = Scenes::scene.emplace<Position>(item, position.fX, position.fY);
+		Scenes::scene.emplace<Potential_Position>(item, position.fX, position.fY);
 	
 		Scenes::scene.emplace<Ground_Item>(item, 
-			position.fX - (32.0f * scale), 
-			position.fY - (32.0f * scale),
+			position2.fX - (32.0f * scale), 
+			position2.fY - (32.0f * scale),
 			64.0f * scale,
 			64.0f * scale);
 		//Scenes::scene.emplace<Assigned>(item);	//stores the entity holding the item	
@@ -58,7 +58,7 @@ namespace Items {
 		
 	}
 
-	void Check_For_Item_Up_Item(DataTypes::f2d position) {
+	void Check_For_Item_Up_Item() {
 		//check if input unit it close enough to item
 		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
 		auto mouseInput = Scenes::scene.view<Position, Input, Radius>();
@@ -68,7 +68,7 @@ namespace Items {
 			auto &y = mouseInput.get<Position>(entity).fY;
 			auto &radius = mouseInput.get<Radius>(entity).fRadius;
 			// rect surrounding unit
-			SDL_FRect rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
+			SDL_FRect unitRect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 			// looks at every ground item in the scene 
 			for (auto itemID : itemView) {
 				auto &itemBox = itemView.get<Ground_Item>(itemID).box;
@@ -76,18 +76,21 @@ namespace Items {
 				SDL_FRect screenItemBox = Camera_Control::Convert_Rect_To_Screen_Coods(itemBox);			
 
 				// check if next to item
-				if (Utilities::bFRect_Intersect(itemBox, rect)) {
+				if (Utilities::bFRect_Intersect(itemBox, unitRect)) {
 					// check if mouse is inside item box					
 					if (Mouse::FRect_inside_Cursor(itemBox)) {
 						
 						Pick_Up_Item(itemID);
 
-					
+						std::cout << "item picked up" << std::endl;
 						
 							//place item in mouse array on click and 
 							//remove ground item component, 
-						//Scenes::scene.remove<Ground_Item>(item);
-						//Scenes::scene.remove<animation>(item);
+						Scenes::scene.remove<Ground_Item>(itemID);
+						
+						Mouse::mouseItem = itemID;
+						Mouse::itemCurrentlyHeld = true;
+					//	Scenes::scene.remove<animation>(itemID); //change the item icon instead of removing it
 							//replace  x and y coords with mouse coords, update every frame
 
 							// add ground item component and replace x and y with mouse coords on click
@@ -99,6 +102,36 @@ namespace Items {
 				}
 				SDL_SetRenderDrawColor(Graphics::renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
 			}
+		}
+	}
+
+	void Drop_Item_If_On_Mouse() {
+		if (Mouse::itemCurrentlyHeld == true) {
+			auto view = Scenes::scene.view<Input, Position>();
+			for (auto entity : view) {
+				auto &unitPosition = view.get<Position>(entity);
+
+				auto &scale = Scenes::scene.get<Scale>(Mouse::mouseItem).scale;
+				auto &position = Scenes::scene.get<Potential_Position>(Mouse::mouseItem);
+				position.fPX = unitPosition.fX;
+				position.fPY = unitPosition.fY;
+
+				Scenes::scene.emplace<Ground_Item>(Mouse::mouseItem,
+					position.fPX - (32.0f * scale),
+					position.fPY - (32.0f * scale),
+					64.0f * scale,
+					64.0f * scale);
+			}
+			Mouse::itemCurrentlyHeld = false;
+		}
+	}
+
+	void Update_Mouse_Slot_Position() {
+		//set item in mouse array position to mouse x, y every frame
+		if (Mouse::itemCurrentlyHeld == true) {
+			Potential_Position& position = Scenes::scene.get<Potential_Position>(Mouse::mouseItem);
+			position.fPX = Mouse::iXWorld_Mouse;
+			position.fPY = Mouse::iYWorld_Mouse;
 		}
 	}
 

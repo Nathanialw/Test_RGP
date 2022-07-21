@@ -17,6 +17,8 @@ namespace Mouse {
 	float Mouse_Selection_Box_x_Display;
 	float Mouse_Selection_Box_y_Display;
 
+	entt::entity mouseItem;
+	bool itemCurrentlyHeld = false;
 
 
 

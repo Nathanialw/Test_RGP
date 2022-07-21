@@ -61,7 +61,7 @@ namespace Event_Handler {
 				case SDLK_1: AI::Spell_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
 				case SDLK_3: AI::Melee_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
-				case SDLK_4: Items::Create_And_Drop_Item(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse); break;
+				case SDLK_4: break;
 				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
@@ -94,11 +94,13 @@ namespace Event_Handler {
 
 	void Mouse_Input(auto& e) {
 		if (event.key.type == SDL_MOUSEBUTTONDOWN) {
-			if (event.button.button == SDL_BUTTON_LEFT) {	
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				Items::Drop_Item_If_On_Mouse();
 				User_Mouse_Input::Selection_Box(); //if units are currently selected				
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {
 				Mouse::bRight_Mouse_Pressed = true;
+				Items::Check_For_Item_Up_Item();
 				User_Mouse_Input::Order_Unit(); //if units are currently selected
 				
 			}
@@ -109,7 +111,7 @@ namespace Event_Handler {
 				User_Mouse_Input::Select_Units();
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {				
-				Mouse::bRight_Mouse_Pressed = false;
+				Mouse::bRight_Mouse_Pressed = false;				
 				User_Mouse_Input::Command_Squad();
 				User_Mouse_Input::Command_Unit();				
 			}
