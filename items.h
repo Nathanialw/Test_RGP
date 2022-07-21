@@ -38,6 +38,11 @@ namespace Items {
 		auto& offset = Scenes::scene.emplace<Sprite_Offset>(item, 32.0f * scale, 32.0f * scale);
 		Scenes::scene.emplace<Scale>(item, scale);
 
+		auto &icon = Scenes::scene.emplace<Icon>(item, Graphics::longsword_default_icon);
+		icon.clipSprite = { 0,0,32,32 };
+		icon.renderPosition = { 0,0,16,16 };
+		icon.offset = { 8,8 };
+
 		Scenes::scene.emplace<Actions>(item, isStatic);
 		Scenes::scene.emplace<Direction>(item, W);
 
@@ -55,7 +60,14 @@ namespace Items {
 	}
 
 	void Pick_Up_Item(entt::entity item) {
-		
+		//removed pickup box from ground
+		Scenes::scene.remove<Ground_Item>(item); 
+		//removes for main rendering loop
+		Scenes::scene.remove<Direction>(item);
+		//to render on mouse
+		Scenes::scene.emplace<On_Mouse>(item);
+		Mouse::mouseItem = item;
+		Mouse::itemCurrentlyHeld = true;
 	}
 
 	void Check_For_Item_Up_Item() {
@@ -78,18 +90,10 @@ namespace Items {
 				// check if next to item
 				if (Utilities::bFRect_Intersect(itemBox, unitRect)) {
 					// check if mouse is inside item box					
-					if (Mouse::FRect_inside_Cursor(itemBox)) {
-						
+					if (Mouse::FRect_inside_Cursor(itemBox)) {						
 						Pick_Up_Item(itemID);
-
-						std::cout << "item picked up" << std::endl;
 						
-							//place item in mouse array on click and 
-							//remove ground item component, 
-						Scenes::scene.remove<Ground_Item>(itemID);
 						
-						Mouse::mouseItem = itemID;
-						Mouse::itemCurrentlyHeld = true;
 					//	Scenes::scene.remove<animation>(itemID); //change the item icon instead of removing it
 							//replace  x and y coords with mouse coords, update every frame
 
@@ -100,7 +104,6 @@ namespace Items {
 								// place x,y coords in empty array slot coords update every frame the UI is open
 					}
 				}
-				SDL_SetRenderDrawColor(Graphics::renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
 			}
 		}
 	}
@@ -121,6 +124,11 @@ namespace Items {
 					position.fPY - (32.0f * scale),
 					64.0f * scale,
 					64.0f * scale);
+
+				//adds to rendering with the main animation loop
+				Scenes::scene.emplace<Direction>(Mouse::mouseItem, W);
+				// to remove from rendering on mouse
+				Scenes::scene.remove<On_Mouse>(Mouse::mouseItem);
 			}
 			Mouse::itemCurrentlyHeld = false;
 		}

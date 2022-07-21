@@ -34,6 +34,7 @@ namespace Graphics {
 	SDL_Texture* fireball_0;	
 	SDL_Texture* fireball_explosion_0;
 	SDL_Texture* longsword_default;
+	SDL_Texture* longsword_default_icon;
 	//SDL_Texture* item_ui;
 	SDL_Texture* itsmars_Inventory;
 	SDL_Texture* cursor_0;
@@ -90,6 +91,7 @@ namespace Graphics {
 		fireball_explosion_0 = createTexture("sprites/spells/fireball_explosion_0.png");
 	
 		longsword_default = createTexture("sprites/items/long_sword/w_longsword.png");
+		longsword_default_icon = createTexture("sprites/items/weaponIcons32x32_png_Transparent/icon_sword_long4.png");
 		//item_ui = createTexture("sprites/UI/equipment.jpg");
 		itsmars_Inventory = createTexture("sprites/UI/itsmars_Inventory.png");
 		cursor_0 = createTexture("sprites/UI/cursor.png");

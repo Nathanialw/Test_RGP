@@ -175,15 +175,15 @@ namespace Rendering {
 
 			}
 
-			auto view3 = Scenes::scene.view<Ground_Item>();
+			//auto view3 = Scenes::scene.view<Ground_Item>();
 
 
-			for (auto entity : view3) {
-				auto& x = view3.get<Ground_Item>(entity).box;
-				SDL_FRect attackRect = Utilities::worldToScreen(x, camera_offset);
-				SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-				SDL_RenderDrawRectF(Graphics::renderer, &attackRect);
-			}
+			//for (auto entity : view3) {
+			//	auto& x = view3.get<Ground_Item>(entity).box;
+			//	SDL_FRect attackRect = Utilities::worldToScreen(x, camera_offset);
+			//	SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+			//	SDL_RenderDrawRectF(Graphics::renderer, &attackRect);
+			//}
 		}
 
 	}
@@ -253,6 +253,38 @@ namespace Rendering {
 				SDL_RenderCopyF(Graphics::renderer, texture.pTexture, &texture.clippedSpriteFrame, &anim.renderPosition);
 				if (showSpriteBox) {
 					SDL_RenderDrawRectF(Graphics::renderer, &anim.renderPosition);
+				}
+			}
+		}
+	}
+
+	void Render_Mouse_Item() {
+		
+		float sx;
+		float sy;
+		auto view = Scenes::scene.view<Position, Icon, On_Mouse>();
+		auto view2 = Scenes::scene.view<Camera>();
+
+		for (auto cam : view2) {
+			auto& camera_offset = view2.get<Camera>(cam);
+			for (auto spell : view) {
+				
+				auto& icon = view.get<Icon>(spell);
+				auto& x = view.get<Position>(spell).fX;
+				auto& y = view.get<Position>(spell).fY;
+				
+				
+
+				
+				sx = x - camera_offset.screen.x;
+				sy = y - camera_offset.screen.y;
+				icon.renderPosition.x = sx - icon.offset.x;
+				icon.renderPosition.y = sy - icon.offset.y;
+
+
+				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &icon.renderPosition);
+				if (showSpriteBox) {
+					SDL_RenderDrawRect(Graphics::renderer, &icon.renderPosition);
 				}
 			}
 		}
@@ -406,6 +438,7 @@ namespace Rendering {
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
+		Render_Mouse_Item();
 		Items::Update_Mouse_Slot_Position();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);

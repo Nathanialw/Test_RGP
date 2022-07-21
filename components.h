@@ -312,6 +312,17 @@ namespace Components {
 		armour,
 		potion
 	};
+
+	struct Icon {		
+		SDL_Texture* pTexture;		
+		SDL_Rect clipSprite;
+		SDL_Rect renderPosition;
+		DataTypes::i2d offset;
+	};
+
+	struct On_Mouse {
+
+	};
 	
 
 	
