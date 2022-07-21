@@ -109,13 +109,15 @@ namespace collision {
 		//	}
 		//}
 		
-		auto view2 = Scenes::scene.view<Health, Struck>();
+		auto view2 = Scenes::scene.view<Health, Struck, Actions>();
 		
 		for (auto entity : view2) {
-			auto& struck = view2.get<Struck>(entity).struck;
+			auto& damage = view2.get<Struck>(entity).struck;
 			auto& health = view2.get<Health>(entity).iHealth;
+			auto& action = view2.get<Actions>(entity).action;
+			action = struck;
 			std::cout << "health = " << health << std::endl;
-			health -= struck;
+			health -= damage;
 			Scenes::scene.remove<Struck>(entity);
 
 			//if the soldier is in the assignment vector it will be set as dead if it dies

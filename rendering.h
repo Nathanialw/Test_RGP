@@ -56,8 +56,25 @@ namespace Rendering {
 
 		x.y = x.h * b.eDirection; //check which directioon is facing then change clip.y to sprite height x direction enum
 
+
+
 		if (act.action != isStatic) {
 			if (act.action != dead) {
+				if (act.action == struck) {
+					if (x.x > a.frameStart + a.sheetWidth - x.w) {
+						x.x = a.frameStart;
+					}
+					if (act.frameCount[act.action].currentFrame >= act.frameCount[act.action].NumFrames) {
+						act.frameCount[act.action].currentFrame = 0;
+						act.action = idle;
+						return x;
+					}
+					else {
+						act.frameCount[act.action].currentFrame++;
+						return x;
+					}
+				}
+
 				if (a.bReversable) {
 					if (a.bReversing == true) {
 						x.x += (x.w * act.frameCount[act.action].currentFrame);
