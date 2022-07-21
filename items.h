@@ -60,14 +60,16 @@ namespace Items {
 	}
 
 	void Pick_Up_Item(entt::entity item) {
-		//removed pickup box from ground
-		Scenes::scene.remove<Ground_Item>(item); 
-		//removes for main rendering loop
-		Scenes::scene.remove<Direction>(item);
-		//to render on mouse
-		Scenes::scene.emplace<On_Mouse>(item);
-		Mouse::mouseItem = item;
-		Mouse::itemCurrentlyHeld = true;
+		if (Mouse::itemCurrentlyHeld == false) {
+			//removed pickup box from ground
+			Scenes::scene.remove<Ground_Item>(item);
+			//removes for main rendering loop
+			Scenes::scene.remove<Direction>(item);
+			//to render on mouse
+			Scenes::scene.emplace<On_Mouse>(item);
+			Mouse::mouseItem = item;
+			Mouse::itemCurrentlyHeld = true;
+		}
 	}
 
 	void Check_For_Item_Up_Item() {
@@ -92,7 +94,7 @@ namespace Items {
 					// check if mouse is inside item box					
 					if (Mouse::FRect_inside_Cursor(itemBox)) {						
 						Pick_Up_Item(itemID);
-						
+						break;
 						
 					//	Scenes::scene.remove<animation>(itemID); //change the item icon instead of removing it
 							//replace  x and y coords with mouse coords, update every frame
