@@ -9,17 +9,43 @@ namespace UI {
 		float scale = 1.0f;
 		SDL_FRect screenPosition = { 100.0f, 100.0f, 554.0f, 1080.0f };
 		
-		int bagslotsize = 16;
-		DataTypes::i2d bagslotoffset;
-		std::vector<DataTypes::i2d>UI_bagSlots;
+		
+		//x 32
+		//y 544
+		DataTypes::i2d bagoffset = { 32, 544 };
+		int bagslotsize = 64; // or 32 not even sure		
+		std::vector<entt::entity>UI_bagSlots;
+		
+		//calculate slot position based on which slot its in and save the rect to the Icon component
 
+		
+	}
+
+	SDL_FRect Convert_Rect_To_Scale(SDL_FRect &rect) {
+		auto view = Scenes::scene.view<Camera>();
+		
+		for (auto focus : view) {
+			auto& componentCamera = view.get<Camera>(focus);
+			SDL_FRect renderToScreen = {
+				rect.x / componentCamera.scale.fX,
+				rect.y / componentCamera.scale.fY,
+				(rect.w / componentCamera.scale.fX),
+				(rect.h / componentCamera.scale.fY) };
+			return renderToScreen;
+		}
+	}
+
+	void Place_Item_In_Bag() {
+		if (toggleBag) {
+
+		}
 	}
 
 	void Create_Bag_UI() {
-		for (int i = 0; i < 16, i++;) {
-			UI_bagSlots.at(i) = { charui.x + bagslotsize, charui.y + bagslotsize };
-
-		}
+		//for (int i = 0; i < 16; i++) {
+			//I_bagSlots.at(i) = { };
+			//charui.x + bagslotsize, charui. + bagslotsize
+		//}
 	}
 
 	void Toggle_Bag() {
@@ -33,17 +59,8 @@ namespace UI {
 
 	void Render_UI() {
 		if (toggleBag) {
-			auto view = Scenes::scene.view<Camera>();
-			for (auto focus : view) {
-				auto& componentCamera = view.get<Camera>(focus);
-				SDL_FRect renderToScreen = {
-					screenPosition.x / componentCamera.scale.fX,
-					screenPosition.y / componentCamera.scale.fY,
-					(screenPosition.w / componentCamera.scale.fX),
-					(screenPosition.h / componentCamera.scale.fY) };
-				
-				SDL_RenderCopyF(Graphics::renderer, Graphics::itsmars_Inventory, &charui, &renderToScreen);
-			}
+			SDL_FRect renderRect = Convert_Rect_To_Scale(screenPosition);
+			SDL_RenderCopyF(Graphics::renderer, Graphics::itsmars_Inventory, &charui, &renderRect);
 		}
 	}
 
