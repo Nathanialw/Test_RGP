@@ -121,7 +121,8 @@ namespace Scene {
 		Scenes::scene.emplace<Health>(skeleton, 10);
 
 		Scenes::scene.emplace<Input>(skeleton);
-		Scenes::scene.emplace<Camera>(skeleton, 0.0f, 0.0f, Graphics::resolution.w, Graphics::resolution.h, 1.0f, 1.0f);
+		Scenes::scene.emplace<Camera>(skeleton, 0.0f, 0.0f, Graphics::resolution.w, Graphics::resolution.h, 2.0f, 2.0f);
+		
 		//scene.emplace<Component_Camera::Viewport>(skeleton, 0.0f, 0.0f, resolution.w/2.0f, resolution.h/2.0f, 1.0f, 1.0f );
 
 		//grass
@@ -214,5 +215,6 @@ namespace Scene {
 		Map::Build_Map(Map::terrain);
 		Entity_Loader::init_db();
 		Load_Entities();
+		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
 	}
 }

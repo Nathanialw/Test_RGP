@@ -17,16 +17,16 @@ namespace Interface {
 	void Update_Zoom(SDL_Event& e) {
 		auto view = Scenes::scene.view<Camera>();
 		for (auto focus : view) {
-			auto& x = view.get<Camera>(focus);
+			auto& x = view.get<Camera>(focus).scale;
 			if (e.wheel.y > 0) {
-				x.scale.fX *= 1.1f;
-				x.scale.fY *= 1.1f;
-				SDL_RenderSetScale(Graphics::renderer, x.scale.fX, x.scale.fY);
+				x.fX *= 1.1f;
+				x.fY *= 1.1f;
+				SDL_RenderSetScale(Graphics::renderer, x.fX, x.fY);
 			}
 			if (e.wheel.y < 0) {
-				x.scale.fX *= 0.9f;
-				x.scale.fY *= 0.9f;
-				SDL_RenderSetScale(Graphics::renderer, x.scale.fX, x.scale.fY);
+				x.fX *= 0.9f;
+				x.fY *= 0.9f;
+				SDL_RenderSetScale(Graphics::renderer, x.fX, x.fY);
 			}
 		}
 	}

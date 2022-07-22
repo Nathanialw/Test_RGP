@@ -8,6 +8,18 @@ namespace UI {
 		SDL_Rect charui = { 0, 0, 554, 1080 };
 		float scale = 1.0f;
 		SDL_FRect screenPosition = { 100.0f, 100.0f, 554.0f, 1080.0f };
+		
+		int bagslotsize = 16;
+		DataTypes::i2d bagslotoffset;
+		std::vector<DataTypes::i2d>UI_bagSlots;
+
+	}
+
+	void Create_Bag_UI() {
+		for (int i = 0; i < 16, i++;) {
+			UI_bagSlots.at(i) = { charui.x + bagslotsize, charui.y + bagslotsize };
+
+		}
 	}
 
 	void Toggle_Bag() {
