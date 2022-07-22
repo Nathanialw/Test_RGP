@@ -266,7 +266,7 @@ namespace Rendering {
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto cam : view2) {
-			auto& camera_offset = view2.get<Camera>(cam);
+			auto& camera = view2.get<Camera>(cam);
 			for (auto spell : view) {
 				
 				auto& icon = view.get<Icon>(spell);
@@ -276,15 +276,23 @@ namespace Rendering {
 				
 
 				
-				sx = x - camera_offset.screen.x;
-				sy = y - camera_offset.screen.y;
-				icon.renderPosition.x = sx - icon.offset.x;
-				icon.renderPosition.y = sy - icon.offset.y;
+				sx = x - camera.screen.x;
+				sy = y - camera.screen.y;
+				icon.renderPosition.x = sx - (icon.offset.x / camera.scale.fX);
+				icon.renderPosition.y = sy - (icon.offset.y / camera.scale.fY);
 
+				SDL_Rect DisplayRect = {};
 
-				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &icon.renderPosition);
+				DisplayRect.x = icon.renderPosition.x;
+				DisplayRect.y = icon.renderPosition.y;
+				DisplayRect.w = icon.renderPosition.w / camera.scale.fX;
+				DisplayRect.h = icon.renderPosition.h / camera.scale.fY;
+
+				std::cout << "x: " << DisplayRect.x << " y: " << DisplayRect.y << " w: " << DisplayRect.w << " h: " << DisplayRect.h << std::endl;
+
+				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &DisplayRect);
 				if (showSpriteBox) {
-					SDL_RenderDrawRect(Graphics::renderer, &icon.renderPosition);
+					SDL_RenderDrawRect(Graphics::renderer, &DisplayRect);
 				}
 			}
 		}

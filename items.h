@@ -40,8 +40,8 @@ namespace Items {
 
 		auto &icon = Scenes::scene.emplace<Icon>(item, Graphics::longsword_default_icon);
 		icon.clipSprite = { 0,0,32,32 };
-		icon.renderPosition = { 0,0,16,16 };
-		icon.offset = { 8,8 };
+		icon.renderPosition = { 0,0,48,48 };
+		icon.offset = { icon.renderPosition.w / 2, icon.renderPosition.h / 2 };
 
 		Scenes::scene.emplace<Actions>(item, isStatic);
 		Scenes::scene.emplace<Direction>(item, W);
