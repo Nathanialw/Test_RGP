@@ -260,35 +260,25 @@ namespace Rendering {
 
 	void Render_Mouse_Item() {
 		
-		float sx;
-		float sy;
+		SDL_Rect DisplayRect = {};
+		
 		auto view = Scenes::scene.view<Position, Icon, On_Mouse>();
 		auto view2 = Scenes::scene.view<Camera>();
 
 		for (auto cam : view2) {
 			auto& camera = view2.get<Camera>(cam);
-			for (auto spell : view) {
+			for (auto item : view) {
 				
-				auto& icon = view.get<Icon>(spell);
-				auto& x = view.get<Position>(spell).fX;
-				auto& y = view.get<Position>(spell).fY;
-				
-				
+				const auto& icon = view.get<Icon>(item);
+				const auto& x = view.get<Position>(item).fX;
+				const auto& y = view.get<Position>(item).fY;
+								
+				DisplayRect.x = (x - camera.screen.x) - (icon.renderPositionOffset.x / camera.scale.fX);
+				DisplayRect.y = (y - camera.screen.y) - (icon.renderPositionOffset.y / camera.scale.fY);
+				DisplayRect.w = icon.renderRectSize.x / camera.scale.fX;
+				DisplayRect.h = icon.renderRectSize.y / camera.scale.fY;
 
-				
-				sx = x - camera.screen.x;
-				sy = y - camera.screen.y;
-				icon.renderPosition.x = sx - (icon.offset.x / camera.scale.fX);
-				icon.renderPosition.y = sy - (icon.offset.y / camera.scale.fY);
-
-				SDL_Rect DisplayRect = {};
-
-				DisplayRect.x = icon.renderPosition.x;
-				DisplayRect.y = icon.renderPosition.y;
-				DisplayRect.w = icon.renderPosition.w / camera.scale.fX;
-				DisplayRect.h = icon.renderPosition.h / camera.scale.fY;
-
-				std::cout << "x: " << DisplayRect.x << " y: " << DisplayRect.y << " w: " << DisplayRect.w << " h: " << DisplayRect.h << std::endl;
+				//std::cout << "x: " << DisplayRect.x << " y: " << DisplayRect.y << " w: " << DisplayRect.w << " h: " << DisplayRect.h << std::endl;
 
 				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &DisplayRect);
 				if (showSpriteBox) {
@@ -446,8 +436,8 @@ namespace Rendering {
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI();
 		Interface::Run_Interface();
-		Render_Mouse_Item();
 		Items::Update_Mouse_Slot_Position();
+		Render_Mouse_Item(); 
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);

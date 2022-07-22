@@ -39,9 +39,9 @@ namespace Items {
 		Scenes::scene.emplace<Scale>(item, scale);
 
 		auto &icon = Scenes::scene.emplace<Icon>(item, Graphics::longsword_default_icon);
-		icon.clipSprite = { 0,0,32,32 };
-		icon.renderPosition = { 0,0,48,48 };
-		icon.offset = { icon.renderPosition.w / 2, icon.renderPosition.h / 2 };
+		icon.clipSprite = { 0, 0, 32, 32 };
+		icon.renderRectSize = { 48, 48 };
+		icon.renderPositionOffset = { icon.renderRectSize.x / 2, icon.renderRectSize.y / 2 };
 
 		Scenes::scene.emplace<Actions>(item, isStatic);
 		Scenes::scene.emplace<Direction>(item, W);

@@ -316,8 +316,8 @@ namespace Components {
 	struct Icon {		
 		SDL_Texture* pTexture;		
 		SDL_Rect clipSprite;
-		SDL_Rect renderPosition;
-		DataTypes::i2d offset;
+		DataTypes::i2d renderRectSize;
+		DataTypes::i2d renderPositionOffset;
 	};
 
 	struct On_Mouse {
