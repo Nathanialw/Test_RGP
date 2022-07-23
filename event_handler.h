@@ -105,7 +105,7 @@ namespace Event_Handler {
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {
 				Mouse::bRight_Mouse_Pressed = true;
-				Items::Check_For_Item_Up_Item();
+				Items::Check_For_Item_To_Pick_Up(UI::UI_bagSlots, UI::iTotalSlots, Graphics::defaultIcon, UI::bToggleBag);
 				User_Mouse_Input::Order_Unit(); //if units are currently selected
 				
 			}

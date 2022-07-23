@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "scenes.h"
 #include "mouse_control.h"
 #include "components.h"
@@ -6,7 +7,7 @@
 #include "graphics.h"
 #include "utilities.h"
 #include "camera.h"
-#include "UI.h"
+
 
 // item
 
@@ -75,7 +76,7 @@ namespace Items {
 
 	//maybe change to take in the mouse data as arguements so I don't have to include mouse_control.h, also can break out of check faster maybe
 	//void Check_For_Item_Up_Item(float &xMouse, float &yMouse, bool &isItemCurrentlyHeld) {
-	void Check_For_Item_Up_Item() {
+	void Check_For_Item_To_Pick_Up(std::vector<entt::entity> &bag, int &totalSlots, entt::entity emptySlot, bool &isBagOpen) {
 		//check if input unit it close enough to item
 		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
 		auto mouseInput = Scenes::scene.view<Position, Input, Radius>();
@@ -96,14 +97,14 @@ namespace Items {
 				if (Utilities::bFRect_Intersect(itemBox, unitRect)) {
 					// check if mouse is inside item box					
 					if (Mouse::FRect_inside_Cursor(itemBox)) {
-						if (UI::toggleBag) { //bag is closed
+						if (isBagOpen) { //bag is closed
 							Pick_Up_Item(itemID);
 						}
 						else {
 							//find the first slot with a default icon
-							for (int i = 0; i < UI::totalSlots; i++) {
-								if (UI::UI_bagSlots.at(i) == Graphics::defaultIcon) {
-									UI::UI_bagSlots.at(i) = itemID;
+							for (int i = 0; i < totalSlots; i++) {
+								if (bag.at(i) == emptySlot) {
+									bag.at(i) = itemID;
 									//removed pickup box from ground
 									Scenes::scene.remove<Ground_Item>(itemID);
 									//removes for main rendering loop
@@ -111,7 +112,6 @@ namespace Items {
 									break;
 								}
 								//either pick it up with the mouse using this function or have an overburdened function instead
-
 							}							
 						}
 					}
