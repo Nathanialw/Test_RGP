@@ -150,7 +150,7 @@ namespace AI {
 				auto& targetPosition = targets.get<Position>(target);
 				
 				SDL_FPoint targetPoint = { targetPosition.fX, targetPosition.fY };
-				if (Utilities::bPoint_RectIntersect(targetPoint, sightBox)) {
+				if (Utilities::bFPoint_FRectIntersect(targetPoint, sightBox)) {
 					Attack_Move(unit, radius, position, targetPosition);
 					//Spell_Attack(unit, tarx, tary, "'fireball'");					
 					

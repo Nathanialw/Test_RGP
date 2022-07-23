@@ -20,6 +20,31 @@ namespace Rendering {
 		float fRenderable = 0.0f;
 	}
 
+	//check if the Mouse point is in the rect and which one
+	void Get_Bag_Slot_Render() {
+
+		SDL_Rect slotRect = {};
+		slotRect.w = UI::bagslotsize;
+		slotRect.h = UI::bagslotsize;
+
+		for (int i = 0; i < UI::numOfSlots.x; i++) {
+			slotRect.x = (i * UI::bagslotsize) + UI::Bag.x;
+
+			for (int j = 0; j < UI::numOfSlots.y; j++) {
+				slotRect.y = (j * UI::bagslotsize) + UI::Bag.y;
+				
+				//	Camera_Control::Convert_Rect_To_Scale(UI::Bag, slotRect);
+					SDL_RenderDrawRect(Graphics::renderer, &slotRect);
+					//return j;
+			}
+			//Camera_Control::Convert_Rect_To_Scale(UI::Bag, slotRect);
+			SDL_RenderDrawRect(Graphics::renderer, &slotRect);
+			//return i;
+			
+		}
+		
+	}
+
 	void Render_Terrain() { //state
 		auto view1 = Scenes::scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions, Sprite_Offset>();
 		auto view2 = Scenes::scene.view<Camera>();
@@ -42,6 +67,7 @@ namespace Rendering {
 				anim.renderPosition.y = (int)(sy - position.offset.fY);
 				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
 			}
+			UI::Update_Bag_Scale(camera_offset);
 		}
 	}
 
@@ -172,7 +198,7 @@ namespace Rendering {
 				if (showSpriteBox) {
 					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);
 				}
-
+				
 			}
 
 			//auto view3 = Scenes::scene.view<Ground_Item>();
@@ -255,6 +281,7 @@ namespace Rendering {
 					SDL_RenderDrawRectF(Graphics::renderer, &anim.renderPosition);
 				}
 			}
+
 		}
 	}
 
@@ -438,6 +465,7 @@ namespace Rendering {
 		Interface::Run_Interface();
 		Items::Update_Mouse_Slot_Position();
 		Render_Mouse_Item(); 
+		Get_Bag_Slot_Render();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);

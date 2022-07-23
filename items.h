@@ -138,6 +138,7 @@ namespace Items {
 		}
 	}
 
+	
 	void Update_Mouse_Slot_Position() {
 		//set item in mouse array position to mouse x, y every frame
 		if (Mouse::itemCurrentlyHeld == true) {

@@ -12,6 +12,8 @@ namespace Mouse {
 	bool bLeft_Mouse_Pressed = false;
 	float iXMouse;
 	float iYMouse;
+	SDL_Point mousePoint;
+
 	float iXWorld_Mouse;
 	float iYWorld_Mouse;
 	float Mouse_Selection_Box_x_Display;
@@ -20,13 +22,17 @@ namespace Mouse {
 	entt::entity mouseItem;
 	bool itemCurrentlyHeld = false;
 
-
+	
 
 	bool FRect_inside_Cursor(SDL_FRect &rect) {
 		SDL_FRect cursor = { iXWorld_Mouse, iYWorld_Mouse, cursorSize, cursorSize };
 		return Utilities::bFRect_Intersect(cursor, rect);
 	}
 
+	bool bRect_inside_Cursor(SDL_Rect& rect) {
+		SDL_Rect cursor = { iXMouse, iYMouse, cursorSize, cursorSize };
+		return Utilities::bRect_Intersect(cursor, rect);
+	}
 
 	bool Point_Inside_Cursor(float targetX, float targetY) { 
 		if (iXWorld_Mouse + cursorSize > targetX &&

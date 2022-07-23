@@ -97,15 +97,15 @@ namespace Map {
 	int size = 4;
 
 	void Place_Point_on_Grid(SDL_FPoint& point, Map::Node3& map, entt::entity& entity) { //inserts unit into a sigle node
-		if (Utilities::bPoint_RectIntersect(point, map.sCollide_Box)) {
+		if (Utilities::bFPoint_FRectIntersect(point, map.sCollide_Box)) {
 			for (int i = 0; i < size; i++) {
-				if (Utilities::bPoint_RectIntersect(point, map.nodes[i].sCollide_Box)) {
+				if (Utilities::bFPoint_FRectIntersect(point, map.nodes[i].sCollide_Box)) {
 					for (int j = 0; j < size; j++) {
-						if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
+						if (Utilities::bFPoint_FRectIntersect(point, map.nodes[i].nodes[j].sCollide_Box)) {
 							for (int k = 0; k < size; k++) {
-								if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+								if (Utilities::bFPoint_FRectIntersect(point, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
 									for (int l = 0; l < size; l++) {
-										if (Utilities::bPoint_RectIntersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+										if (Utilities::bFPoint_FRectIntersect(point, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 											map.nodes[i].nodes[j].nodes[k].cells[l].entities.push_back(entity);
 											return;
 										}

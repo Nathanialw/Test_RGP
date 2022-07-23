@@ -3,6 +3,10 @@
 
 namespace Utilities {
 
+	void Log(const std::string &string) {
+		std::cout << string << std::endl;
+	}
+
 	SDL_FRect worldToScreen(SDL_FRect& Rect, SDL_FRect &camera) {
 		SDL_FRect screenRect = {};
 
@@ -35,11 +39,24 @@ namespace Utilities {
 		}
 		return false;
 	};	
-	
-	bool bPoint_RectIntersect(SDL_FPoint &p, SDL_FRect &r) {		
+
+	bool bRect_Intersect(SDL_Rect& entity, SDL_Rect& target) {
+		if ((entity.y <= target.y + target.h) &&
+			(entity.x <= target.x + target.w) &&
+			(entity.y + entity.h >= target.y) &&
+			(entity.x + entity.w >= target.x)) {
+			return true;
+		}
+		return false;
+	};
+
+	bool bFPoint_FRectIntersect(SDL_FPoint &p, SDL_FRect &r) {		
 		return ((p.x >= r.x) && (p.x < (r.x + r.w)) && (p.y >= r.y) && (p.y < (r.y + r.h))) ? SDL_TRUE : SDL_FALSE;
 	};	
 	
+	bool bPoint_RectIntersect(SDL_Point& p, SDL_Rect& r) {
+		return ((p.x >= r.x) && (p.x < (r.x + r.w)) && (p.y >= r.y) && (p.y < (r.y + r.h))) ? SDL_TRUE : SDL_FALSE;
+	};
 
 	SDL_Rect SDL_FRect_To_SDL_Rect(SDL_FRect& a) {
 		SDL_Rect b = {};
@@ -75,5 +92,7 @@ namespace Utilities {
 		SDL_FRect rect = { rectX, rectY, width , height };
 		return rect;
 	}
+
+	
 
 }

@@ -29,7 +29,8 @@ namespace Camera_Control {
 			Mouse::iXWorld_Mouse = (Mouse::iXMouse / componentCamera.scale.fX) + componentCamera.screen.x;//getting mouse world Position corrected for scale
 			Mouse::iYWorld_Mouse = (Mouse::iYMouse / componentCamera.scale.fY) + componentCamera.screen.y;//getting mouse world Position corrected for scale
 			Mouse::iXMouse = Mouse::iXMouse / componentCamera.scale.fX;  // getting the screen mouse position corrected for scale
-			Mouse::iYMouse = Mouse::iYMouse / componentCamera.scale.fY;  // getting the screen mouse position corrected for scale	
+			Mouse::iYMouse = Mouse::iYMouse / componentCamera.scale.fY;  // getting the screen mouse position corrected for scale
+			Mouse::mousePoint = { mx, my };
 		}
 	}
 
@@ -48,5 +49,23 @@ namespace Camera_Control {
 			return screenRect;
 		}
 		
+	}
+
+
+	SDL_Rect Convert_Rect_To_Scale(SDL_Rect& rect, SDL_Rect& scaledScreenRect) {
+		auto view = Scenes::scene.view<Camera>();
+
+		for (auto focus : view) {
+			auto& componentCamera = view.get<Camera>(focus);
+
+			SDL_FRect fRenderToScreen = {
+				float(rect.x) / componentCamera.scale.fX,
+				float(rect.y) / componentCamera.scale.fY,
+				(float(rect.w) / componentCamera.scale.fX),
+				(float(rect.h) / componentCamera.scale.fY) };
+
+			scaledScreenRect = Utilities::SDL_FRect_To_SDL_Rect(fRenderToScreen);
+			return scaledScreenRect;
+		}
 	}
 }

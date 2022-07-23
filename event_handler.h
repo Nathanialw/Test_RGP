@@ -95,7 +95,13 @@ namespace Event_Handler {
 	void Mouse_Input(auto& e) {
 		if (event.key.type == SDL_MOUSEBUTTONDOWN) {
 			if (event.button.button == SDL_BUTTON_LEFT) {
-				Items::Drop_Item_If_On_Mouse();
+				if (UI::Interact_With_Bag(Mouse::mouseItem, Mouse::mousePoint)) {
+					Scenes::scene.remove<On_Mouse>(Mouse::mouseItem);
+					Mouse::itemCurrentlyHeld = false;
+				}
+				else {
+					Items::Drop_Item_If_On_Mouse();
+				}
 				User_Mouse_Input::Selection_Box(); //if units are currently selected				
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {

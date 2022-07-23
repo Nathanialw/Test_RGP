@@ -183,7 +183,7 @@ namespace collision {
 			// if the distance is zero it means they are the same unit or directly on top of each other
 			if (fDistance != 0.0f) {
 				SDL_FPoint target = { xTarget, yTarget };
-				if (Utilities::bPoint_RectIntersect(target, attackRect)) {
+				if (Utilities::bFPoint_FRectIntersect(target, attackRect)) {
 				//if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 					//fDistance = sqrtf(fDistance);
 					//float fOverlap = fDistance - (radiusTarget + radiusUnit);

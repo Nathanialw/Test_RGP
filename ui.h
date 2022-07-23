@@ -7,33 +7,30 @@ namespace UI {
 		bool toggleBag = false;
 		SDL_Rect charui = { 0, 0, 554, 1080 };
 		float scale = 1.0f;
-		SDL_FRect screenPosition = { 100.0f, 100.0f, 554.0f, 1080.0f };
+		SDL_Rect defaultScreenPosition = { 100, 100, 554, 1080 };
+		SDL_Rect currentScreenPosition = { };
 		
 		
 		//x 32
 		//y 544
-		DataTypes::i2d bagoffset = { 32, 544 };
+		DataTypes::i2d bagoffset = { 32, 544 }; //i THIKN
+		DataTypes::i2d numOfSlots = { 8, 4 };
 		int bagslotsize = 64; // or 32 not even sure		
+		SDL_Rect Bag = { currentScreenPosition.x + bagoffset.x, currentScreenPosition.y + bagoffset.y, numOfSlots.x * bagslotsize, numOfSlots.y * bagslotsize };
+		SDL_Rect screenBag = { };
 		std::vector<entt::entity>UI_bagSlots;
 		
+		//int totalSlots = numOfSlots.x * numOfSlots.y;
+		std::vector<SDL_Rect>UI_bagSlotPosition(numOfSlots.x * numOfSlots.y);
+		
+
+
 		//calculate slot position based on which slot its in and save the rect to the Icon component
 
 		
 	}
 
-	SDL_FRect Convert_Rect_To_Scale(SDL_FRect &rect) {
-		auto view = Scenes::scene.view<Camera>();
-		
-		for (auto focus : view) {
-			auto& componentCamera = view.get<Camera>(focus);
-			SDL_FRect renderToScreen = {
-				rect.x / componentCamera.scale.fX,
-				rect.y / componentCamera.scale.fY,
-				(rect.w / componentCamera.scale.fX),
-				(rect.h / componentCamera.scale.fY) };
-			return renderToScreen;
-		}
-	}
+	
 
 	void Place_Item_In_Bag() {
 		if (toggleBag) {
@@ -42,10 +39,10 @@ namespace UI {
 	}
 
 	void Create_Bag_UI() {
-		//for (int i = 0; i < 16; i++) {
-			//I_bagSlots.at(i) = { };
-			//charui.x + bagslotsize, charui. + bagslotsize
-		//}
+		for (int i = 0; i < (numOfSlots.x * numOfSlots.y); i++) {
+			
+			
+		}
 	}
 
 	void Toggle_Bag() {
@@ -57,10 +54,62 @@ namespace UI {
 		}
 	}
 
+	//check if the Mouse point is in the rect and which one
+	int Get_Bag_Slot(SDL_Point &mousePoint) {		
+		SDL_Rect slotRect = {};		
+		slotRect.w = bagslotsize;
+		slotRect.h = bagslotsize;
+		
+		for (int i = 0; i < numOfSlots.x; i++) {
+			slotRect.x = (i * bagslotsize) + Bag.x;
+			
+			for (int j = 0; j < numOfSlots.y; j++) {
+				slotRect.y = (j * bagslotsize) + Bag.y;
+				if (Utilities::bPoint_RectIntersect(mousePoint, slotRect)) {
+					
+					return j;
+				}
+			}
+			if (Utilities::bPoint_RectIntersect(mousePoint, slotRect)) {
+				
+				return i;
+			}
+		}
+		
+	}
+
+	void Update_Bag_Scale(Camera &camera) {
+		
+		
+		
+	}
+
+	bool Interact_With_Bag(entt::entity &item, SDL_Point &mousePoint) {
+		if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)) {
+			Utilities::Log("inside");
+			SDL_Point cursorRelativeToBagUIPosition = { mousePoint.x - currentScreenPosition.x, mousePoint.y - currentScreenPosition.y };
+			if (Utilities::bPoint_RectIntersect(cursorRelativeToBagUIPosition, Bag)) {
+				int slotNum = Get_Bag_Slot(mousePoint);
+				
+				std::cout << slotNum << std::endl;
+				//UI_bagSlots.at(slotNum) = item;
+				Utilities::Log("in bag");
+				return true;
+				//remove from mouse
+			}
+			Utilities::Log("not in bag");
+		}
+		else {
+			return false;
+		}
+		
+	}
+
 	void Render_UI() {
 		if (toggleBag) {
-			SDL_FRect renderRect = Convert_Rect_To_Scale(screenPosition);
-			SDL_RenderCopyF(Graphics::renderer, Graphics::itsmars_Inventory, &charui, &renderRect);
+			
+			SDL_Rect renderRect = Camera_Control::Convert_Rect_To_Scale(defaultScreenPosition, currentScreenPosition);
+			SDL_RenderCopy(Graphics::renderer, Graphics::itsmars_Inventory, &charui, &renderRect);
 		}
 	}
 
