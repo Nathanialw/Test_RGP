@@ -6,6 +6,7 @@
 #include "graphics.h"
 #include "utilities.h"
 #include "camera.h"
+#include "UI.h"
 
 // item
 
@@ -94,18 +95,25 @@ namespace Items {
 				// check if next to item
 				if (Utilities::bFRect_Intersect(itemBox, unitRect)) {
 					// check if mouse is inside item box					
-					if (Mouse::FRect_inside_Cursor(itemBox)) {						
-						Pick_Up_Item(itemID);
-						break;
-						
-					//	Scenes::scene.remove<animation>(itemID); //change the item icon instead of removing it
-							//replace  x and y coords with mouse coords, update every frame
+					if (Mouse::FRect_inside_Cursor(itemBox)) {
+						if (UI::toggleBag) { //bag is closed
+							Pick_Up_Item(itemID);
+						}
+						else {
+							//find the first slot with a default icon
+							for (int i = 0; i < UI::totalSlots; i++) {
+								if (UI::UI_bagSlots.at(i) == Graphics::defaultIcon) {
+									UI::UI_bagSlots.at(i) = itemID;
+									//removed pickup box from ground
+									Scenes::scene.remove<Ground_Item>(itemID);
+									//removes for main rendering loop
+									Scenes::scene.remove<Direction>(itemID);
+									break;
+								}
+								//either pick it up with the mouse using this function or have an overburdened function instead
 
-							// add ground item component and replace x and y with mouse coords on click
-
-							// if over bag
-								//add item to bag array and 
-								// place x,y coords in empty array slot coords update every frame the UI is open
+							}							
+						}
 					}
 				}
 			}

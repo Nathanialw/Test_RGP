@@ -43,8 +43,9 @@ namespace Graphics {
 	SDL_Texture* icon_axe1;
 	SDL_Texture* default_icon;
 
-	void Render_Rect(SDL_Texture* texture, const SDL_Rect* sourceRect, const SDL_Rect* targetRect) {
-		SDL_RenderCopy(renderer, texture, sourceRect, targetRect);
+
+	void Render_Rect(SDL_Texture* pTexture, SDL_Rect& clipSprite, SDL_Rect& scaledSlot) {
+		SDL_RenderCopy(renderer, pTexture, &clipSprite, &scaledSlot);
 	}
 
 	void Render_FRect(SDL_Texture* texture, const SDL_Rect* sourceRect, const SDL_FRect* targetRect) {
@@ -113,12 +114,6 @@ namespace Graphics {
 	}
 
 	void createGraphicsContext() {
-		//SDL_GL_SetSwapInterval(0);
-		//GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
-		//renderer = GPU_Init(resolution.w, resolution.h, GPU_DEFAULT_INIT_FLAGS);
-		//
-		//cam = GPU_GetDefaultCamera();
-
 		SDL_CreateWindowAndRenderer(resolution.w, resolution.h, NULL, &window, &renderer);
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 		Load_Textures();
@@ -129,8 +124,6 @@ namespace Graphics {
 		running = false;
 	}
 
-	void Render(SDL_Texture* pTexture, SDL_Rect& clipSprite, SDL_Rect& scaledSlot) {
-		SDL_RenderCopy(renderer, pTexture, &clipSprite, &scaledSlot);
-	}
+
 
 }

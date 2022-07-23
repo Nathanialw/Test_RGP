@@ -30,8 +30,6 @@ namespace UI {
 	}
 
 	void Create_Bag_UI() {
-		
-
 		for (int i = 0; i < (totalSlots); i++) {
 			UI_bagSlots.at(i) = Graphics::defaultIcon;
 		}
@@ -149,7 +147,7 @@ namespace UI {
 			currentScreenPosition = Camera_Control::Convert_Rect_To_Scale(defaultScreenPosition);
 			screenBag = Camera_Control::Convert_Rect_To_Scale(Bag);
 			//render UI
-			Graphics::Render(Graphics::itsmars_Inventory, charui, currentScreenPosition);
+			Graphics::Render_Rect(Graphics::itsmars_Inventory, charui, currentScreenPosition);
 			//render Items in bag
 			Render_Bag_Slot();
 		}

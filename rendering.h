@@ -40,7 +40,7 @@ namespace Rendering {
 				sy = y.fY - camera_offset.screen.y;
 				anim.renderPosition.x = (int)(sx - position.offset.fX);
 				anim.renderPosition.y = (int)(sy - position.offset.fY);
-				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				Graphics::Render_Rect(anim.pTexture, anim.clipSprite, anim.renderPosition);
 			}		
 		}
 	}
@@ -168,7 +168,7 @@ namespace Rendering {
 				//fade rendering objects at bottom of screen
 				SDL_SetTextureAlphaMod(anim.pTexture, alpha);
 
-				Graphics::Render_Rect(anim.pTexture, &anim.clipSprite, &anim.renderPosition);
+				Graphics::Render_Rect(anim.pTexture, anim.clipSprite, anim.renderPosition);
 				if (showSpriteBox) {
 					SDL_RenderDrawRect(Graphics::renderer, &anim.renderPosition);
 				}
