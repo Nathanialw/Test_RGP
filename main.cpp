@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
 	Init::init();
 	Graphics::createGraphicsContext();
 	Init_Game();
+	UI::Init_UI();
   
 	while (Graphics::running == true) {
 		AI::Run_AI();

@@ -2,7 +2,6 @@
 #include <SDL.h>
 #include <iostream>
 #include <vector>
-#include "debug_components.h"
 #include "classes.h"
 
 

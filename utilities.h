@@ -76,6 +76,13 @@ namespace Utilities {
 		return b;
 	}
 
+	SDL_Point SDL_FPoint_to_Point(SDL_FPoint &a) {
+		SDL_Point b = {};
+		b.x = (int)a.x;
+		b.y = (int)a.y;
+		return b;
+	}
+
 	float Get_Direction_Point(float &sourceX, float &sourceY, float& targetX, float& targetY) {
 		float a = targetX - sourceX;
 		float b = targetY - sourceY;

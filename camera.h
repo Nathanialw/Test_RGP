@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL_assert.h>
-#include "scene.h"
+#include "components.h"
+#include "scenes.h"
 
 
 namespace Camera_Control {
@@ -52,7 +53,7 @@ namespace Camera_Control {
 	}
 
 
-	SDL_Rect Convert_Rect_To_Scale(SDL_Rect& rect, SDL_Rect& scaledScreenRect) {
+	SDL_Rect Convert_Rect_To_Scale(SDL_Rect& rect) {
 		auto view = Scenes::scene.view<Camera>();
 
 		for (auto focus : view) {
@@ -64,8 +65,21 @@ namespace Camera_Control {
 				(float(rect.w) / componentCamera.scale.fX),
 				(float(rect.h) / componentCamera.scale.fY) };
 
-			scaledScreenRect = Utilities::SDL_FRect_To_SDL_Rect(fRenderToScreen);
-			return scaledScreenRect;
+			return Utilities::SDL_FRect_To_SDL_Rect(fRenderToScreen);
+		}
+	}
+
+	SDL_Point Convert_Point_To_Scale(SDL_Point& rect) {
+		auto view = Scenes::scene.view<Camera>();
+
+		for (auto focus : view) {
+			auto& componentCamera = view.get<Camera>(focus);
+
+			SDL_FPoint fRenderToScreen = {
+				float(rect.x) / componentCamera.scale.fX,
+				float(rect.y) / componentCamera.scale.fY };
+
+			return Utilities::SDL_FPoint_to_Point(fRenderToScreen);
 		}
 	}
 }

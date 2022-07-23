@@ -1,6 +1,8 @@
 #pragma once
 #include "components.h"
 #include "graphics.h"
+#include "scenes.h"
+
 
 namespace UI {
 	namespace {
@@ -8,29 +10,18 @@ namespace UI {
 		SDL_Rect charui = { 0, 0, 554, 1080 };
 		float scale = 1.0f;
 		SDL_Rect defaultScreenPosition = { 100, 100, 554, 1080 };
-		SDL_Rect currentScreenPosition = { };
-		
-		
-		//x 32
-		//y 544
-		DataTypes::i2d bagoffset = { 32, 544 }; //i THIKN
+		SDL_Rect currentScreenPosition = {};
+	
+		DataTypes::i2d bagoffset = { 32, 544 };
 		DataTypes::i2d numOfSlots = { 8, 4 };
-		int bagslotsize = 64; // or 32 not even sure		
-		SDL_Rect Bag = { currentScreenPosition.x + bagoffset.x, currentScreenPosition.y + bagoffset.y, numOfSlots.x * bagslotsize, numOfSlots.y * bagslotsize };
+		int totalSlots = numOfSlots.x * numOfSlots.y;
+		int bagslotsize = 64; 
+		SDL_Rect Bag = { defaultScreenPosition.x + bagoffset.x, defaultScreenPosition.y + bagoffset.y, numOfSlots.x * bagslotsize, numOfSlots.y * bagslotsize };
 		SDL_Rect screenBag = { };
-		std::vector<entt::entity>UI_bagSlots;
-		
-		//int totalSlots = numOfSlots.x * numOfSlots.y;
-		std::vector<SDL_Rect>UI_bagSlotPosition(numOfSlots.x * numOfSlots.y);
-		
-
-
-		//calculate slot position based on which slot its in and save the rect to the Icon component
-
-		
+		std::vector<entt::entity>UI_bagSlots(totalSlots);
 	}
 
-	
+
 
 	void Place_Item_In_Bag() {
 		if (toggleBag) {
@@ -39,9 +30,10 @@ namespace UI {
 	}
 
 	void Create_Bag_UI() {
-		for (int i = 0; i < (numOfSlots.x * numOfSlots.y); i++) {
-			
-			
+		
+
+		for (int i = 0; i < (totalSlots); i++) {
+			UI_bagSlots.at(i) = Graphics::defaultIcon;
 		}
 	}
 
@@ -55,77 +47,127 @@ namespace UI {
 	}
 
 	//check if the Mouse point is in the rect and which one
-	int Get_Bag_Slot(SDL_Point &mousePoint) {		
-		SDL_Rect slotRect = {};		
+	int Get_Bag_Slot(SDL_Point& mousePoint) {
+
+		SDL_Rect slotRect = {};
 		slotRect.w = bagslotsize;
 		slotRect.h = bagslotsize;
-		
-		for (int i = 0; i < numOfSlots.x; i++) {
+		int i;
+		int j;
+		int slot = 0;
+
+		for (i = 0; i < numOfSlots.x; i++) {
 			slotRect.x = (i * bagslotsize) + Bag.x;
-			
-			for (int j = 0; j < numOfSlots.y; j++) {
+
+			for (j = 0; j < numOfSlots.y; j++) {
 				slotRect.y = (j * bagslotsize) + Bag.y;
-				if (Utilities::bPoint_RectIntersect(mousePoint, slotRect)) {
-					
-					return j;
+
+				SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+				if (Utilities::bPoint_RectIntersect(mousePoint, scaledSlot)) {
+					return slot;
+				}
+				if (j < (numOfSlots.y - 1)) {
+					slot++;
 				}
 			}
-			if (Utilities::bPoint_RectIntersect(mousePoint, slotRect)) {
-				
-				return i;
+			SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+			if (Utilities::bPoint_RectIntersect(mousePoint, scaledSlot)) {
+				return slot;
+			}
+			if (i < (numOfSlots.x - 1)) {
+				slot++;
 			}
 		}
-		
-	}
 
-	void Update_Bag_Scale(Camera &camera) {
-		
-		
-		
 	}
+	//check if the Mouse point is in the rect and which one
+	void Render_Bag_Slot() {
 
-	bool Interact_With_Bag(entt::entity &item, SDL_Point &mousePoint) {
-		if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)) {
-			Utilities::Log("inside");
-			SDL_Point cursorRelativeToBagUIPosition = { mousePoint.x - currentScreenPosition.x, mousePoint.y - currentScreenPosition.y };
-			if (Utilities::bPoint_RectIntersect(cursorRelativeToBagUIPosition, Bag)) {
-				int slotNum = Get_Bag_Slot(mousePoint);
-				
-				std::cout << slotNum << std::endl;
-				//UI_bagSlots.at(slotNum) = item;
-				Utilities::Log("in bag");
-				return true;
-				//remove from mouse
+		SDL_Rect slotRect = {};
+		slotRect.w = bagslotsize;
+		slotRect.h = bagslotsize;
+		int i;
+		int j;
+		int slot = 0;
+
+		for (i = 0; i < numOfSlots.x; i++) {
+			slotRect.x = (i * bagslotsize) + Bag.x;
+
+			for (j = 0; j < numOfSlots.y; j++) {
+				slotRect.y = (j * bagslotsize) + Bag.y;
+
+				auto &icon = Scenes::scene.get<Icon>(UI_bagSlots.at(slot));
+				SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
+				if (j < (numOfSlots.y - 1)) {
+					slot++;
+				}
 			}
-			Utilities::Log("not in bag");
+
+			auto icon = Scenes::scene.get<Icon>(UI_bagSlots.at(slot));
+			SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+			SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
+			if (i < (numOfSlots.x - 1)) {
+				slot++;
+			}
+		}
+
+	}
+
+
+	bool Interact_With_Bag(entt::entity& item, SDL_Point& mousePoint, bool &mouseHasItem) {
+		if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)) {
+			SDL_Point screenCursor = Camera_Control::Convert_Point_To_Scale(mousePoint);
+			int slotNum = Get_Bag_Slot(screenCursor);
+
+			if (Utilities::bPoint_RectIntersect(screenCursor, screenBag)) {
+				if (mouseHasItem) {
+					UI_bagSlots.at(slotNum) = item;
+					mouseHasItem = false;
+					Scenes::scene.remove<On_Mouse>(Mouse::mouseItem);
+					return true;				
+				}
+				else if (UI_bagSlots.at(slotNum) != Graphics::defaultIcon) {
+					item = UI_bagSlots.at(slotNum);
+					UI_bagSlots.at(slotNum) = Graphics::defaultIcon;
+					Scenes::scene.emplace<On_Mouse>(Mouse::mouseItem);
+					mouseHasItem = true;
+					return true;
+				}
+			}
+			return false;
 		}
 		else {
 			return false;
 		}
-		
+
 	}
 
 	void Render_UI() {
 		if (toggleBag) {
-			
-			SDL_Rect renderRect = Camera_Control::Convert_Rect_To_Scale(defaultScreenPosition, currentScreenPosition);
-			SDL_RenderCopy(Graphics::renderer, Graphics::itsmars_Inventory, &charui, &renderRect);
+
+			currentScreenPosition = Camera_Control::Convert_Rect_To_Scale(defaultScreenPosition);
+			screenBag = Camera_Control::Convert_Rect_To_Scale(Bag);
+			//render UI
+			Graphics::Render(Graphics::itsmars_Inventory, charui, currentScreenPosition);
+			//render Items in bag
+			Render_Bag_Slot();
 		}
 	}
 
-	//void Create_Bag() {
-	//	auto item = Scenes::scene.create();
+	//run at game start to init bag vector
+	void Init_UI() {
+		Create_Bag_UI();
+	}
 
-	//	
-	//	Scenes::scene.emplace<Scale>(item, 1);
 
-	//	Scenes::scene.emplace<Actions>(item, isStatic);
-	//	Scenes::scene.emplace<Direction>(item, W);
 
-	//	auto& x = Scenes::scene.emplace<Position_X>(item, 0.0f, 100.0f);
-	//	auto& y = Scenes::scene.emplace<Position_Y>(item, 0.0f, 100.0f);
 
-	//	Scenes::scene.emplace<Ground_Item>(item, x.fX - offset.offset.fX, y.fY - offset.offset.fY, 64.0f, 64.0f);
-	//	//Scenes::scene.emplace<Item_Type>(item, weapon);
-	//}
+
+
+
+
+
+
+
 }

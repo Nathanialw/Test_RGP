@@ -216,5 +216,6 @@ namespace Scene {
 		Entity_Loader::init_db();
 		Load_Entities();
 		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
+		
 	}
 }
