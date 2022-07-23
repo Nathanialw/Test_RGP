@@ -50,7 +50,7 @@ namespace Debug_System {
 	bool frameRateMode = true;
 	bool frameTimeMode = false;
 
-	void Toggle_Count_Rate_Mode() {
+	void Toggle_Frame_Rate_Mode() {
 		if (frameRateMode) {
 			frameRateMode = false;
 			frameTimeMode = true;			

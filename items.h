@@ -76,7 +76,7 @@ namespace Items {
 
 	//maybe change to take in the mouse data as arguements so I don't have to include mouse_control.h, also can break out of check faster maybe
 	//void Check_For_Item_Up_Item(float &xMouse, float &yMouse, bool &isItemCurrentlyHeld) {
-	void Check_For_Item_To_Pick_Up(std::vector<entt::entity> &bag, int &totalSlots, entt::entity emptySlot, bool &isBagOpen) {
+	bool Check_For_Item_To_Pick_Up(std::vector<entt::entity> &bag, int &totalSlots, entt::entity emptySlot, bool &isBagOpen) {
 		//check if input unit it close enough to item
 		auto itemView = Scenes::scene.view<Position, Renderable, Ground_Item>();
 		auto mouseInput = Scenes::scene.view<Position, Input, Radius>();
@@ -114,8 +114,10 @@ namespace Items {
 								//either pick it up with the mouse using this function or have an overburdened function instead
 							}							
 						}
+						return true;
 					}
 				}
+				return false;
 			}
 		}
 	}

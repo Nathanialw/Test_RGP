@@ -62,7 +62,7 @@ namespace Event_Handler {
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
 				case SDLK_3: AI::Melee_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
 				case SDLK_4: break;
-				case SDLK_5: Debug_System::Toggle_Count_Rate_Mode(); break;
+				case SDLK_5: Debug_System::Toggle_Frame_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
 				case SDLK_8: Rendering::RenderCullMode(); break;
@@ -95,8 +95,9 @@ namespace Event_Handler {
 	void Mouse_Input(auto& e) {
 		if (event.key.type == SDL_MOUSEBUTTONDOWN) {
 			if (event.button.button == SDL_BUTTON_LEFT) {
-				if (UI::Interact_With_Bag(Mouse::mouseItem, Mouse::mousePoint, Mouse::itemCurrentlyHeld)) {
-					//				
+				//check if cursor is in the bag UI
+				if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)){
+					UI::Interact_With_Bag(Mouse::mouseItem, Mouse::mousePoint, Mouse::itemCurrentlyHeld);
 				}
 				else {
 					Items::Drop_Item_If_On_Mouse();
@@ -104,10 +105,13 @@ namespace Event_Handler {
 				User_Mouse_Input::Selection_Box(); //if units are currently selected				
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {
-				Mouse::bRight_Mouse_Pressed = true;
-				Items::Check_For_Item_To_Pick_Up(UI::UI_bagSlots, UI::iTotalSlots, Graphics::defaultIcon, UI::bToggleBag);
-				User_Mouse_Input::Order_Unit(); //if units are currently selected
-				
+				if (Items::Check_For_Item_To_Pick_Up(UI::UI_bagSlots, UI::iTotalSlots, Graphics::defaultIcon, UI::bToggleBag)) {
+					//
+				}
+				else {
+					Mouse::bRight_Mouse_Pressed = true;
+					User_Mouse_Input::Order_Unit(); //if units are currently selected
+				}
 			}
 		}
 

@@ -118,27 +118,18 @@ namespace UI {
 	}
 
 
-	bool Interact_With_Bag(entt::entity& item, SDL_Point& mousePoint, bool &mouseHasItem) {
-		if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)) {
-			SDL_Point screenCursor = Camera_Control::Convert_Point_To_Scale(mousePoint);
-			int slotNum = Get_Bag_Slot(screenCursor);
+	void Interact_With_Bag(entt::entity& item, SDL_Point& mousePoint, bool &mouseHasItem) {
+		SDL_Point screenCursor = Camera_Control::Convert_Point_To_Scale(mousePoint);
+		int slotNum = Get_Bag_Slot(screenCursor);
 
-			if (Utilities::bPoint_RectIntersect(screenCursor, screenBag)) {
-				if (mouseHasItem) {
-					Place_Item_In_Bag(item, mouseHasItem, slotNum);
-					return true;				
-				}
-				else if (UI_bagSlots.at(slotNum) != Graphics::defaultIcon) {
-					Remove_Item_From_Bag(item, mouseHasItem, slotNum);
-					return true;
-				}
+		if (Utilities::bPoint_RectIntersect(screenCursor, screenBag)) {
+			if (mouseHasItem) {
+				Place_Item_In_Bag(item, mouseHasItem, slotNum);			
 			}
-			return false;
+			else if (UI_bagSlots.at(slotNum) != Graphics::defaultIcon) {
+				Remove_Item_From_Bag(item, mouseHasItem, slotNum);
+			}
 		}
-		else {
-			return false;
-		}
-
 	}
 
 	void Render_UI() {
