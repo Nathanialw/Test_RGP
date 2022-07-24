@@ -15,7 +15,7 @@ namespace Interface {
 	}
 
 	void Update_Zoom(SDL_Event& e) {
-		auto view = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Camera>();
 		for (auto focus : view) {
 			auto& x = view.get<Camera>(focus).scale;
 			if (e.wheel.y > 0) {
@@ -32,11 +32,11 @@ namespace Interface {
 	}
 
 	void Display_Military_Groups() {
-		auto camera_view = Scenes::scene.view<Camera>();
+		auto camera_view = World::zone.view<Camera>();
 		for (auto cameras : camera_view) {
 			auto& cam = camera_view.get<Camera>(cameras);
 
-			auto squad_view = Scenes::scene.view<Squad>();
+			auto squad_view = World::zone.view<Squad>();
 			for (auto squads : squad_view) {
 				auto& x = squad_view.get<Squad>(squads);
 				SDL_FRect o = x.sCollide_Box;
@@ -46,7 +46,7 @@ namespace Interface {
 				//SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 
-			auto platoon_view = Scenes::scene.view<Platoon>();
+			auto platoon_view = World::zone.view<Platoon>();
 			for (auto platoons : platoon_view) {
 				auto& platoon = platoon_view.get<Platoon>(platoons);
 				SDL_FRect o = platoon.sCollide_Box;
@@ -56,7 +56,7 @@ namespace Interface {
 				//SDL_RenderDrawRectF(renderer, &o);
 			}		
 			
-			auto company_view = Scenes::scene.view<Company>();
+			auto company_view = World::zone.view<Company>();
 			for (auto companies : company_view) {
 				auto& company = company_view.get<Company>(companies);
 				SDL_FRect o = company.sCollide_Box;
@@ -95,7 +95,7 @@ namespace Interface {
 
 
 	void Display_Mouse() {
-		auto view = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Camera>();
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);
 
@@ -119,7 +119,7 @@ namespace Interface {
 			gridDepth = -1;
 		}
 		else {
-			auto view = Scenes::scene.view<Camera>();
+			auto view = World::zone.view<Camera>();
 
 			for (auto id : view) {
 				auto& camera = view.get<Camera>(id);
@@ -179,8 +179,8 @@ namespace Interface {
 
 	void Show_Attacks() {
 		SDL_SetRenderDrawColor(Graphics::renderer, 155, 155, 55, 255);
-		auto weapon_view = Scenes::scene.view<Weapon_Size>();
-		auto camera_view = Scenes::scene.view<Camera>();
+		auto weapon_view = World::zone.view<Weapon_Size>();
+		auto camera_view = World::zone.view<Camera>();
 		for (auto camera : camera_view) {
 			auto& cam = camera_view.get<Camera>(camera);
 			SDL_FRect offset = cam.screen;
@@ -195,8 +195,8 @@ namespace Interface {
 	}
 
 	void Unit_Arrive_UI() {
-		auto view = Scenes::scene.view<Mouse_Move>();
-		auto view2 = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Mouse_Move>();
+		auto view2 = World::zone.view<Camera>();
 		for (auto camera : view2) {
 			auto& cam = view2.get<Camera>(camera);
 			for (auto entity : view) {

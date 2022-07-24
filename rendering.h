@@ -21,8 +21,8 @@ namespace Rendering {
 	}
 
 	void Render_Terrain() { //state
-		auto view1 = Scenes::scene.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions, Sprite_Offset>();
-		auto view2 = Scenes::scene.view<Camera>();
+		auto view1 = World::zone.view<Terrain_Renderable, Terrain_Position_Y, Terrain_Position_X, animation, Actions, Sprite_Offset>();
+		auto view2 = World::zone.view<Camera>();
 		float sx;
 		float sy;
 		for (auto id : view2) {
@@ -47,7 +47,7 @@ namespace Rendering {
 
 	void sort_Positions() {
 		
-		Scenes::scene.sort<Renderable>([](const auto& lhs, const auto& rhs) { return lhs.y < rhs.y; }); //sorts position least to	
+		World::zone.sort<Renderable>([](const auto& lhs, const auto& rhs) { return lhs.y < rhs.y; }); //sorts position least to	
 	}
 
 	SDL_Rect Frame_Update(spriteframes& a, Direction& b, Actions& act) {
@@ -137,8 +137,8 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view1 = Scenes::scene.view<Renderable, Position, animation, Actions, Direction, Sprite_Offset, Scale>();
-		auto view2 = Scenes::scene.view<Camera>();
+		auto view1 = World::zone.view<Renderable, Position, animation, Actions, Direction, Sprite_Offset, Scale>();
+		auto view2 = World::zone.view<Camera>();
 
 		for (auto id : view2) {
 			auto& camera_offset = view2.get<Camera>(id).screen;
@@ -211,8 +211,8 @@ namespace Rendering {
 		SDL_Rect xClipPos;
 		float sx;
 		float sy;
-		auto view = Scenes::scene.view<Explosion, Position, Frame_Delay, Texture, Sprite_Frames>();
-		auto view2 = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Explosion, Position, Frame_Delay, Texture, Sprite_Frames>();
+		auto view2 = World::zone.view<Camera>();
 
 		for (auto cam : view2) {
 			auto& camera_offset = view2.get<Camera>(cam);
@@ -236,7 +236,7 @@ namespace Rendering {
 					}
 					else {
 						//remove explosion from scene and free the entity
-						Scenes::scene.destroy(spell);
+						World::zone.destroy(spell);
 					}
 					delay.currentFrameTime = 0;
 				}
@@ -263,8 +263,8 @@ namespace Rendering {
 		
 		SDL_Rect DisplayRect = {};
 		
-		auto view = Scenes::scene.view<Position, Icon, On_Mouse>();
-		auto view2 = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Position, Icon, On_Mouse>();
+		auto view2 = World::zone.view<Camera>();
 
 		for (auto cam : view2) {
 			auto& camera = view2.get<Camera>(cam);
@@ -290,7 +290,7 @@ namespace Rendering {
 	}
 
 	void isDead() {
-		auto view = Scenes::scene.view<Actions, Health, Position, Sprite_Offset>(entt::exclude<Spell>);
+		auto view = World::zone.view<Actions, Health, Position, Sprite_Offset>(entt::exclude<Spell>);
 		for (auto entity : view) {
 			auto& health = view.get<Health>(entity);
 			if (health.iHealth <= 0) {
@@ -308,18 +308,18 @@ namespace Rendering {
 				offset.fY = 0.0f;
 
 
-				Scenes::scene.get<Alive>(entity).bIsAlive = false;
-				Scenes::scene.remove<Commandable>(entity);
-				Scenes::scene.remove<Selected>(entity);
-				Scenes::scene.remove<Moving>(entity);
-				Scenes::scene.remove<Potential_Position>(entity);
-				Scenes::scene.remove<Mouse_Move>(entity);
-				Scenes::scene.remove<Velocity>(entity);
-				Scenes::scene.remove<Spellbook>(entity);
-				Scenes::scene.remove<Mass>(entity);
-				Scenes::scene.remove<Sight_Range>(entity);
-				Scenes::scene.remove<Health>(entity);
-				Scenes::scene.remove<Radius>(entity);
+				World::zone.get<Alive>(entity).bIsAlive = false;
+				World::zone.remove<Commandable>(entity);
+				World::zone.remove<Selected>(entity);
+				World::zone.remove<Moving>(entity);
+				World::zone.remove<Potential_Position>(entity);
+				World::zone.remove<Mouse_Move>(entity);
+				World::zone.remove<Velocity>(entity);
+				World::zone.remove<Spellbook>(entity);
+				World::zone.remove<Mass>(entity);
+				World::zone.remove<Sight_Range>(entity);
+				World::zone.remove<Health>(entity);
+				World::zone.remove<Radius>(entity);
 			}
 		}
 	}
@@ -327,11 +327,11 @@ namespace Rendering {
 	void RenderCullMode() {
 		if (renderType == true) {
 			renderType = false;
-			Scenes::scene.clear<Renderable>();
+			World::zone.clear<Renderable>();
 			}
 		else {
 			renderType = true;
-			Scenes::scene.clear<Renderable>();
+			World::zone.clear<Renderable>();
 		}
 	}
 
@@ -350,7 +350,7 @@ namespace Rendering {
 	}
 
 	void Add_Remove_Renderable_Component() {
-		auto camera_view = Scenes::scene.view<Camera>();
+		auto camera_view = World::zone.view<Camera>();
 		//system("CLS");
 		int i = 0;
 		int j = 0;
@@ -363,22 +363,22 @@ namespace Rendering {
 				screenRect.w * 2, 
 				screenRect.h * 2 };
 			
-			auto terrainView = Scenes::scene.view<Terrain_Position_Y, Terrain_Position_X>();
+			auto terrainView = World::zone.view<Terrain_Position_Y, Terrain_Position_X>();
 			
 			for (auto terrain : terrainView) {
 				auto& x = terrainView.get<Terrain_Position_X>(terrain).fX;
 				auto& y = terrainView.get<Terrain_Position_Y>(terrain).fY;
 				SDL_FPoint point = { x, y};
 				if (SDL_PointInFRect(&point, &renderRect)) {
-					Scenes::scene.emplace_or_replace<Terrain_Renderable>(terrain);
+					World::zone.emplace_or_replace<Terrain_Renderable>(terrain);
 					i++;
 				}
 				else {
-					Scenes::scene.remove<Terrain_Renderable>(terrain);
+					World::zone.remove<Terrain_Renderable>(terrain);
 				}
 			}
 
-			auto objectsView = Scenes::scene.view<Position>();
+			auto objectsView = World::zone.view<Position>();
 			float bottomOfScreenEdge = screenRect.y + screenRect.h;
 			float bottomOfRenderRect = renderRect.y + renderRect.h;
 			
@@ -388,11 +388,11 @@ namespace Rendering {
 				SDL_FPoint point = { x, y};
 				if (SDL_PointInFRect(&point, &renderRect)) {
 					int alpha = Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y);
-					Scenes::scene.emplace_or_replace<Renderable>(entity, y, alpha);
+					World::zone.emplace_or_replace<Renderable>(entity, y, alpha);
 					j++;
 				}
 				else {
-					Scenes::scene.remove<Renderable>(entity);
+					World::zone.remove<Renderable>(entity);
 				}
 			}
 			//std::cout << "entt render" << std::endl;
@@ -415,6 +415,18 @@ namespace Rendering {
 		}
 	};
 
+	void Update_Camera_And_Mouse() {
+		auto focus_view = World::zone.view<Camera, Position>();
+		
+		for (auto player : focus_view) {
+			auto& camera = focus_view.get<Camera>(player);
+			auto& position = focus_view.get<Position>(player);
+
+			Camera_Control::Update_Camera_Follow(camera, position, Graphics::resolution);
+			Mouse::Update_Mouse(camera);
+		}
+	}
+
 	void Rendering() {
 		//std::cout << "SDL_RenderClear = Good" << std::endl;
 
@@ -422,7 +434,7 @@ namespace Rendering {
 		if (debug) {
 			std::cout << "--- Starting Rendering() --- = Good" << std::endl;
 		}
-		Camera_Control::Update_Camera();
+		
 		if (debug) {
 			std::cout << "Check_Renderable = Good" << std::endl;
 		}
@@ -435,11 +447,11 @@ namespace Rendering {
 		Animation_Frame();
 		Render_Explosions();
 		//std::cout << "Animation_Frame = Good" << std::endl;
-		UI::Render_UI();
+		UI::Render_UI(Graphics::renderer, World::zone);
 		Interface::Run_Interface();
-		Items::Update_Mouse_Slot_Position();
+		Items::Update_Mouse_Slot_Position(World::zone, Mouse::mouseItem, Mouse::itemCurrentlyHeld, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 		Render_Mouse_Item(); 
-	
+		Update_Camera_And_Mouse();
 		///std::cout << "Run_Interface = Good" << std::endl;
 		SDL_SetRenderDrawColor(Graphics::renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 		SDL_RenderPresent(Graphics::renderer);

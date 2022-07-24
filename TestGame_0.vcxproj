@@ -212,6 +212,7 @@
     <ClInclude Include="debug_system.h" />
     <ClInclude Include="entity_loader.h" />
     <ClInclude Include="entt.hpp" />
+    <ClInclude Include="equipment.h" />
     <ClInclude Include="event_handler.h" />
     <ClInclude Include="gameLoop.h" />
     <ClInclude Include="graphics.h" />
@@ -226,7 +227,7 @@
     <ClInclude Include="recruitable_units.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="rendering.h" />
-    <ClInclude Include="scenes.h" />
+    <ClInclude Include="world.h" />
     <ClInclude Include="spells.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="sqlite3.h" />
@@ -236,7 +237,6 @@
     <ClInclude Include="unit_control.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="weapons.h" />
-    <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data.db" />

@@ -4,7 +4,6 @@
 #include "SDL_image.h"
 #include "SDL_TTF.h"
 #include "components.h"
-#include "Scenes.h"
 
 
 namespace Graphics {
@@ -82,15 +81,15 @@ namespace Graphics {
 		return texture;
 	}
 
-	void Create_Default_Icon_Entity() {
-		defaultIcon = Scenes::scene.create();
-		auto& icon = Scenes::scene.emplace<Components::Icon>(defaultIcon, default_icon);
+	void Create_Default_Icon_Entity(entt::registry& zone) {
+		defaultIcon = zone.create();
+		auto& icon = zone.emplace<Components::Icon>(defaultIcon, default_icon);
 		icon.clipSprite = { 0, 0, 100, 100 };
 		icon.renderRectSize = { 48, 48 };
 		icon.renderPositionOffset = { icon.renderRectSize.x / 2, icon.renderRectSize.y / 2 };
 	}
 
-	void Load_Textures() {
+	void Load_Textures(entt::registry& zone) {
 		Create_Font();
 		skeleton_0 = createTexture("sprites/units/skeleton/armoured_skeleton_00.png");
 		warrior_axe = createTexture("sprites/units/warrior/warrior_axe.png");
@@ -110,13 +109,13 @@ namespace Graphics {
 		cursor_0 = createTexture("sprites/UI/cursor.png");
 		default_icon = createTexture("sprites/default.jpg");
 
-		Create_Default_Icon_Entity();
+		Create_Default_Icon_Entity(zone);
 	}
 
-	void createGraphicsContext() {
+	void createGraphicsContext(entt::registry& zone) {
 		SDL_CreateWindowAndRenderer(resolution.w, resolution.h, NULL, &window, &renderer);
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
-		Load_Textures();
+		Load_Textures(zone);
 	}
 
 	void closeContext() {

@@ -16,36 +16,36 @@ namespace AI {
 
 
 	void Move_Order(entt::entity& entity, float& x, float& y) {
-		Scenes::scene.emplace_or_replace<Mouse_Move>(entity, x, y);
-		Scenes::scene.emplace_or_replace<Moving>(entity);
+		World::zone.emplace_or_replace<Mouse_Move>(entity, x, y);
+		World::zone.emplace_or_replace<Moving>(entity);
 	}
 
 	void Spell_Attack(entt::entity& entity, float& targetX, float& targetY, const char* name) {
 
-		if (Scenes::scene.any_of<Casting>(entity) == false) { //locks out casing until cast animation has finished
-			Scenes::scene.emplace_or_replace<Cast>(entity, targetX, targetY);
-			Scenes::scene.emplace_or_replace<Spell_Name>(entity, name);
+		if (World::zone.any_of<Casting>(entity) == false) { //locks out casing until cast animation has finished
+			World::zone.emplace_or_replace<Cast>(entity, targetX, targetY);
+			World::zone.emplace_or_replace<Spell_Name>(entity, name);
 		}
 	}
 
 	void Melee_Attack(entt::entity& entity, float& x, float& y) {		
-		if (Scenes::scene.any_of<Attacking>(entity) == false) { //locks out attacking until attack animation has finished
-			Scenes::scene.emplace_or_replace<Attack>(entity, x, y);
+		if (World::zone.any_of<Attacking>(entity) == false) { //locks out attacking until attack animation has finished
+			World::zone.emplace_or_replace<Attack>(entity, x, y);
 		}
 	}
 
 	bool In_Range(float &radius, float &x, float &y) {		
 		SDL_FRect unit_collide_rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 
-		auto company_view = Scenes::scene.view<Company>();
+		auto company_view = World::zone.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (Utilities::bFRect_Intersect(company.sCollide_Box, unit_collide_rect)) {
 				for (int c = 0; c < company.iSub_Units.size(); c++) {
-					auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
+					auto& platoon = World::zone.get<Platoon>(company.iSub_Units[c]);
 					if (Utilities::bFRect_Intersect(platoon.sCollide_Box, unit_collide_rect)) {
 						for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-							auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
+							auto& squad = World::zone.get<Squad>(platoon.iSub_Units[p]);
 							if (Utilities::bFRect_Intersect(squad.sCollide_Box, unit_collide_rect)) { //checks against itself too so that units with the squad will have collision
 								for (int i = 0; i < squad.iSub_Units.size(); i++) {
 									if (squad.bAlive.at(i) != false) {
@@ -74,7 +74,7 @@ namespace AI {
 		
 		SDL_FRect unit_collide_rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 		
-		auto units = Scenes::scene.view<Input, Position, Radius>();		
+		auto units = World::zone.view<Input, Position, Radius>();		
 		for (auto unit : units) {
 			float tarx = units.get<Position>(unit).fX;
 			float tary = units.get<Position>(unit).fY;
@@ -91,16 +91,16 @@ namespace AI {
 	}
 
 	void Mouse_Attack_Move() { // maybe change to move and attack?
-		if (Scenes::scene.empty<Selected>()) {
+		if (World::zone.empty<Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
-				auto units = Scenes::scene.view<Input, Position, Radius>();
+				auto units = World::zone.view<Input, Position, Radius>();
 
 				for (auto unit : units) {					
 					auto& radius = units.get<Radius>(unit).fRadius;
 					auto& x = units.get<Position>(unit).fX;
 					auto& y = units.get<Position>(unit).fY;
 					
-					if (Scenes::scene.any_of<Attacking>(unit) == false) {
+					if (World::zone.any_of<Attacking>(unit) == false) {
 						//attack target if it is next to you
 						if (In_Range(radius, x, y)) { //check if center of attack rect is in the target
  							Melee_Attack(unit, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
@@ -119,10 +119,10 @@ namespace AI {
 
 
 	void Attack_Move(entt::entity &entity, float &radius, Position &unitPosition, Position &targetPosition) { // maybe change to move and attack?
-		if (Scenes::scene.any_of<Attacking>(entity) == true) {
+		if (World::zone.any_of<Attacking>(entity) == true) {
 			return;
 		}
-		if (Scenes::scene.any_of<Attacking>(entity) == false) {
+		if (World::zone.any_of<Attacking>(entity) == false) {
 			if (Player_In_Melee_Range(radius, unitPosition.fX, unitPosition.fY)) { //check if center of attack rect is in the target
 				Melee_Attack(entity, targetPosition.fX, targetPosition.fY);
 				return;
@@ -138,8 +138,8 @@ namespace AI {
 
 
 	void Check_For_Targets() {
-		auto units = Scenes::scene.view<Sight_Range, Radius, Position, Alive>();
-		auto targets = Scenes::scene.view<Position, Input>();
+		auto units = World::zone.view<Sight_Range, Radius, Position, Alive>();
+		auto targets = World::zone.view<Position, Input>();
 
 		for (auto unit : units) {
 			auto sightBox = units.get<Sight_Range>(unit).sightBox;
@@ -160,7 +160,7 @@ namespace AI {
 	}
 
 	void Update_Sight_Box() {
-		auto view = Scenes::scene.view<Sight_Range, Position, Alive>();
+		auto view = World::zone.view<Sight_Range, Position, Alive>();
 		for (auto entity : view) {
 			auto& sight = view.get<Sight_Range>(entity).sightBox;
 			auto& x = view.get<Position>(entity).fX;

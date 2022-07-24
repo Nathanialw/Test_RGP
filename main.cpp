@@ -1,4 +1,3 @@
-
 #include "rendering.h"
 #include "init.h"
 #include "event_handler.h"
@@ -13,7 +12,7 @@ int main(int argc, char* argv[]) {
 	
 	//initialization
 	Init::init();
-	Graphics::createGraphicsContext();
+	Graphics::createGraphicsContext(World::zone);
 	Init_Game();
 	UI::Init_UI();
   

@@ -18,9 +18,9 @@ namespace Movement {
 
 
 	void Mouse_Moving() { // maybe change to move and attack?
-		if (Scenes::scene.empty<Selected>()) {
+		if (World::zone.empty<Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
-				auto view = Scenes::scene.view<Input>();
+				auto view = World::zone.view<Input>();
 				for (auto entity : view) {
 					AI::Move_Order(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 				}
@@ -33,7 +33,7 @@ namespace Movement {
 
 	
 	void Update_Position() {
-		auto view = Scenes::scene.view<Potential_Position, Velocity>();
+		auto view = World::zone.view<Potential_Position, Velocity>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
 		float angleY = 0.0f;
@@ -79,7 +79,7 @@ namespace Movement {
 	}
 
 	void Update_Direction() {
-		auto view = Scenes::scene.view<Direction, Actions, Velocity, Moving>();
+		auto view = World::zone.view<Direction, Actions, Velocity, Moving>();
 		for (auto entity : view) {
 			auto& vel = view.get<Velocity>(entity);
 			auto& b = view.get<Direction>(entity);
@@ -99,7 +99,7 @@ namespace Movement {
 		Player_Move_Poll += Timer::timeStep;
 		if (Player_Move_Poll >= 200) {
 			Player_Move_Poll = 0;
-			auto view = Scenes::scene.view<Potential_Position, Velocity, Mouse_Move, Actions, Moving>();
+			auto view = World::zone.view<Potential_Position, Velocity, Mouse_Move, Actions, Moving>();
 			for (auto entity : view) {	
 				auto& x = view.get<Potential_Position>(entity);
 				auto& y = view.get<Potential_Position>(entity);
@@ -128,7 +128,7 @@ namespace Movement {
 	}
 		
 	void Mouse_Move_Arrived() {
-		auto view = Scenes::scene.view<Potential_Position, Velocity, Actions, Mouse_Move>();
+		auto view = World::zone.view<Potential_Position, Velocity, Actions, Mouse_Move>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			auto& v = view.get<Velocity>(entity);
@@ -139,8 +139,8 @@ namespace Movement {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;
-				Scenes::scene.remove<Mouse_Move>(entity);
-				Scenes::scene.remove<Moving>(entity);
+				World::zone.remove<Mouse_Move>(entity);
+				World::zone.remove<Moving>(entity);
 			}
 		}
 	}
@@ -151,7 +151,7 @@ namespace Movement {
 	void Linear_Move_To() {
 		linearMovePoll += Timer::timeStep;
 		if (linearMovePoll >= 50) {
-			auto view = Scenes::scene.view<Potential_Position, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
+			auto view = World::zone.view<Potential_Position, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
 			for (auto entity : view) {
 				auto& x = view.get<Potential_Position>(entity);
 				auto& y = view.get<Potential_Position>(entity);
@@ -168,7 +168,7 @@ namespace Movement {
 					
 				}
 				else {
-					Scenes::scene.remove<Linear_Move>(entity);
+					World::zone.remove<Linear_Move>(entity);
 				}
 			}
 			linearMovePoll = 0;

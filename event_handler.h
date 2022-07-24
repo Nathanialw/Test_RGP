@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include "ui.h"
 #include "scene.h"
 #include "timer.h"
 #include "utilities.h"
@@ -10,7 +11,6 @@
 #include "spells.h"
 #include "weapons.h"
 #include "ai_control.h"
-#include "rendering.h"
 
 namespace Event_Handler {
 
@@ -49,14 +49,14 @@ namespace Event_Handler {
 						poisition = potential position
 					*/
 				{
-				case SDLK_e:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; act.action = walk; break;
-				case SDLK_d:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; act.action = walk; break;
-				case SDLK_s:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX -= vel.speed; act.action = walk; break;
-				case SDLK_f:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_w:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
-				case SDLK_r:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_v:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-				case SDLK_x:  Scenes::scene.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_e:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; act.action = walk; break;
+				case SDLK_d:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; act.action = walk; break;
+				case SDLK_s:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_f:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_w:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+				case SDLK_r:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_v:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+				case SDLK_x:  World::zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 
 				case SDLK_1: AI::Spell_Attack(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
@@ -97,15 +97,15 @@ namespace Event_Handler {
 			if (event.button.button == SDL_BUTTON_LEFT) {
 				//check if cursor is in the bag UI
 				if (Mouse::bRect_inside_Cursor(UI::currentScreenPosition)){
-					UI::Interact_With_Bag(Mouse::mouseItem, Mouse::mousePoint, Mouse::itemCurrentlyHeld);
+					UI::Interact_With_Bag(Mouse::mouseItem, World::zone, Mouse::mousePoint, Mouse::itemCurrentlyHeld);
 				}
 				else {
-					Items::Drop_Item_If_On_Mouse();
+					Items::Drop_Item_If_On_Mouse(World::zone, Mouse::mouseItem, Mouse::itemCurrentlyHeld);
 				}
 				User_Mouse_Input::Selection_Box(); //if units are currently selected				
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT) {
-				if (Items::Check_For_Item_To_Pick_Up(UI::UI_bagSlots, UI::iTotalSlots, Graphics::defaultIcon, UI::bToggleBag)) {
+				if (Items::Check_For_Item_To_Pick_Up(World::zone, UI::UI_bagSlots, UI::iTotalSlots, Graphics::defaultIcon, UI::bToggleBag, Mouse::itemCurrentlyHeld)) {
 					//
 				}
 				else {
@@ -129,13 +129,13 @@ namespace Event_Handler {
 
 	void Player_Input() {
 		while (SDL_PollEvent(&event) != 0) {
-			auto view = Scenes::scene.view<Velocity, Actions, Input>();
+			auto view = World::zone.view<Velocity, Actions, Input>();
 			for (auto entity : view) {
 				auto& vel = view.get<Velocity>(entity);
 				auto& act = view.get<Actions>(entity);
 				if (event.key.type == SDL_KEYDOWN || event.key.type == SDL_KEYUP) {	
-					if (Scenes::scene.all_of<Mouse_Move>(entity)) {
-						Scenes::scene.remove<Mouse_Move>(entity);
+					if (World::zone.all_of<Mouse_Move>(entity)) {
+						World::zone.remove<Mouse_Move>(entity);
 						vel.magnitude.fX = 0;
 						vel.magnitude.fY = 0;
 					}

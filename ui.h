@@ -1,8 +1,6 @@
 #pragma once
 #include "components.h"
-#include "graphics.h"
-#include "scenes.h"
-
+#include "camera.h"
 
 namespace UI {
 	namespace {
@@ -21,16 +19,16 @@ namespace UI {
 		std::vector<entt::entity>UI_bagSlots(iTotalSlots);
 	}
 
-	void Place_Item_In_Bag(entt::entity &item, bool &mouseHasItem, int & slotNum) {
+	void Place_Item_In_Bag(entt::entity &item, entt::registry& scene, bool &mouseHasItem, int & slotNum) {
 		UI_bagSlots.at(slotNum) = item;
 		mouseHasItem = false;
-		Scenes::scene.remove<On_Mouse>(Mouse::mouseItem);
+		scene.remove<On_Mouse>(item);
 	}
 
-	void Remove_Item_From_Bag(entt::entity& item, bool& mouseHasItem, int& slotNum) {
+	void Remove_Item_From_Bag(entt::entity& item, entt::registry& scene, bool& mouseHasItem, int& slotNum) {
 		item = UI_bagSlots.at(slotNum);
 		UI_bagSlots.at(slotNum) = Graphics::defaultIcon;
-		Scenes::scene.emplace<On_Mouse>(Mouse::mouseItem);
+		scene.emplace<On_Mouse>(item);
 		mouseHasItem = true;
 	}
 
@@ -79,12 +77,12 @@ namespace UI {
 			}
 			if (i < (numOfSlots.x - 1)) {
 				slot++;
-			}
+			} 
 		}
 
 	}
 	//check if the Mouse point is in the rect and which one
-	void Render_Bag_Slot() {
+	void Render_Bag_Slot(SDL_Renderer *renderer, entt::registry &scene) {
 
 		SDL_Rect slotRect = {};
 		slotRect.w = iBagSlotPixelSize;
@@ -99,17 +97,17 @@ namespace UI {
 			for (j = 0; j < numOfSlots.y; j++) {
 				slotRect.y = (j * iBagSlotPixelSize) + Bag.y;
 
-				auto &icon = Scenes::scene.get<Icon>(UI_bagSlots.at(slot));
-				SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
-				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
+				auto &icon = scene.get<Icon>(UI_bagSlots.at(slot));
+				/*could be injected instead if it was a class object method*/SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+				SDL_RenderCopy(renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 				if (j < (numOfSlots.y - 1)) {
 					slot++;
 				}
 			}
 
-			auto icon = Scenes::scene.get<Icon>(UI_bagSlots.at(slot));
-			SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
-			SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
+			auto &icon = scene.get<Icon>(UI_bagSlots.at(slot));
+			/*could be injected instead if it was a class object method*/SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
+			SDL_RenderCopy(renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 			if (i < (numOfSlots.x - 1)) {
 				slot++;
 			}
@@ -118,21 +116,21 @@ namespace UI {
 	}
 
 
-	void Interact_With_Bag(entt::entity& item, SDL_Point& mousePoint, bool &mouseHasItem) {
-		SDL_Point screenCursor = Camera_Control::Convert_Point_To_Scale(mousePoint);
+	void Interact_With_Bag(entt::entity& item, entt::registry& scene, SDL_Point& mousePoint, bool &mouseHasItem) {
+		/*could be injected instead*/SDL_Point screenCursor = Camera_Control::Convert_Point_To_Scale(mousePoint);
 		int slotNum = Get_Bag_Slot(screenCursor);
 
 		if (Utilities::bPoint_RectIntersect(screenCursor, screenBag)) {
 			if (mouseHasItem) {
-				Place_Item_In_Bag(item, mouseHasItem, slotNum);			
+				Place_Item_In_Bag(item, scene, mouseHasItem, slotNum);			
 			}
 			else if (UI_bagSlots.at(slotNum) != Graphics::defaultIcon) {
-				Remove_Item_From_Bag(item, mouseHasItem, slotNum);
+				Remove_Item_From_Bag(item, scene, mouseHasItem, slotNum);
 			}
 		}
 	}
 
-	void Render_UI() {
+	void Render_UI(SDL_Renderer* renderer, entt::registry& scene) {
 		if (bToggleBag) {
 
 			currentScreenPosition = Camera_Control::Convert_Rect_To_Scale(defaultScreenPosition);
@@ -140,7 +138,7 @@ namespace UI {
 			//render UI
 			Graphics::Render_Rect(Graphics::itsmars_Inventory, charui, currentScreenPosition);
 			//render Items in bag
-			Render_Bag_Slot();
+			Render_Bag_Slot(renderer, scene);
 		}
 	}
 

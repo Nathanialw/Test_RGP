@@ -44,9 +44,6 @@
     <ClInclude Include="scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="world.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rendering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -110,7 +107,7 @@
     <ClInclude Include="sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scenes.h">
+    <ClInclude Include="world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="weapons.h">
@@ -129,6 +126,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="equipment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

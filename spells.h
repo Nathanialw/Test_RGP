@@ -4,23 +4,23 @@
 namespace Spells {
 
 	void Spell_Move_Target(entt::entity entity, float& x, float& y) { //sends spell to where the mouse is
-		Scenes::scene.emplace<Moving>(entity);
-		Scenes::scene.emplace<Mouse_Move>(entity, x, y);
-		Scenes::scene.remove<Casted>(entity);
+		World::zone.emplace<Moving>(entity);
+		World::zone.emplace<Mouse_Move>(entity, x, y);
+		World::zone.remove<Casted>(entity);
 	}
 
 	void Spell_Linear_Target(entt::entity& entity, float& x, float& y, float& sourceX, float& sourceY) { //sends spell to where the mouse is
-		Scenes::scene.emplace<Moving>(entity);
-		Scenes::scene.emplace<Linear_Move>(entity, x, y);
-		Scenes::scene.emplace<Spell_Range>(entity, sourceX, sourceY, 0.0f);
-		Scenes::scene.remove<Casted>(entity);		
+		World::zone.emplace<Moving>(entity);
+		World::zone.emplace<Linear_Move>(entity, x, y);
+		World::zone.emplace<Spell_Range>(entity, sourceX, sourceY, 0.0f);
+		World::zone.remove<Casted>(entity);		
 	}
 
 	void Spell_Stack_Spells(float& x, float& y) { //sends spell to where the mouse is
-		auto view = Scenes::scene.view<Spell>();
+		auto view = World::zone.view<Spell>();
 		for (auto entity : view) {
-			Scenes::scene.emplace_or_replace<Moving>(entity);
-			Scenes::scene.emplace_or_replace<Mouse_Move>(entity, x, y);			
+			World::zone.emplace_or_replace<Moving>(entity);
+			World::zone.emplace_or_replace<Mouse_Move>(entity, x, y);			
 		}
 	}
 
@@ -45,34 +45,34 @@ namespace Spells {
 		DataTypes::f2d spelldir = Spell_Direction(pos, direction, scale);
  
 		//rendering data
-		Scenes::scene.emplace<animation>(spell, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
-		Scenes::scene.get<animation>(spell).sheet = { //populate the vector
+		World::zone.emplace<animation>(spell, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
+		World::zone.get<animation>(spell).sheet = { //populate the vector
 			{ NULL },
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f }, //idle
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f } //walk
 		};
-		Scenes::scene.emplace<Sprite_Offset>(spell, 32.0f * scale, 32.0f * scale);
-		Scenes::scene.emplace<Scale>(spell, scale);
+		World::zone.emplace<Sprite_Offset>(spell, 32.0f * scale, 32.0f * scale);
+		World::zone.emplace<Scale>(spell, scale);
 
-		Scenes::scene.emplace<Actions>(spell, walk);
-		Scenes::scene.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
+		World::zone.emplace<Actions>(spell, walk);
+		World::zone.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
 		
 		//positon data
-		Scenes::scene.emplace<Position>(spell, spelldir.fX, spelldir.fY); 
-		Scenes::scene.emplace<Potential_Position>(spell, spelldir.fX, spelldir.fY);
+		World::zone.emplace<Position>(spell, spelldir.fX, spelldir.fY); 
+		World::zone.emplace<Potential_Position>(spell, spelldir.fX, spelldir.fY);
 
 		//spell data
-		Scenes::scene.emplace<Radius>(spell, data.radius * scale);
-		Scenes::scene.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
-		Scenes::scene.emplace<Mass>(spell, data.mass * scale);
+		World::zone.emplace<Radius>(spell, data.radius * scale);
+		World::zone.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
+		World::zone.emplace<Mass>(spell, data.mass * scale);
 		//Scenes::scene.emplace<Spell_Range>(spell, 1000.0f);
 
 		//default data
-		Scenes::scene.emplace<Spell>(spell);
-		Scenes::scene.emplace<Casted>(spell);
-		Scenes::scene.emplace<Renderable>(spell);
-		Scenes::scene.emplace<Direction>(spell, direction); //match Direction of the caster
-		Scenes::scene.emplace<Alive>(spell, true);		
+		World::zone.emplace<Spell>(spell);
+		World::zone.emplace<Casted>(spell);
+		World::zone.emplace<Renderable>(spell);
+		World::zone.emplace<Direction>(spell, direction); //match Direction of the caster
+		World::zone.emplace<Alive>(spell, true);		
 		Spell_Linear_Target(spell, targetX, targetY, spelldir.fX, spelldir.fY);
 		//Spell_Move_Target(spell, targetX, targetY);
 		//std::cout << "casted " << scene.get<handle>(spell).sName << std::endl;
@@ -80,7 +80,7 @@ namespace Spells {
 
 
 	void create_fireball(float& x, float& y, Compass& direction, const char* spellname, float& targetX, float& targetY) {
-		auto fireball = Scenes::scene.create();
+		auto fireball = World::zone.create();
 		DataTypes::f2d pos = { x, y };
 		create_spell(fireball, pos, direction, spellname, targetX, targetY);
 	}
@@ -88,7 +88,7 @@ namespace Spells {
 
 
 	void cast_fireball() {
-		auto view = Scenes::scene.view<Direction, Actions, Position, Cast, Spell_Name, Velocity>();
+		auto view = World::zone.view<Direction, Actions, Position, Cast, Spell_Name, Velocity>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			act.action = cast;
@@ -107,8 +107,8 @@ namespace Spells {
 			//cast Fireball
 			create_fireball(x, y, direction, name, target.targetX, target.targetY);		
 			//set into casting mode
-			Scenes::scene.emplace_or_replace<Casting>(entity);
-			Scenes::scene.remove<Cast>(entity);			
+			World::zone.emplace_or_replace<Casting>(entity);
+			World::zone.remove<Cast>(entity);			
 		}
 	}
 
@@ -118,19 +118,19 @@ namespace Spells {
 	}
 
 	void Create_Explosion(float& x, float y) { //creates the explosion for fireballs
-		auto explosion = Scenes::scene.create();
+		auto explosion = World::zone.create();
 
-		Scenes::scene.emplace<Position>(explosion, x, y);
-		Scenes::scene.emplace<Potential_Position>(explosion, x, y);
-		Scenes::scene.emplace<Sprite_Frames>(explosion, 63, 0, 0, 0);
-		Scenes::scene.emplace<Texture>(explosion, Graphics::fireball_explosion_0, 0, 0, 128, 128);
-		Scenes::scene.emplace<Frame_Delay>(explosion, 16.0f, 0.0f);
-		Scenes::scene.emplace<Explosion>(explosion, 0, 0, 0.0f, 0.0f, 128.0f, 128.0f, 64.0f, 100.0f);
+		World::zone.emplace<Position>(explosion, x, y);
+		World::zone.emplace<Potential_Position>(explosion, x, y);
+		World::zone.emplace<Sprite_Frames>(explosion, 63, 0, 0, 0);
+		World::zone.emplace<Texture>(explosion, Graphics::fireball_explosion_0, 0, 0, 128, 128);
+		World::zone.emplace<Frame_Delay>(explosion, 16.0f, 0.0f);
+		World::zone.emplace<Explosion>(explosion, 0, 0, 0.0f, 0.0f, 128.0f, 128.0f, 64.0f, 100.0f);
 	}
 
 
 	void Destroy_NonMoving_Spells() {
-		auto view = Scenes::scene.view<Spell, Position>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
+		auto view = World::zone.view<Spell, Position>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
 		for (auto entity : view) {
 			auto& x = view.get<Position>(entity).fX;
 			auto& y = view.get<Position>(entity).fY;
@@ -138,12 +138,12 @@ namespace Spells {
 			//create explosion
 			Create_Explosion(x, y);
 			//destroy spell
-			Scenes::scene.destroy(entity);
+			World::zone.destroy(entity);
 		}
 	}
 
 	void Clear_Collided_Spells() {
-		auto view = Scenes::scene.view<Spell, Position, Alive>();
+		auto view = World::zone.view<Spell, Position, Alive>();
 		for (auto entity : view)
 		if (view.get<Alive>(entity).bIsAlive == false) {
 			auto& x = view.get<Position>(entity).fX;
@@ -152,19 +152,19 @@ namespace Spells {
 			//create explosion
 			Create_Explosion(x, y);
 			//destroy spell
-			Scenes::scene.destroy(entity);
+			World::zone.destroy(entity);
 		}
 	}
 	
 	void Casting_Updater() {
-		auto view = Scenes::scene.view<Casting, Actions>();
+		auto view = World::zone.view<Casting, Actions>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
 			if (act.action != dead) {
 				if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
 					act.action = idle;
-					Scenes::scene.remove<Casting>(entity);
+					World::zone.remove<Casting>(entity);
 				}
 			}
 		}

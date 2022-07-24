@@ -20,7 +20,7 @@ namespace collision {
 	Timer::Frame_Timer Print_calcs(500.0f);
 
 	void resolveCollisons() {	
-		auto view = Scenes::scene.view<Position, Potential_Position>();
+		auto view = World::zone.view<Position, Potential_Position>();
 		for (auto entity : view) {
 			auto& x = view.get<Position>(entity);
 			auto& y = view.get<Position>(entity);
@@ -32,12 +32,12 @@ namespace collision {
 	}
 
 	void Update_Unit() { // updates positions of soldiers stored in units for collision box
-		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier>();
+		auto view = World::zone.view<Potential_Position, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Potential_Position>(entity);
 			auto& y = view.get<Potential_Position>(entity);
 			auto& soldier = view.get<Assigned>(entity);
-			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
+			auto& squad = World::zone.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			squad.fPX.at(soldier.iIndex) = x.fPX;
 			squad.fPY.at(soldier.iIndex) = y.fPY;
 		}
@@ -45,11 +45,11 @@ namespace collision {
 
 
 	void Update_Company() { // updates positions of soldiers stored in units for collision box
-		auto company_view = Scenes::scene.view<Company>();
+		auto company_view = World::zone.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			for (int i = 0; i < company.iSub_Units.size(); i++) {
-				auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[i]); // gets the squad that the soldier is attached to
+				auto& platoon = World::zone.get<Platoon>(company.iSub_Units[i]); // gets the squad that the soldier is attached to
 				company.fPX[i] = platoon.sCollide_Box.x;
 				company.fPY[i] = platoon.sCollide_Box.y;
 				company.fPW[i] = platoon.sCollide_Box.x + platoon.sCollide_Box.w;
@@ -61,11 +61,11 @@ namespace collision {
 
 
 	void Update_Platoons() { // updates positions of soldiers stored in units for collision box
-		auto view = Scenes::scene.view<Platoon>();
+		auto view = World::zone.view<Platoon>();
 		for (auto platoons : view) {
 			auto& platoon = view.get<Platoon>(platoons);
 			for (int i = 0; i < platoon.iSub_Units.size(); i++) {
-				auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[i]); // gets the squad that the soldier is attached to
+				auto& squad = World::zone.get<Squad>(platoon.iSub_Units[i]); // gets the squad that the soldier is attached to
 				platoon.fPX[i] = squad.sCollide_Box.x;
 				platoon.fPY[i] = squad.sCollide_Box.y;
 				platoon.fPW[i] = squad.sCollide_Box.x + squad.sCollide_Box.w;
@@ -75,13 +75,13 @@ namespace collision {
 	}
 
 	void Update_Collided_Unit() {
-		auto view = Scenes::scene.view<Potential_Position, Assigned, Soldier>();
+		auto view = World::zone.view<Potential_Position, Assigned, Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Potential_Position>(entity);
 			auto& y = view.get<Potential_Position>(entity);
 			//auto& z = view.get<Collision_Radius>(entity);
 			auto& soldier = view.get<Assigned>(entity);
-			auto& squad = Scenes::scene.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
+			auto& squad = World::zone.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			x.fPX = squad.fPX.at(soldier.iIndex);
 			y.fPY = squad.fPY.at(soldier.iIndex);		
 
@@ -109,7 +109,7 @@ namespace collision {
 		//	}
 		//}
 		
-		auto view2 = Scenes::scene.view<Health, Struck, Actions>();
+		auto view2 = World::zone.view<Health, Struck, Actions>();
 		
 		for (auto entity : view2) {
 			auto& damage = view2.get<Struck>(entity).struck;
@@ -118,13 +118,13 @@ namespace collision {
 			action = struck;
 			std::cout << "health = " << health << std::endl;
 			health -= damage;
-			Scenes::scene.remove<Struck>(entity);
+			World::zone.remove<Struck>(entity);
 
 			//if the soldier is in the assignment vector it will be set as dead if it dies
 			if (health == 0) {
-				if (Scenes::scene.any_of<Assigned>(entity)) {
-					auto& assignment = Scenes::scene.get<Assigned>(entity);
-					auto& squad = Scenes::scene.get<Squad>(assignment.iUnit_Assigned_To);
+				if (World::zone.any_of<Assigned>(entity)) {
+					auto& assignment = World::zone.get<Assigned>(entity);
+					auto& squad = World::zone.get<Squad>(assignment.iUnit_Assigned_To);
 					squad.bAlive.at(assignment.iIndex) = false;
 				}
 			}
@@ -133,7 +133,7 @@ namespace collision {
 
 ////////////////////////////////////////////////////////////////////////////////////	
 	void Update_Squad_Box() {
-		auto view = Scenes::scene.view<Squad>();
+		auto view = World::zone.view<Squad>();
 		for (auto squads : view) { //update colliders
 			auto& squad1 = view.get<Squad>(squads);
 			if (!squad1.iSub_Units.empty()) { //will crash if vector is empty
@@ -148,7 +148,7 @@ namespace collision {
 	}
 
 	void Update_Platoon_Box() {
-		auto Platoon_View = Scenes::scene.view<Platoon>();
+		auto Platoon_View = World::zone.view<Platoon>();
 		for (auto platoons : Platoon_View) {
 			auto& platoon1 = Platoon_View.get<Platoon>(platoons);
 			if (!platoon1.iSub_Units.empty()) { //will crash if vector is empty {
@@ -162,7 +162,7 @@ namespace collision {
 	}
 	
 	void Update_Company_Box() {
-		auto company_view = Scenes::scene.view<Company>();
+		auto company_view = World::zone.view<Company>();
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
 			if (!company.iSub_Units.empty()) { //will crash if vector is empty {
@@ -199,12 +199,12 @@ namespace collision {
 					//yUnit -= (resolver.fY * fNomalizedMassA);
 					//aliveUnit = false;
 
-					if (Scenes::scene.any_of<Struck>(entity)) {
-						auto& struck = Scenes::scene.get<Struck>(entity).struck;
+					if (World::zone.any_of<Struck>(entity)) {
+						auto& struck = World::zone.get<Struck>(entity).struck;
 						struck++;
 					}
 					else {
-						Scenes::scene.emplace<Struck>(entity, 1);
+						World::zone.emplace<Struck>(entity, 1);
 					}
 					std::cout << "Hit!!!" << std::endl;
 				}
@@ -236,12 +236,12 @@ namespace collision {
 					yUnit -= (resolver.fY * fNomalizedMassA);
 					aliveUnit = false;
 
-					if (Scenes::scene.any_of<Struck>(entity)) {
-						auto& struck = Scenes::scene.get<Struck>(entity).struck;
+					if (World::zone.any_of<Struck>(entity)) {
+						auto& struck = World::zone.get<Struck>(entity).struck;
 						struck++;
 					}
 					else {
-						Scenes::scene.emplace<Struck>(entity, 1);
+						World::zone.emplace<Struck>(entity, 1);
 					}
 					std::cout << "Hit!!!" << std::endl;
 				}
@@ -251,7 +251,7 @@ namespace collision {
 
 	void player_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = Scenes::scene.view<Camera, Radius, Potential_Position, Mass>();
+			auto spells = World::zone.view<Camera, Radius, Potential_Position, Mass>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Potential_Position>(spell);
@@ -259,15 +259,15 @@ namespace collision {
 				auto& mass = spells.get<Mass>(spell);
 				SDL_FRect spell_collider = { x.fPX - radius.fRadius, y.fPY - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
-				auto company_view = Scenes::scene.view<Company>();
+				auto company_view = World::zone.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = World::zone.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
+									auto& squad = World::zone.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											if (squad.bAlive.at(i) != false) {
@@ -302,7 +302,7 @@ namespace collision {
 
 	void Unit_unit_Collision() {
 		if (1) {
-			auto company_view = Scenes::scene.view<Company>();
+			auto company_view = World::zone.view<Company>();
 			for (auto companies : company_view) {
 				auto& company1 = company_view.get<Company>(companies);
 				for (auto companies : company_view) { 
@@ -311,14 +311,14 @@ namespace collision {
 					if (Utilities::bFRect_Intersect(company1.sCollide_Box, company2.sCollide_Box)) {
 						for (int c1 = 0; c1 < company1.iSub_Units.size(); c1++) {
 							for (int c2 = 0; c2 < company2.iSub_Units.size(); c2++) {
-								auto& platoon1 = Scenes::scene.get<Platoon>(company1.iSub_Units[c1]);
-								auto& platoon2 = Scenes::scene.get<Platoon>(company2.iSub_Units[c2]);
+								auto& platoon1 = World::zone.get<Platoon>(company1.iSub_Units[c1]);
+								auto& platoon2 = World::zone.get<Platoon>(company2.iSub_Units[c2]);
 								iPlatoon_Check++;
 								if (Utilities::bFRect_Intersect(platoon1.sCollide_Box, platoon2.sCollide_Box)) {
 									for (int s1 = 0; s1 < platoon1.iSub_Units.size(); s1++) {
 										for (int s2 = 0; s2 < platoon2.iSub_Units.size(); s2++) {
-											auto& squad1 = Scenes::scene.get<Squad>(platoon1.iSub_Units[s1]);
-											auto& squad2 = Scenes::scene.get<Squad>(platoon2.iSub_Units[s2]);
+											auto& squad1 = World::zone.get<Squad>(platoon1.iSub_Units[s1]);
+											auto& squad2 = World::zone.get<Squad>(platoon2.iSub_Units[s2]);
 											iSquad_Check++;							
 											if (Utilities::bFRect_Intersect(squad1.sCollide_Box, squad2.sCollide_Box)) { //checks against itself too so that units with the squad will have collision
 												for (int i = 0; i < squad1.iSub_Units.size(); i++) {
@@ -364,7 +364,7 @@ namespace collision {
 	//Use this for melee weapon collision as well
 	void Spell_unit_Collision() { //seems to work and pushes the units
 		if (1) {
-			auto spells = Scenes::scene.view<Spell, Radius, Potential_Position, Mass, Alive>();
+			auto spells = World::zone.view<Spell, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell).fRadius;
 				auto& x = spells.get<Potential_Position>(spell).fPX;
@@ -373,15 +373,15 @@ namespace collision {
 				auto& alive = spells.get<Alive>(spell).bIsAlive;
 				SDL_FRect spell_collider = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 
-				auto company_view = Scenes::scene.view<Company>();
+				auto company_view = World::zone.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = World::zone.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-								auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
+								auto& squad = World::zone.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											Check_For_Unit_Collision_Circle(squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
@@ -397,8 +397,8 @@ namespace collision {
 	}
 
 	void Spell_Player_Collision() {
-		auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Spell, Alive>();
-		auto players = Scenes::scene.view<Radius, Potential_Position, Mass, Input, Health>();
+		auto spells = World::zone.view<Radius, Potential_Position, Mass, Spell, Alive>();
+		auto players = World::zone.view<Radius, Potential_Position, Mass, Input, Health>();
 
 		for (auto spell : spells) {
 			auto& spellRadius = spells.get<Radius>(spell);
@@ -443,8 +443,8 @@ namespace collision {
 
 
 	void Melee_Unit_Player_Collision() {
-		auto spells = Scenes::scene.view<Radius, Potential_Position, Weapon_Size, Mass, Melee, Alive>();
-		auto players = Scenes::scene.view<Radius, Potential_Position, Mass, Input, Alive>();
+		auto spells = World::zone.view<Radius, Potential_Position, Weapon_Size, Mass, Melee, Alive>();
+		auto players = World::zone.view<Radius, Potential_Position, Mass, Input, Alive>();
 
 		for (auto spell : spells) {
 			auto& attackRadius = spells.get<Radius>(spell).fRadius;
@@ -471,7 +471,7 @@ namespace collision {
 	//change to use weapon size instead of weapon radius
 	void MeleeAttack_unit_Collision() { //seems to work 
 		if (1) {
-			auto spells = Scenes::scene.view<Melee, Weapon_Size, Radius, Potential_Position, Mass, Alive>();
+			auto spells = World::zone.view<Melee, Weapon_Size, Radius, Potential_Position, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell).fRadius;
 				auto& attackArea = spells.get<Weapon_Size>(spell).attackArea;
@@ -481,15 +481,15 @@ namespace collision {
 				auto& alive = spells.get<Alive>(spell).bIsAlive;
 				SDL_FRect spell_collider = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
 
-				auto company_view = Scenes::scene.view<Company>();
+				auto company_view = World::zone.view<Company>();
 				for (auto companies : company_view) {
 					auto& company = company_view.get<Company>(companies);
 					if (Utilities::bFRect_Intersect(company.sCollide_Box, spell_collider)) {
 						for (int c = 0; c < company.iSub_Units.size(); c++) {
-							auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[c]);
+							auto& platoon = World::zone.get<Platoon>(company.iSub_Units[c]);
 							if (Utilities::bFRect_Intersect(platoon.sCollide_Box, spell_collider)) {
 								for (int p = 0; p < platoon.iSub_Units.size(); p++) {
-									auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[p]);
+									auto& squad = World::zone.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
 											Check_For_Unit_Collision_Rect(squad.iSub_Units.at(i), attackArea, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
@@ -550,7 +550,7 @@ namespace collision {
 	void player_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Input>();
+			auto spells = World::zone.view<Radius, Potential_Position, Mass, Input>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& x = spells.get<Potential_Position>(spell);
@@ -566,10 +566,10 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-							auto& map_x = Scenes::scene.get<Potential_Position>(cell[j].at(i));
-							auto& map_y = Scenes::scene.get<Potential_Position>(cell[j].at(i));
-							auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
-							auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
+							auto& map_x = World::zone.get<Potential_Position>(cell[j].at(i));
+							auto& map_y = World::zone.get<Potential_Position>(cell[j].at(i));
+							auto& map_mass = World::zone.get<Mass>(cell[j].at(i));
+							auto& map_radius = World::zone.get<Radius>(cell[j].at(i));
 							float fx = map_x.fPX - x.fPX;
 							float fy = map_y.fPY - y.fPY;
 							float fDistance = (fx * fx) + (fy * fy);
@@ -602,7 +602,7 @@ namespace collision {
 	void spell_grid_collision(Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = Scenes::scene.view<Radius, Potential_Position, Mass, Spell, Alive>();
+			auto spells = World::zone.view<Radius, Potential_Position, Mass, Spell, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
 				auto& a = spells.get<Alive>(spell);
@@ -619,10 +619,10 @@ namespace collision {
 							p++;
 							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
 								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-								auto& map_x = Scenes::scene.get<Potential_Position>(cell[j].at(i));
-								auto& map_y = Scenes::scene.get<Potential_Position>(cell[j].at(i));
-								auto& map_mass = Scenes::scene.get<Mass>(cell[j].at(i));
-								auto& map_radius = Scenes::scene.get<Radius>(cell[j].at(i));
+								auto& map_x = World::zone.get<Potential_Position>(cell[j].at(i));
+								auto& map_y = World::zone.get<Potential_Position>(cell[j].at(i));
+								auto& map_mass = World::zone.get<Mass>(cell[j].at(i));
+								auto& map_radius = World::zone.get<Radius>(cell[j].at(i));
 								float fx = map_x.fPX - x.fPX;
 								float fy = map_y.fPY - y.fPY;
 								float fDistance = (fx * fx) + (fy * fy);
@@ -655,7 +655,7 @@ namespace collision {
 
 	void unit_grid_collision(Map::Node3& map) { //waaaaay too slow		
 
-		auto company_view = Scenes::scene.view<Company>();
+		auto company_view = World::zone.view<Company>();
 		
 		for (auto companies : company_view) {
 			auto& company = company_view.get<Company>(companies);
@@ -665,22 +665,22 @@ namespace collision {
 						for (int j = 0; j < Map::size; j++) {
 
 							if (Utilities::bFRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
-								auto& platoon = Scenes::scene.get<Platoon>(company.iSub_Units[b]);
+								auto& platoon = World::zone.get<Platoon>(company.iSub_Units[b]);
 								for (int c = 0; c < platoon.iSub_Units.size(); c++) {
 									for (int k = 0; k < Map::size; k++) {
 
 										if (Utilities::bFRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-											auto& squad = Scenes::scene.get<Squad>(platoon.iSub_Units[c]);
+											auto& squad = World::zone.get<Squad>(platoon.iSub_Units[c]);
 											for (int l = 0; l < Map::size; l++) {
 
 												if (Utilities::bFRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
 													for (int d = 0; d < squad.iSub_Units.size(); d++) {
 														if (squad.bAlive.at(d) != false) {
 															for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
-																auto& radius = Scenes::scene.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& mass = Scenes::scene.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& x = Scenes::scene.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& y = Scenes::scene.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& radius = World::zone.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& mass = World::zone.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& x = World::zone.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+																auto& y = World::zone.get<Potential_Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
 																for (int e = 0; e < squad.iSub_Units.size(); e++) {
 																	float fx = squad.fPX.at(e) - x.fPX;
 																	float fy = squad.fPY.at(e) - y.fPY;
@@ -719,9 +719,9 @@ namespace collision {
 
 	void CollisionsT() {
 		if (Print_calcs.Calc()) {
-			std::cout << "Company:      " << Scenes::scene.size<Company>() << "   checks:   " << iCompany_Check << std::endl;
-			std::cout << "Platoon:      " << Scenes::scene.size<Platoon>() << "   checks:   " << iPlatoon_Check << std::endl;
-			std::cout << "Squad:        " << Scenes::scene.size<Squad>()   << "   checks:   " << iSquad_Check << std::endl;
+			std::cout << "Company:      " << World::zone.size<Company>() << "   checks:   " << iCompany_Check << std::endl;
+			std::cout << "Platoon:      " << World::zone.size<Platoon>() << "   checks:   " << iPlatoon_Check << std::endl;
+			std::cout << "Squad:        " << World::zone.size<Squad>()   << "   checks:   " << iSquad_Check << std::endl;
 			std::cout << "Soldiers:     " << iNumber << std::endl;
 			std::cout << "Resolves:     " << iActual_Resolves << std::endl;
 			std::cout << "----------   " << iActual_Resolves << std::endl;

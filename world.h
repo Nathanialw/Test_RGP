@@ -1,11 +1,8 @@
-#include "pools.h"
+#pragma once
+#include "entt.hpp"
 
-
-using namespace Scene;
-
-
-namespace World {
-
-
-
+namespace World
+{
+	entt::registry zone;
 }
+

@@ -63,7 +63,7 @@ namespace Debug_System {
 	}
 
 	void Framerate() {		
-		auto view = Scenes::scene.view<Camera>();
+		auto view = World::zone.view<Camera>();
 
 		for (auto focus : view) {
 			auto& componentCamera = view.get<Camera>(focus);

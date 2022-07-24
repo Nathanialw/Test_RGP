@@ -56,6 +56,18 @@ namespace Mouse {
 		
 	};
 
+	void Update_Mouse(Camera &camera) {
+		int mx, my;
+		SDL_GetMouseState(&mx, &my);
+		iXMouse = (float)mx;
+		iYMouse = (float)my;
+		iXWorld_Mouse = (iXMouse / camera.scale.fX) + camera.screen.x;//getting mouse world Position corrected for scale
+		iYWorld_Mouse = (iYMouse / camera.scale.fY) + camera.screen.y;//getting mouse world Position corrected for scale
+		iXMouse = iXMouse / camera.scale.fX;  // getting the screen mouse position corrected for scale
+		iYMouse = iYMouse / camera.scale.fY;  // getting the screen mouse position corrected for scale
+		mousePoint = { mx, my };
+	}
+
 
 	
 }

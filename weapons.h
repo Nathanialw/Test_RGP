@@ -1,6 +1,6 @@
 #pragma once
 #include "components.h"
-#include "scenes.h"
+#include "world.h"
 #include "timer.h"
 #include "movement.h"
 
@@ -40,21 +40,21 @@ namespace Weapons {
 	void create_attack(DataTypes::f2d& pos, Components::Compass& direction) {
 		SDL_FRect attackPos = Attack_Direction(pos, direction);
 
-		auto weapon = Scenes::scene.create();
+		auto weapon = World::zone.create();
 		//Scenes::scene.emplace<Components::Weapon_Type>(weapon, sword);
-		Scenes::scene.emplace<Components::Damage>(weapon, 1, 4);
-		Scenes::scene.emplace<Components::Melee>(weapon);
-		Scenes::scene.emplace<Components::Attack_Box_Duration>(weapon, 0, 0);
-		Scenes::scene.emplace<Components::Radius>(weapon, 20.0f);
-		Scenes::scene.emplace<Components::Mass>(weapon, 500.0f);
-		Scenes::scene.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
-		Scenes::scene.emplace<Components::Position>(weapon, pos.fX, pos.fY);
-		Scenes::scene.emplace<Components::Potential_Position>(weapon, pos.fX, pos.fY);
-		Scenes::scene.emplace<Components::Alive>(weapon, true);
+		World::zone.emplace<Components::Damage>(weapon, 1, 4);
+		World::zone.emplace<Components::Melee>(weapon);
+		World::zone.emplace<Components::Attack_Box_Duration>(weapon, 0, 0);
+		World::zone.emplace<Components::Radius>(weapon, 20.0f);
+		World::zone.emplace<Components::Mass>(weapon, 500.0f);
+		World::zone.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
+		World::zone.emplace<Components::Position>(weapon, pos.fX, pos.fY);
+		World::zone.emplace<Components::Potential_Position>(weapon, pos.fX, pos.fY);
+		World::zone.emplace<Components::Alive>(weapon, true);
 	}
 
 	void Attack_cast() {
-		auto view = Scenes::scene.view<Direction, Position, Actions, Attack, Velocity>();
+		auto view = World::zone.view<Direction, Position, Actions, Attack, Velocity>();
 		for (auto entity : view) {
 		//	act.action = slash;
 			auto& act = view.get<Actions>(entity);
@@ -71,34 +71,34 @@ namespace Weapons {
 			dir.eDirection = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle);
 			create_attack(pos, dir.eDirection);	
 			//std::cout << dir.eDirection << std::endl;
-			Scenes::scene.emplace_or_replace<Attacking>(entity);
-			Scenes::scene.remove<Attack>(entity);
+			World::zone.emplace_or_replace<Attacking>(entity);
+			World::zone.remove<Attack>(entity);
 		}
 		//create SDL_FRect in front of unit, size from a size component on weapon
 	}
 
 	void Attack_Box_Destroy() {
-		auto view = Scenes::scene.view<Attack_Box_Duration>();
+		auto view = World::zone.view<Attack_Box_Duration>();
 		for (auto entity : view) {
 			auto& time = view.get<Attack_Box_Duration>(entity).lifeTime;
 			auto& count = view.get<Attack_Box_Duration>(entity).count;
 			count += Timer::timeStep;
 			if (count >= time) {
-				Scenes::scene.destroy(entity);
+				World::zone.destroy(entity);
 			}
 		}
 	}
 
 
 	void Attacking_Updater() {
-		auto view = Scenes::scene.view<Attacking, Actions>();
+		auto view = World::zone.view<Attacking, Actions>();
 		for (auto entity : view) {
 			auto& act = view.get<Actions>(entity);
 			//std::cout << act.frameCount[act.action].currentFrame << "/" << act.frameCount[act.action].NumFrames <<std::endl;
 			if (act.action != dead) {
 				if (act.frameCount[act.action].currentFrame == act.frameCount[act.action].NumFrames) {
 					act.action = idle;
-					Scenes::scene.remove<Attacking>(entity);
+					World::zone.remove<Attacking>(entity);
 				}
 			}
 		}
