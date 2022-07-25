@@ -1,5 +1,5 @@
 #pragma once
-
+#include "components.h"
 
 
 namespace Mouse {
@@ -56,7 +56,7 @@ namespace Mouse {
 		
 	};
 
-	void Update_Mouse(Camera &camera) {
+	void Update_Cursor (Components::Camera &camera) {
 		int mx, my;
 		SDL_GetMouseState(&mx, &my);
 		iXMouse = (float)mx;

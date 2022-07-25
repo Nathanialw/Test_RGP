@@ -89,7 +89,7 @@ namespace Items {
 			for (auto itemID : itemView) {
 				auto &itemBox = itemView.get<Ground_Item>(itemID).box;
 				// rect surrounding item
-				SDL_FRect screenItemBox = Camera_Control::Convert_Rect_To_Screen_Coods(itemBox);			
+				SDL_FRect screenItemBox = Camera_Control::Convert_Rect_To_Screen_Coods(zone, itemBox);		/*should probably not be in the camera file*/
 
 				// check if next to item
 				if (Utilities::bFRect_Intersect(itemBox, unitRect)) {

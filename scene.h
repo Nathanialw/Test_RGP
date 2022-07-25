@@ -47,11 +47,11 @@ namespace Scene {
 		}
 	}
 
-	void Spawn_Skeletons(int x, int y) {
+	void Spawn_Skeletons(entt::registry &zone, int x, int y) {
 		for (float j = 0; j < x; ++j) {
 			for (float i = 0; i < y; ++i) {
-				Death_Spells::Summon_Skeleton((100.0f + (i * 60.0f)), (100.0f + (j * 60.0f)), "'skeleton'", Graphics::skeleton_1);
-				Death_Spells::Summon_Skeleton((200.0f + (i * 60.0f)), (200.0f + (j * 60.0f)), "'skeleton_mage'", Graphics::skeleton_mage_0);
+				Death_Spells::Summon_Skeleton(zone, (100.0f + (i * 60.0f)), (100.0f + (j * 60.0f)), "'skeleton'", Graphics::skeleton_1);
+				Death_Spells::Summon_Skeleton(zone, (200.0f + (i * 60.0f)), (200.0f + (j * 60.0f)), "'skeleton_mage'", Graphics::skeleton_mage_0);
 			}
 		}
 	}
@@ -86,7 +86,7 @@ namespace Scene {
 		}
 	}
 
-	void Load_Entities() {
+	void Load_Entities(entt::registry &zone) {
 		float scale = 1.0f;
 		//player
 		auto skeleton = World::zone.create();			//creates a unique handle for an entity
@@ -146,7 +146,7 @@ namespace Scene {
 		}
 
 		//Skeletons
-		Spawn_Skeletons(8, 4);
+		Spawn_Skeletons(zone, 8, 4);
 
 		//archers
 		Units::Create_Archer(0.0f, 0.0f);
@@ -210,11 +210,11 @@ namespace Scene {
 		//std::cout << "add_terrain_to_grid = Good" << std::endl;
 	}
 
-	void Init_Game() {
+	void Init_Zone(entt::registry &zone) {
 		Map::Build_Map(Map::map);
 		Map::Build_Map(Map::terrain);
 		Entity_Loader::init_db();
-		Load_Entities();
+		Load_Entities(zone);
 		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
 		
 	}

@@ -68,7 +68,7 @@ namespace Weapons {
 			
 			DataTypes::f2d pos = { x, y };
 			
-			dir.eDirection = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle);
+			dir.eDirection = Movement::Look_At_Target(x, y, target.targetX, target.targetY, angle); 
 			create_attack(pos, dir.eDirection);	
 			//std::cout << dir.eDirection << std::endl;
 			World::zone.emplace_or_replace<Attacking>(entity);

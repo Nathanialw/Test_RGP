@@ -1,8 +1,7 @@
 #pragma once
-#include "scene.h"
 #include "timer.h"
 #include "ai_control.h"
-
+#include "components.h"
 
 
 
@@ -17,13 +16,10 @@ namespace Movement {
 
 
 
-	void Mouse_Moving() { // maybe change to move and attack?
-		if (World::zone.empty<Selected>()) {
+	void Mouse_Moving(entt::registry &zone, entt::entity& player) { // maybe change to move and attack?
+		if (zone.empty<Components::Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
-				auto view = World::zone.view<Input>();
-				for (auto entity : view) {
-					AI::Move_Order(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
-				}
+				AI::Move_Order(zone, player, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 			}
 		}
 	}
@@ -33,16 +29,16 @@ namespace Movement {
 
 	
 	void Update_Position() {
-		auto view = World::zone.view<Potential_Position, Velocity>();
+		auto view = World::zone.view<Components::Potential_Position, Components::Velocity>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
 		float angleY = 0.0f;
 		//std::cout << Update_Position_Poll << std::endl;
 		if (Update_Position_Poll >= 20) {
 			for (auto entity : view) {
-				auto& vel = view.get<Velocity>(entity);
-				auto& pX = view.get<Potential_Position>(entity);
-				auto& pY = view.get<Potential_Position>(entity);
+				auto& vel = view.get<Components::Velocity>(entity);
+				auto& pX = view.get<Components::Potential_Position>(entity);
+				auto& pY = view.get<Components::Potential_Position>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
 					number_of_units++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors

@@ -1,4 +1,5 @@
 #pragma once
+#include "entt.hpp"
 #include <iostream>
 #include <SDL.h>
 #include "SDL_image.h"

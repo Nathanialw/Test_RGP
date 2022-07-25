@@ -13,20 +13,20 @@ int main(int argc, char* argv[]) {
 	//initialization
 	Init::init();
 	Graphics::createGraphicsContext(World::zone);
-	Init_Game();
+	Init_Zone(World::zone);
 	UI::Init_UI();
   
 	while (Graphics::running == true) {
-		AI::Run_AI();
+		AI::Run_AI(World::zone);
 
 		//std::cout << "update_scene = Good" << std::endl;
 		Weapons::Update_Attacks();
 		//std::cout << "Update_Attacks = Good" << std::endl;
 		Spells::Update_Spells();
 		//std::cout << "Update_Spells = Good" << std::endl;
-		User_Mouse_Input::Assign_Soldiers_On_Spawn();
+		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);
 		//std::cout << "Assign_Soldiers_On_Spawn = Good" << std::endl;
-		Event_Handler::Player_Input();
+		Event_Handler::Player_Input(World::zone);
 		//std::cout << "Player_Input = Good" << std::endl;
 		Movement::Movement_Handler();
 		//std::cout << "Movement_Handler = Good" << std::endl;
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 		//std::cout << "Collisions = Good" << std::endl;
 		update_scene();
 			
-		Rendering::Rendering();
+		Rendering::Rendering(World::zone);
 		//std::cout << "Rendering = Good" << std::endl;
 		Timer::frameTime();	
 		//std::cout << "frameTime = Good" << std::endl;

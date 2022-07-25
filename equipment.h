@@ -20,16 +20,16 @@ namespace Equipment {
 
 
 
-	void Place_Item_In_Equip(entt::entity& item, bool& mouseHasItem, int& slotNum) {
+	void Equip_Item(entt::registry &zone, entt::entity& item, bool& mouseHasItem, int& slotNum) {
 		UI_bagSlots.at(slotNum) = item;
 		mouseHasItem = false;
-		Scenes::scene.remove<Components::On_Mouse>(item);
+		zone.remove<Components::On_Mouse>(item);
 	}
 
-	void Remove_Item_From_Equip(entt::entity& item, bool& mouseHasItem, int& slotNum) {
+	void Unequip_Item(entt::registry& zone, entt::entity& item, bool& mouseHasItem, int& slotNum) {
 		item = UI_bagSlots.at(slotNum);
 		UI_bagSlots.at(slotNum) = Graphics::defaultIcon;
-		Scenes::scene.emplace<Components::On_Mouse>(item);
+		zone.emplace<Components::On_Mouse>(item);
 		mouseHasItem = true;
 	}
 
@@ -75,7 +75,7 @@ namespace Equipment {
 
 	}
 	//check if the Mouse point is in the rect and which one
-	void Render_Equipment_Slot() {
+	void Render_Equipment_Slot(entt::registry& zone) {
 
 		SDL_Rect slotRect = {};
 		slotRect.w = iBagSlotPixelSize;
@@ -90,7 +90,7 @@ namespace Equipment {
 			for (j = 0; j < numOfSlots.y; j++) {
 				slotRect.y = (j * iBagSlotPixelSize) + Bag.y;
 
-				auto& icon = Scenes::scene.get<Components::Icon>(UI_bagSlots.at(slot));
+				auto& icon = zone.get<Components::Icon>(UI_bagSlots.at(slot));
 				SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
 				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 				if (j < (numOfSlots.y - 1)) {
@@ -98,7 +98,7 @@ namespace Equipment {
 				}
 			}
 
-			auto icon = Scenes::scene.get<Components::Icon>(UI_bagSlots.at(slot));
+			auto icon = zone.get<Components::Icon>(UI_bagSlots.at(slot));
 			SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
 			SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 			if (i < (numOfSlots.x - 1)) {
@@ -115,10 +115,10 @@ namespace Equipment {
 
 		if (Utilities::bPoint_RectIntersect(screenCursor, screenBag)) {
 			if (mouseHasItem) {
-				Place_Item_In_Bag(item, mouseHasItem, slotNum);
+				Equip_Item(item, mouseHasItem, slotNum);
 			}
 			else if (UI_bagSlots.at(slotNum) != Graphics::defaultIcon) {
-				Remove_Item_From_Bag(item, mouseHasItem, slotNum);
+				Unequip_Item(item, mouseHasItem, slotNum);
 			}
 		}
 	}

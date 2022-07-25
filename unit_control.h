@@ -1,11 +1,6 @@
 #pragma once
-#include "scene.h"
 #include "utilities.h"
-#include "mouse_control.h"
-#include "movement.h"
 
-
-using namespace Scene;
 
 namespace User_Mouse_Input {
 
@@ -20,11 +15,11 @@ namespace User_Mouse_Input {
 	Unit_Selection eUnit_Selection;
 
 
-	void Order_Move() {
+	void Order_Move(entt::registry &zone) {
 		auto view = World::zone.view<Selected, Commandable, Soldier>();
 		for (auto entity : view) {
-			World::zone.emplace_or_replace<Mouse_Move>(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
-			World::zone.emplace_or_replace<Moving>(entity);
+			zone.emplace_or_replace<Mouse_Move>(entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+			zone.emplace_or_replace<Moving>(entity);
 		}
 	}
 
@@ -48,123 +43,123 @@ namespace User_Mouse_Input {
 		eUnit_Selection = battalions;
 	}
 
-	bool Select_Battalion() {
+	bool Select_Battalion(entt::registry &zone) {
 		bool bSelected = false;
-		auto platoon_view = World::zone.view<Platoon>();
+		auto platoon_view = zone.view<Platoon>();
 		for (auto platoons : platoon_view) {
 			auto& platoon = platoon_view.get<Platoon>(platoons);
 			if (Mouse::Mouse_Selection_Box(platoon.sCollide_Box)) {
-				World::zone.emplace_or_replace<Selected>(platoons);
+				zone.emplace_or_replace<Selected>(platoons);
 				bSelected = true;
 			}
 		}
 		if (bSelected == false) {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 		}
 		return bSelected;
 	}
 
-	bool Select_Company() {
+	bool Select_Company(entt::registry& zone) {
 		bool bSelected = false;
-		auto platoon_view = World::zone.view<Platoon>();
+		auto platoon_view = zone.view<Platoon>();
 		for (auto platoons : platoon_view) {
 			auto& platoon = platoon_view.get<Platoon>(platoons);
 			if (Mouse::Mouse_Selection_Box(platoon.sCollide_Box)) {
-				World::zone.emplace_or_replace<Selected>(platoons);
+				zone.emplace_or_replace<Selected>(platoons);
 				bSelected = true;
 			}
 		}
 		if (bSelected == false) {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 		}
 		return bSelected;
 	}
 
-	bool Select_Platoon() {
+	bool Select_Platoon(entt::registry& zone) {
 		bool bSelected = false;
-		auto platoon_view = World::zone.view<Platoon>();
+		auto platoon_view = zone.view<Platoon>();
 		for (auto platoons : platoon_view) {
 			auto& platoon = platoon_view.get<Platoon>(platoons);		
 			if (Mouse::Mouse_Selection_Box(platoon.sCollide_Box)) {
-				World::zone.emplace_or_replace<Selected>(platoons);
+				zone.emplace_or_replace<Selected>(platoons);
 				bSelected = true;
 			}
 		}
 		if (bSelected == false) {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 		}
 		return bSelected;
 	}
 
 
-	bool Select_Squad() {
+	bool Select_Squad(entt::registry& zone) {
 		bool bSelected = false;
-		auto squad_view = World::zone.view<Squad>();
+		auto squad_view = zone.view<Squad>();
 		for (auto squads : squad_view) {
 			auto& squad = squad_view.get<Squad>(squads);
 			if (Mouse::Mouse_Selection_Box(squad.sCollide_Box)) { 
-				World::zone.emplace_or_replace<Selected>(squads);
+				zone.emplace_or_replace<Selected>(squads);
 				bSelected = true;
 			}
 		}
 		if (bSelected == false) {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 		}
 		return bSelected;
 	}
 
 
 
-	bool Select_Soldier() {
+	bool Select_Soldier(entt::registry& zone) {
 		bool bSelected = false;
-		auto soldier_view = World::zone.view<Potential_Position, Radius, Soldier, Commandable>();
+		auto soldier_view = zone.view<Potential_Position, Radius, Soldier, Commandable>();
 		for (auto soldiers : soldier_view) {
 			auto& x = soldier_view.get<Potential_Position>(soldiers);
 			auto& y = soldier_view.get<Potential_Position>(soldiers);
 			auto& r = soldier_view.get<Radius>(soldiers);
 			if (Mouse::Mouse_Selection_Box({ x.fPX - r.fRadius, y.fPY - r.fRadius, r.fRadius * 2, r.fRadius * 2 })) {
-				World::zone.emplace_or_replace<Selected>(soldiers);
+				zone.emplace_or_replace<Selected>(soldiers);
 				bSelected = true;					
 			}
 		}
 		if (bSelected == false) {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 		}		
 		return bSelected;
 	}
 
 
-	void Select() {
-		Select_Platoon();
-		Select_Squad();
-		Select_Soldier();
+	void Select(entt::registry& zone) {
+		Select_Platoon(zone);
+		Select_Squad(zone);
+		Select_Soldier(zone);
 	}
 
 
-	void Select_Units() {
+	void Select_Units(entt::registry& zone) {
 		//if unit.Soldier then select all in his squad
-		if (World::zone.empty<Selected>()) {
+		if (zone.empty<Selected>()) {
 			switch (eUnit_Selection) {
-				case soldiers: Select_Soldier(); break;
-				case squads: Select_Squad(); break;
-				case platoons: Select_Platoon(); break;
-				case companies: Select_Company(); break;
-				case battalions: Select_Battalion(); break;
+				case soldiers: Select_Soldier(zone); break;
+				case squads: Select_Squad(zone); break;
+				case platoons: Select_Platoon(zone); break;
+				case companies: Select_Company(zone); break;
+				case battalions: Select_Battalion(zone); break;
 			}
 			Mouse::bLeft_Mouse_Pressed = false;
 		}
 		else {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 			Mouse::bLeft_Mouse_Pressed = false;
 		}
 
 	}
 
 
-	void Command_Unit() {
-		if (!World::zone.empty<Selected>()) {
+	void Command_Unit(entt::registry& zone) {
+		if (!zone.empty<Selected>()) {
 			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
-				auto view = World::zone.view<Selected, Soldier, Commandable>();
+				auto view = zone.view<Selected, Soldier, Commandable>();
 				float x = 0;
 				float y = Mouse::Mouse_Selection_Box_y;
 				int i = 0;
@@ -181,22 +176,22 @@ namespace User_Mouse_Input {
 					i++;
 					spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
 
-					World::zone.emplace_or_replace<Moving>(entity);
-					World::zone.emplace_or_replace<Mouse_Move>(entity, x, y);
+					zone.emplace_or_replace<Moving>(entity);
+					zone.emplace_or_replace<Mouse_Move>(entity, x, y);
 				}
 			}
 			else { //moves all the units onto a single point, I want to have the spread out in some kind of formation
-				Order_Move();
+				Order_Move(zone);
 			}
 			Mouse::bRight_Mouse_Pressed = false;
 		}
 	}
 
 
-	void Command_Squad() {
-		if (!World::zone.empty<Selected>()) {
+	void Command_Squad(entt::registry& zone) {
+		if (!zone.empty<Selected>()) {
 			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
-				auto view = World::zone.view<Selected, Squad>();
+				auto view = zone.view<Selected, Squad>();
 				float x = 0;
 				float y = Mouse::Mouse_Selection_Box_y;
 				int i = 0;
@@ -215,18 +210,18 @@ namespace User_Mouse_Input {
 						i++;
 						spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
 
-						World::zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
-						World::zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], x, y);
+						zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], x, y);
 					}
 				}
 			}
 			else { //moves all the units onto a single point, I want to have the spread out in some kind of formation
-				auto squads_view = World::zone.view<Selected, Squad>();
+				auto squads_view = zone.view<Selected, Squad>();
 				for (auto squads : squads_view) {
 					auto& squad = World::zone.get<Squad>(squads);
 					for (int j = 0; j < squad.iSub_Units.size(); j++) {
-						World::zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
-						World::zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+						zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 					}
 				}
 			}
@@ -234,10 +229,10 @@ namespace User_Mouse_Input {
 		}
 	}
 
-	void Command_Platoon() {
-		if (!World::zone.empty<Selected>()) {
+	void Command_Platoon(entt::registry& zone) {
+		if (!zone.empty<Selected>()) {
 			if (abs((Mouse::Mouse_Selection_Box_x - Mouse::iXWorld_Mouse)) > 50) {
-				auto view = World::zone.view<Selected, Platoon>();
+				auto view = zone.view<Selected, Platoon>();
 				float x = 0;
 				float y = Mouse::Mouse_Selection_Box_y;
 				int i = 0;
@@ -256,18 +251,18 @@ namespace User_Mouse_Input {
 						i++;
 						spacing = spacing + 50; //spacing shoudl be stored in "battalion" component					
 
-						World::zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
-						World::zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], x, y);
+						zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], x, y);
 					}
 				}
 			}
 			else { //moves all the units onto a single point, I want to have the spread out in some kind of formation
-				auto squads_view = World::zone.view<Selected, Platoon>();
+				auto squads_view = zone.view<Selected, Platoon>();
 				for (auto squads : squads_view) {
 					auto& squad = World::zone.get<Platoon>(squads);
 					for (int j = 0; j < squad.iSub_Units.size(); j++) {
-						World::zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
-						World::zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
+						zone.emplace_or_replace<Moving>(squad.iSub_Units[j]);
+						zone.emplace_or_replace<Mouse_Move>(squad.iSub_Units[j], Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 					}
 				}
 			}
@@ -275,8 +270,8 @@ namespace User_Mouse_Input {
 		}
 	}
 
-	void Selection_Box() {
-		if (World::zone.empty<Selected>()) {
+	void Selection_Box(entt::registry& zone) {
+		if (zone.empty<Selected>()) {
 			Mouse::bLeft_Mouse_Pressed = true;
 			Mouse::Mouse_Selection_Box_x = Mouse::iXWorld_Mouse;
 			Mouse::Mouse_Selection_Box_y = Mouse::iYWorld_Mouse;
@@ -284,7 +279,7 @@ namespace User_Mouse_Input {
 			Mouse::Mouse_Selection_Box_y_Display = Mouse::iYMouse;
 		}
 		else {
-			World::zone.clear<Selected>();
+			zone.clear<Selected>();
 			Mouse::bLeft_Mouse_Pressed = true;
 			Mouse::Mouse_Selection_Box_x = Mouse::iXWorld_Mouse;
 			Mouse::Mouse_Selection_Box_y = Mouse::iYWorld_Mouse;
@@ -294,8 +289,8 @@ namespace User_Mouse_Input {
 	}
 
 
-	void Order_Unit() {
-		if (!World::zone.empty<Selected>()) {
+	void Order_Unit(entt::registry &zone) {
+		if (!zone.empty<Selected>()) {
 			Mouse::bRight_Mouse_Pressed = true;
 			Mouse::Mouse_Selection_Box_x = Mouse::iXWorld_Mouse;
 			Mouse::Mouse_Selection_Box_y = Mouse::iYWorld_Mouse;
@@ -314,8 +309,8 @@ namespace User_Mouse_Input {
 	//Unit Oraginzation
 	//
 	
-	void Delete_Squad() {		
-		auto view = World::zone.view<Assigned, Selected>();
+	void Delete_Squad(entt::registry& zone) {
+		auto view = zone.view<Assigned, Selected>();
 		for (auto entity : view) {
 			auto& sold = view.get<Assigned>(entity);
 			
@@ -335,13 +330,13 @@ namespace User_Mouse_Input {
 		}
 	};
 
-	void Add_Soldiers_To_Squad() {			
-		auto view = World::zone.view<Potential_Position, Selected, Radius, Mass, Soldier>(entt::exclude<Assigned>);
+	void Add_Soldiers_To_Squad(entt::registry& zone) {
+		auto view = zone.view<Potential_Position, Selected, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		
 		int iUnit = 0;
 		
-		auto squad_ID = World::zone.create();
-		auto& squad = World::zone.emplace<Squad>(squad_ID);
+		auto squad_ID = zone.create();
+		auto& squad = zone.emplace<Squad>(squad_ID);
 
 		for (auto entity : view) {
 			if (iUnit < squad.size) { // caps number of units per squad				
@@ -349,9 +344,9 @@ namespace User_Mouse_Input {
 				auto& y = view.get<Potential_Position>(entity);
 				auto& m = view.get<Mass>(entity);
 				auto& r = view.get<Radius>(entity);
-				auto& soldier = World::zone.emplace_or_replace<Assigned>(entity, 0, squad_ID);
-				const auto SOLDIER_ID = entt::to_entity(World::zone, soldier);
-				const auto SQUAD_ID = entt::to_entity(World::zone, squad);
+				auto& soldier = zone.emplace_or_replace<Assigned>(entity, 0, squad_ID);
+				const auto SOLDIER_ID = entt::to_entity(zone, soldier);
+				const auto SQUAD_ID = entt::to_entity(zone, squad);
 				squad.fPX.emplace_back(x.fPX);
 				squad.fPY.emplace_back(y.fPY);
 				squad.fMass.emplace_back(m.fKilos);
@@ -366,19 +361,19 @@ namespace User_Mouse_Input {
 
 	//assign squads to Platoons
 
-	void Create_Companies() {
-		auto platoons_view = World::zone.view<Platoon>(entt::exclude<Assigned>);
+	void Create_Companies(entt::registry& zone) {
+		auto platoons_view = zone.view<Platoon>(entt::exclude<Assigned>);
 
 		for (auto view : platoons_view) {
 			int iUnit = 0;
-			auto Company_ID = World::zone.create();
-			auto& company = World::zone.emplace<Company>(Company_ID);
+			auto Company_ID = zone.create();
+			auto& company = zone.emplace<Company>(Company_ID);
 			for (auto platoons : platoons_view) {
 				if (iUnit < company.size) { // caps number of units per squad				
 					auto& platoon = platoons_view.get<Platoon>(platoons);
-					const auto PLATOON_ID = entt::to_entity(World::zone, platoon);
-					const auto COMPANY_ID = entt::to_entity(World::zone, company);
-					auto& assigned = World::zone.emplace_or_replace<Assigned>(platoons, 0, Company_ID);
+					const auto PLATOON_ID = entt::to_entity(zone, platoon);
+					const auto COMPANY_ID = entt::to_entity(zone, company);
+					auto& assigned = zone.emplace_or_replace<Assigned>(platoons, 0, Company_ID);
 					//add squad ID to  to Platoon list
 					company.iSub_Units.emplace_back(PLATOON_ID);	//?? add Platoon ID to squad???
 					//add index to squad
@@ -394,19 +389,19 @@ namespace User_Mouse_Input {
 		}
 	};
 
-	void Create_Platoons() {
-		auto squads_view = World::zone.view<Squad>(entt::exclude<Assigned>);
+	void Create_Platoons(entt::registry& zone) {
+		auto squads_view = zone.view<Squad>(entt::exclude<Assigned>);
 
 		for (auto entity2 : squads_view) {
 			int iUnit = 0;
-			auto Platoon_ID = World::zone.create();
-			auto& platoon = World::zone.emplace<Platoon>(Platoon_ID);
+			auto Platoon_ID = zone.create();
+			auto& platoon = zone.emplace<Platoon>(Platoon_ID);
 			for (auto squads : squads_view) {
 				if (iUnit < platoon.size) { // caps number of units per squad				
 					auto& squad = squads_view.get<Squad>(squads);
-					const auto SQUAD_ID = entt::to_entity(World::zone, squad);
-					const auto PLATOON_ID = entt::to_entity(World::zone, platoon);
-					auto& assigned = World::zone.emplace_or_replace<Assigned>(squads, 0, PLATOON_ID);
+					const auto SQUAD_ID = entt::to_entity(zone, squad);
+					const auto PLATOON_ID = entt::to_entity(zone, platoon);
+					auto& assigned = zone.emplace_or_replace<Assigned>(squads, 0, PLATOON_ID);
 					//add squad ID to  to Platoon list
 					platoon.iSub_Units.emplace_back(SQUAD_ID);	//?? add Platoon ID to squad???
 					//add index to squad
@@ -423,15 +418,15 @@ namespace User_Mouse_Input {
 	};
 
 
-	void Create_Squads() {
-		auto view = World::zone.view<Potential_Position, Radius, Mass, Soldier>(entt::exclude<Assigned>);
+	void Create_Squads(entt::registry& zone) {
+		auto view = zone.view<Potential_Position, Radius, Mass, Soldier>(entt::exclude<Assigned>);
 		for (auto entity2 : view) {
 			int iUnit = 0;
-			auto squad_ID = World::zone.create();
+			auto squad_ID = zone.create();
 
 			//currently creates a new one every time instead of searching for empty spots in one that already exists
 			//Needs to search current squads for an empty slot then make a new squad if needed
-			auto& squad = World::zone.emplace<Squad>(squad_ID);
+			auto& squad = zone.emplace<Squad>(squad_ID);
 
 			for (auto entity : view) {
 				if (iUnit < squad.size) { // caps number of units per squad				
@@ -439,9 +434,9 @@ namespace User_Mouse_Input {
 					auto& y = view.get<Potential_Position>(entity);
 					auto& m = view.get<Mass>(entity);
 					auto& r = view.get<Radius>(entity);
-					auto& soldier = World::zone.emplace_or_replace<Assigned>(entity, 0, squad_ID);
-					const auto SOLDIER_ID = entt::to_entity(World::zone, soldier);
-					const auto SQUAD_ID = entt::to_entity(World::zone, squad);
+					auto& soldier = zone.emplace_or_replace<Assigned>(entity, 0, squad_ID);
+					const auto SOLDIER_ID = entt::to_entity(zone, soldier);
+					const auto SQUAD_ID = entt::to_entity(zone, squad);
 					squad.fPX.emplace_back(x.fPX);
 					squad.fPY.emplace_back(y.fPY);
 					squad.vPosition.emplace_back(x.fPX, y.fPY);
@@ -459,10 +454,10 @@ namespace User_Mouse_Input {
 		}
 	};
 
-	void Assign_Soldiers_On_Spawn() {
-		Create_Squads(); 
-		Create_Platoons(); 
-		Create_Companies();
+	void Assign_Soldiers_On_Spawn(entt::registry& zone) {
+		Create_Squads(zone); 
+		Create_Platoons(zone); 
+		Create_Companies(zone);
 	}
 
 
