@@ -227,6 +227,7 @@
     <ClInclude Include="recruitable_units.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="rendering.h" />
+    <ClInclude Include="unit_formations.h" />
     <ClInclude Include="world.h" />
     <ClInclude Include="spells.h" />
     <ClInclude Include="sprites.h" />

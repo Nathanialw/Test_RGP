@@ -8,6 +8,7 @@
 #include "world.h"
 #include "recruitable_units.h"
 #include "unit_control.h"
+#include "unit_formations.h"
 
 
 using namespace Components;
@@ -21,7 +22,7 @@ namespace Scene {
 
 	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = World::zone.view<Potential_Position, Radius, Environment>(entt::exclude<Assigned>);
+		auto view = World::zone.view<Potential_Position, Radius, Environment>(entt::exclude<Assigned_To>);
 		for (auto entity : view) {
 			auto& x = view.get<Potential_Position>(entity);
 			auto& y = view.get<Potential_Position>(entity);
@@ -29,14 +30,14 @@ namespace Scene {
 			SDL_FRect rect = { x.fPX - r, y.fPY - r, r * 2, r * 2 };
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
-			World::zone.emplace_or_replace<Assigned>(entity);
+			World::zone.emplace_or_replace<Assigned_To>(entity);
 		}
 	}
 
 	//adds Environment items to map grid
 
 	void add_terrain_to_grid(Map::Node3& map) {
-		auto view = World::zone.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned>);
+		auto view = World::zone.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned_To>);
 		for (auto entity : view) {
 			auto& x = view.get<Terrain_Position_X>(entity);
 			auto& y = view.get<Terrain_Position_Y>(entity);
@@ -44,7 +45,7 @@ namespace Scene {
 			SDL_FRect rect = { x.fX, y.fY, 100, 100 };
 
 			Map::Place_Rect_On_Grid_Once(rect, map, entity);
-			World::zone.emplace_or_replace<Assigned>(entity);
+			World::zone.emplace_or_replace<Assigned_To>(entity);
 		}
 	}
 
@@ -217,6 +218,7 @@ namespace Scene {
 		Entity_Loader::init_db();
 		Load_Entities(zone);
 		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);
+		Test_Units::Assign_Soldiers_On_Spawn(World::zone);
 		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
 		
 	}

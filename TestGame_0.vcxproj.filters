@@ -131,6 +131,9 @@
     <ClInclude Include="equipment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="unit_formations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

@@ -18,7 +18,7 @@ namespace Components {
 		entt::entity iCell_Assigned_To;
 	};
 
-	struct Assigned {
+	struct Assigned_To {
 		int iIndex;
 		entt::entity iUnit_Assigned_To;
 	};

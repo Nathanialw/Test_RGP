@@ -311,9 +311,9 @@ namespace User_Mouse_Input {
 	//
 	
 	void Delete_Squad(entt::registry& zone) {
-		auto view = zone.view<Components::Assigned, Components::Selected>();
+		auto view = zone.view<Components::Assigned_To, Components::Selected>();
 		for (auto entity : view) {
-			auto& sold = view.get<Components::Assigned>(entity);
+			auto& sold = view.get<Components::Assigned_To>(entity);
 			
 			//auto &squad = scene.get<Squad>(sold.SquadAssgnedTo);
 			
@@ -332,7 +332,7 @@ namespace User_Mouse_Input {
 	};
 
 	void Add_Soldiers_To_Squad(entt::registry& zone) {
-		auto view = zone.view<Components::Potential_Position, Components::Selected, Components::Radius, Components::Mass, Components::Soldier>(entt::exclude<Components::Assigned>);
+		auto view = zone.view<Components::Potential_Position, Components::Selected, Components::Radius, Components::Mass, Components::Soldier>(entt::exclude<Components::Assigned_To>);
 		
 		int iUnit = 0;
 		
@@ -345,7 +345,7 @@ namespace User_Mouse_Input {
 				auto& y = view.get<Components::Potential_Position>(entity);
 				auto& m = view.get<Components::Mass>(entity);
 				auto& r = view.get<Components::Radius>(entity);
-				auto& soldier = zone.emplace_or_replace<Components::Assigned>(entity, 0, squad_ID);
+				auto& soldier = zone.emplace_or_replace<Components::Assigned_To>(entity, 0, squad_ID);
 				const auto SOLDIER_ID = entt::to_entity(zone, soldier);
 				const auto SQUAD_ID = entt::to_entity(zone, squad);
 				squad.fPX.emplace_back(x.fPX);
@@ -363,7 +363,7 @@ namespace User_Mouse_Input {
 	//assign squads to Platoons
 
 	void Create_Companies(entt::registry& zone) {
-		auto platoons_view = zone.view<Components::Platoon>(entt::exclude<Components::Assigned>);
+		auto platoons_view = zone.view<Components::Platoon>(entt::exclude<Components::Assigned_To>);
 
 		for (auto view : platoons_view) {
 			int iUnit = 0;
@@ -374,7 +374,7 @@ namespace User_Mouse_Input {
 					auto& platoon = platoons_view.get<Components::Platoon>(platoons);
 					const auto PLATOON_ID = entt::to_entity(zone, platoon);
 					const auto COMPANY_ID = entt::to_entity(zone, company);
-					auto& assigned = zone.emplace_or_replace<Components::Assigned>(platoons, 0, Company_ID);
+					auto& assigned = zone.emplace_or_replace<Components::Assigned_To>(platoons, 0, Company_ID);
 					//add squad ID to  to Platoon list
 					company.iSub_Units.emplace_back(PLATOON_ID);	//?? add Platoon ID to squad???
 					//add index to squad
@@ -391,7 +391,7 @@ namespace User_Mouse_Input {
 	};
 
 	void Create_Platoons(entt::registry& zone) {
-		auto squads_view = zone.view<Components::Squad>(entt::exclude<Components::Assigned>);
+		auto squads_view = zone.view<Components::Squad>(entt::exclude<Components::Assigned_To>);
 
 		for (auto entity2 : squads_view) {
 			int iUnit = 0;
@@ -402,7 +402,7 @@ namespace User_Mouse_Input {
 					auto& squad = squads_view.get<Components::Squad>(squads);
 					const auto SQUAD_ID = entt::to_entity(zone, squad);
 					const auto PLATOON_ID = entt::to_entity(zone, platoon);
-					auto& assigned = zone.emplace_or_replace<Components::Assigned>(squads, 0, PLATOON_ID);
+					auto& assigned = zone.emplace_or_replace<Components::Assigned_To>(squads, 0, PLATOON_ID);
 					//add squad ID to  to Platoon list
 					platoon.iSub_Units.emplace_back(SQUAD_ID);	//?? add Platoon ID to squad???
 					//add index to squad
@@ -434,18 +434,16 @@ namespace User_Mouse_Input {
 				auto& m = mass.fKilos;
 				auto& r = radius.fRadius;
 
-				auto& soldier = zone.emplace_or_replace<Components::Assigned>(entity, 0, squad_ID);
+				auto& soldier = zone.emplace_or_replace<Components::Assigned_To>(entity, i, squad_ID);
 
 				squad.fPX.at(i) = x;
 				squad.fPY.at(i) = y;
-				squad.vPosition.at(i) = { x, y };
 				squad.fMass.at(i) = m;
 				squad.fRadius.at(i) = r;
 				squad.iSub_Units.at(i) = entity;
 				squad.iStruck.at(i) = 0;
 				squad.bAlive.at(i) = true;
 
-				soldier.iIndex = i;
 				return true;
 			}
 		}
@@ -460,11 +458,10 @@ namespace User_Mouse_Input {
 			auto& y = potential_position.fPY;
 			auto& m = mass.fKilos;
 			auto& r = radius.fRadius;
-			auto& soldier = zone.emplace_or_replace<Components::Assigned>(entity, 0, squad_ID);
+			auto& soldier = zone.emplace_or_replace<Components::Assigned_To>(entity, 0, squad_ID);
 
 			squad.fPX.emplace_back(x);
 			squad.fPY.emplace_back(y);
-			squad.vPosition.emplace_back(x, y);
 			squad.fMass.emplace_back(m);
 			squad.fRadius.emplace_back(r);
 			squad.iSub_Units.emplace_back(entity);
@@ -502,7 +499,7 @@ namespace User_Mouse_Input {
 
 	void Create_And_Fill_New_Squad(entt::registry& zone) {
 		
-		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier, Components::Selected>(entt::exclude<Components::Assigned>);
+		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier, Components::Selected>(entt::exclude<Components::Assigned_To>);
 		for (auto unit_ID : view) {
 			auto& position = view.get<Components::Potential_Position>(unit_ID);
 			auto& mass = view.get<Components::Mass>(unit_ID);
@@ -512,22 +509,33 @@ namespace User_Mouse_Input {
 		
 	};
 
+	void Create_And_Fill_New_Platoon(entt::registry& zone) {
+
+		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier, Components::Selected>(entt::exclude<Components::Assigned_To>);
+		for (auto unit_ID : view) {
+			auto& position = view.get<Components::Potential_Position>(unit_ID);
+			auto& mass = view.get<Components::Mass>(unit_ID);
+			auto& radius = view.get<Components::Radius>(unit_ID);
+			Assign_Selected_Units_To_Squad(zone, unit_ID, position, mass, radius);
+		}
+
+	};
+
 	bool Assign_All_Units_To_Squad(entt::registry& zone, entt::entity& squad_ID) {
 		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);
 		int iUnit = 0;
 
-		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier>(entt::exclude<Components::Assigned>);
+		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier>(entt::exclude<Components::Assigned_To>);
 		for (auto entity : view) {
 
 			auto& x = view.get<Components::Potential_Position>(entity).fPX;
 			auto& y = view.get<Components::Potential_Position>(entity).fPY;
 			auto& m = view.get<Components::Mass>(entity).fKilos;
 			auto& r = view.get<Components::Radius>(entity).fRadius;
-			auto& soldier = zone.emplace_or_replace<Components::Assigned>(entity, 0, squad_ID);
+			auto& soldier = zone.emplace_or_replace<Components::Assigned_To>(entity, 0, squad_ID);
 
 			squad.fPX.emplace_back(x);
 			squad.fPY.emplace_back(y);
-			squad.vPosition.emplace_back(x, y);
 			squad.fMass.emplace_back(m);
 			squad.fRadius.emplace_back(r);
 			squad.iSub_Units.emplace_back(entity);
@@ -543,7 +551,6 @@ namespace User_Mouse_Input {
 		}
 		return false;
 	}
-
 	void Create_Squads_From_All_Unassigned(entt::registry &zone) {
 		entt::entity squad_ID;
 		bool units = true;
@@ -553,7 +560,6 @@ namespace User_Mouse_Input {
 			units = Assign_All_Units_To_Squad(zone, squad_ID);;
 		}
 	}
-
 
 	void Assign_Soldiers_On_Spawn(entt::registry& zone) {
 		Create_Squads_From_All_Unassigned(zone);

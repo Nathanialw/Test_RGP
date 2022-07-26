@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		//std::cout << "Player_Input = Good" << std::endl;
 		Movement::Movement_Handler();
 		//std::cout << "Movement_Handler = Good" << std::endl;
-		collision::Collisions();		
+		collision::Collisions(World::zone);		
 		//std::cout << "Collisions = Good" << std::endl;
 		update_scene();
 			

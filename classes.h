@@ -190,7 +190,6 @@ namespace Components {
 		std::vector<float>fMass;
 		std::vector<float>fRadius;
 
-		std::vector<DataTypes::f2d>vPosition; //
 		std::vector<int>iStruck;
 		std::vector<bool>bAlive;
 
@@ -204,7 +203,6 @@ namespace Components {
 			fPY.reserve(size);
 			fMass.reserve(size);
 			fRadius.reserve(size);
-			vPosition.reserve(size);
 			iStruck.reserve(size);
 			bAlive.reserve(size);
 		}
@@ -592,80 +590,64 @@ namespace Military {
 	};
 }
 
+
+
+
 namespace Test {
 
-	struct Unit {
-		int size;
-		std::string name;
-		SDL_FRect sCollide_Box;
+	enum Formation_Type {	
+		squad,	
+		platoon,	
+		company,	
+		battalion,	
+		Regiment,	
+		brigade,
+		division,
+		corps,
+		army
+	};
 
-		std::vector<entt::entity>iSub_Units;
-		std::vector<float>fPX;
-		std::vector<float>fPY;
+	struct Soldier_Data {
+		entt::entity unit_ID;
+		float x;
+		float y;
+		float mass;
+		float radius;
+		int iStruck;
+		bool bAlive;
+	};
 
-		Unit() {
-			name = "Default";
-			size = 3;
-			sCollide_Box = { 0,0,0,0 };
-			iSub_Units.reserve(size);
-			fPX.reserve(size);
-			fPY.reserve(size);
+	struct Soldiers_Assigned {
+		int size = 8;
+		std::vector<Soldier_Data>unitData;
+
+		Soldiers_Assigned() {
+			unitData.reserve(size);
 		}
 	};
-//
-//	class Unit {
-//	public:
-//		int size;
-//		std::string name;
-//		SDL_FRect sCollide_Box;
-//
-//		std::vector<entt::entity>soldiers;
-//		std::vector<float>fPX;
-//		std::vector<float>fPY;
-//		std::vector<float>fMass;
-//		std::vector<float>fRadius;	
-//		std::vector<f2d>vPosition; //
-//
-//		Unit() {
-//			name = "Default";
-//			size = 8;
-//			sCollide_Box = { 0,0,0,0 };
-//			soldiers.reserve(size);
-//			fPX.reserve(size);
-//			fPY.reserve(size);
-//			fMass.reserve(size);
-//			fRadius.reserve(size);
-//			vPosition.reserve(size);
-//		}
-//	};
-//
-//	class Command_Unit : unit {
-//
-//
-////
-////	};
-//
-//	class Platoon : unit {
-//		int size;
-//		std::string name;
-//		SDL_FRect sCollide_Box;
-//
-//		std::vector<Squad>squads;
-//		std::vector<float>fPX;
-//		std::vector<float>fPY;
-//		std::vector<float>fPW;
-//		std::vector<float>fPH;
-//
-//
-//		Platoon() {
-//			name = "Default";
-//			size = 6;
-//			sCollide_Box = { 0,0,0,0 };
-//			squads.reserve(size);
-//			fPX.reserve(size);
-//			fPY.reserve(size);
-//			fPW.reserve(size);
-//			fPH.reserve(size);
-//		}
-//	
+
+
+
+
+	
+	struct Unit_Formation {
+		int size;
+		bool bAlive;
+		Formation_Type formationType;
+		SDL_FRect sCollide_Box;
+		entt::entity formation_ID;	
+		std::vector<Unit_Formation>formationData;
+
+		Unit_Formation() {
+			size = 6;
+			bAlive = true;
+			formationData.reserve(size);
+		}
+
 	};
+
+};
+
+
+
+
