@@ -7,6 +7,7 @@
 #include "death_spells.h"
 #include "world.h"
 #include "recruitable_units.h"
+#include "unit_control.h"
 
 
 using namespace Components;
@@ -215,6 +216,7 @@ namespace Scene {
 		Map::Build_Map(Map::terrain);
 		Entity_Loader::init_db();
 		Load_Entities(zone);
+		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);
 		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
 		
 	}

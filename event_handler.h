@@ -51,8 +51,9 @@ namespace Event_Handler {
 				case SDLK_1: AI::Spell_Attack(zone, entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'fireball'"); break;
 				case SDLK_2: Death_Spells::Summon_Skeleton(zone, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
 				case SDLK_3: AI::Melee_Attack(zone, entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
-				case SDLK_4: break;
-				case SDLK_5: Debug_System::Toggle_Frame_Rate_Mode(); break;
+				case SDLK_4: User_Mouse_Input::Create_And_Fill_New_Squad(zone); break;
+				case SDLK_5: User_Mouse_Input::Add_Unit_to_Existing_Squad(zone); break;
+				//case SDLK_5: Debug_System::Toggle_Frame_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
 				case SDLK_8: Rendering::RenderCullMode(World::zone); break;

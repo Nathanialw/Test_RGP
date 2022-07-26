@@ -180,7 +180,7 @@ namespace Components {
 	//wil have Regiments and Companies as administrative units
 
 	struct Squad {
-		size_t size;
+		int size;
 		std::string name;
 		SDL_FRect sCollide_Box;
 

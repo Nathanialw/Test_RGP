@@ -1,8 +1,10 @@
 #pragma once
 #include <SDL.h>
 #include "mouse_control.h"
+#include "camera.h"
 #include "graphics.h"
 #include "debug_system.h"
+#include "components.h"
 
 
 namespace Interface {
@@ -38,12 +40,11 @@ namespace Interface {
 
 			auto squad_view = World::zone.view<Squad>();
 			for (auto squads : squad_view) {
-				auto& x = squad_view.get<Squad>(squads);
-				SDL_FRect o = x.sCollide_Box;
+				SDL_FRect o = squad_view.get<Squad>(squads).sCollide_Box;
 				o.x -= cam.screen.x;
 				o.y -= cam.screen.y;
-				//SDL_SetRenderDrawColor(renderer, 155, 55, 255, 255);
-				//SDL_RenderDrawRectF(Graphics::renderer, &o);
+				SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
+				SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 
 			auto platoon_view = World::zone.view<Platoon>();
@@ -52,8 +53,8 @@ namespace Interface {
 				SDL_FRect o = platoon.sCollide_Box;
 				o.x = platoon.sCollide_Box.x - cam.screen.x;
 				o.y = platoon.sCollide_Box.y - cam.screen.y;
-				//SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-				//SDL_RenderDrawRectF(renderer, &o);
+				//SDL_SetRenderDrawColor(Graphics::renderer, 255, 0, 0, 255);
+				//SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}		
 			
 			auto company_view = World::zone.view<Company>();
@@ -62,26 +63,30 @@ namespace Interface {
 				SDL_FRect o = company.sCollide_Box;
 				o.x = company.sCollide_Box.x - cam.screen.x;
 				o.y = company.sCollide_Box.y - cam.screen.y;
-				//SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
-				//SDL_RenderDrawRectF(renderer, &o);
+				//SDL_SetRenderDrawColor(Graphics::renderer, 0, 200, 255, 255);
+				//SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 		}
 	}
 
 	void Display_Selected() {
-
-		//auto view = scene.view<Position_X, Position_Y, Mass, Radius, Selected>();
-		//SDL_Color a = { 155, 255, 50, 255 };
-		//for (auto entity : view) {
-		//	auto& x = view.get<Position_X>(entity);
-		//	auto& y = view.get<Position_Y>(entity);
-		//	auto& c = view.get<Mass>(entity);
-		//	auto& d = view.get<Radius>(entity);
-		//	SDL_SetRenderDrawColor(renderer, 55,255,55,255);
-		//	SDL_Rect p = {x. - 15, y.fSY - 15, 30, 30};
-		//	SDL_RenderDrawRect(Graphics::renderer, &p);		
-		//	Debug_System::Entity_Data_Debug(x.fX, y.fY, x., y.fSY);
-		//}
+		auto view1 = World::zone.view<Camera>();
+		auto view = World::zone.view<Selected, Position, Radius>();
+		SDL_Color a = { 155, 255, 50, 255 };
+		for (auto focus : view1) {
+			for (auto entity : view) {
+				auto& x = view.get<Position>(entity).fX;
+				auto& y = view.get<Position>(entity).fY;
+				auto& d = view.get<Radius>(entity).fRadius;
+				SDL_SetRenderDrawColor(Graphics::renderer, 55, 255, 55, 255);
+				SDL_FRect p = { x - d, y - d, d * 2, d * 2 };
+				
+				SDL_FRect s = Camera_Control::Convert_Rect_To_Screen_Coods(World::zone, p);
+				
+				SDL_RenderDrawRectF(Graphics::renderer, &s);
+				//Debug_System::Entity_Data_Debug(x, y, x, y);
+			}
+		}
 	}
 
 
