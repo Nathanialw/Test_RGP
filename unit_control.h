@@ -424,7 +424,9 @@ namespace User_Mouse_Input {
 		return squad_ID;
 	}
 
-	bool Replace_Umit_In_Squad (entt::registry& zone, Components::Squad& squad, entt::entity& squad_ID, entt::entity& entity, Components::Potential_Position& potential_position, Components::Mass& mass, Components::Radius& radius) {
+	bool Replace_Umit_In_Squad (entt::registry& zone, entt::entity& squad_ID, entt::entity& entity, Components::Potential_Position& potential_position, Components::Mass& mass, Components::Radius& radius) {
+		
+		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);
 		for (int i = 0; i < squad.bAlive.size(); i++) {
 			if (squad.bAlive.at(i) == false) {
 				auto& x = potential_position.fPX;
@@ -450,7 +452,9 @@ namespace User_Mouse_Input {
 		return false;
 	}
 
-	bool Emplace_Umit_In_Squad (entt::registry& zone, Components::Squad &squad, entt::entity &squad_ID, entt::entity& entity, Components::Potential_Position &potential_position, Components::Mass &mass, Components::Radius &radius) {
+	bool Emplace_Umit_In_Squad (entt::registry& zone, entt::entity &squad_ID, entt::entity& entity, Components::Potential_Position &potential_position, Components::Mass &mass, Components::Radius &radius) {
+		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);
+		
 		if (squad.bAlive.size() < squad.size) {
 			auto& x = potential_position.fPX;
 			auto& y = potential_position.fPY;
@@ -481,21 +485,18 @@ namespace User_Mouse_Input {
 		///creates a new  squad and adds the unit to it
 
 		auto view = zone.view<Components::Squad>();
-		for (auto squad_ID : view) {
-		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);			
-			if (Replace_Umit_In_Squad(zone, squad, squad_ID, entity, potential_position, mass, radius) == true) {
+		for (auto squad_ID : view) {		
+			if (Replace_Umit_In_Squad(zone, squad_ID, entity, potential_position, mass, radius) == true) {
 				return true;
 			}
 		}
-		for (auto squad_ID : view) {
-		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);			
-			if (Emplace_Umit_In_Squad(zone, squad, squad_ID, entity, potential_position, mass, radius) == true) {
+		for (auto squad_ID : view) {	
+			if (Emplace_Umit_In_Squad(zone, squad_ID, entity, potential_position, mass, radius) == true) {
 				return true;
 			}
 		}
 		entt::entity new_squad_ID = Create_New_Squad(zone);
-		Components::Squad& new_squad = zone.get<Components::Squad>(new_squad_ID);
-		Emplace_Umit_In_Squad(zone, new_squad, new_squad_ID, entity, potential_position, mass, radius);
+		Emplace_Umit_In_Squad(zone, new_squad_ID, entity, potential_position, mass, radius);
 		return true;
 	}
 
@@ -553,44 +554,6 @@ namespace User_Mouse_Input {
 		}
 	}
 
-	void Assign_Selected_Units_To_Existing_Squad_WIth_Space(entt::registry& zone, entt::entity& squad_ID) {
-		Components::Squad& squad = zone.get<Components::Squad>(squad_ID);
-		
-		auto view = zone.view<Components::Potential_Position, Components::Radius, Components::Mass, Components::Soldier, Components::Selected> (entt::exclude<Components::Assigned>);
-
-		for (auto entity : view) {
-			for (int i = 0; i < squad.bAlive.size(); i++) {
-				if (squad.bAlive.at(i) == false) {
-					auto& x = view.get<Components::Potential_Position>(entity).fPX;
-					auto& y = view.get<Components::Potential_Position>(entity).fPY;
-					auto& m = view.get<Components::Mass>(entity).fKilos;
-					auto& r = view.get<Components::Radius>(entity).fRadius;
-					auto& soldier = zone.emplace_or_replace<Components::Assigned>(entity, 0, squad_ID);
-
-					squad.fPX.at(i) = x;
-					squad.fPY.at(i) = y;
-					squad.vPosition.at(i) = {x, y};
-					squad.fMass.at(i) = m;
-					squad.fRadius.at(i) = r;
-					squad.iSub_Units.at(i) = entity;
-					squad.iStruck.at(i) = 0;
-					squad.bAlive.at(i) = true;
-
-					soldier.iIndex = i;					
-					break;
-				}
-			}
-			break;
-		}
-	}
-
-	void Add_Unit_to_Existing_Squad(entt::registry& zone) {
-		
-		auto view = zone.view<Components::Squad>();
-		for (auto squad : view) {
-			Assign_Selected_Units_To_Existing_Squad_WIth_Space(zone, squad);
-		}
-	}
 
 	void Assign_Soldiers_On_Spawn(entt::registry& zone) {
 		Create_Squads_From_All_Unassigned(zone);
