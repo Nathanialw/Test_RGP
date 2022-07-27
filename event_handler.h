@@ -52,7 +52,7 @@ namespace Event_Handler {
 				case SDLK_2: Death_Spells::Summon_Skeleton(zone, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse, "'skeleton'", Graphics::skeleton_mage_0);  break;
 				case SDLK_3: AI::Melee_Attack(zone, entity, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);   break;
 				case SDLK_4: Test_Units::Create_And_Fill_New_Squad(zone); break;
-				case SDLK_5: Test_Units::Create_Platoon(zone); break;
+				case SDLK_5: Test_Units::Create_Formation(zone); break;
 				//case SDLK_5: Debug_System::Toggle_Frame_Rate_Mode(); break;
 				case SDLK_6: Interface::gridDepth++; break;
 				case SDLK_7: Interface::gridDepth--; break;
@@ -68,19 +68,21 @@ namespace Event_Handler {
 			}
 			if (act.action == idle || act.action ==  walk) {
 				if (event.type == SDL_KEYDOWN) {
+					auto& position = zone.get<Position>(entity);
 					switch (event.key.keysym.sym) {
-					case SDLK_e:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; act.action = walk; break;
-					case SDLK_d:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; act.action = walk; break;
-					case SDLK_s:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fX -= vel.speed; act.action = walk; break;
-					case SDLK_f:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fX += vel.speed; act.action = walk; break;
-					case SDLK_w:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
-					case SDLK_r:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-					case SDLK_v:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
-					case SDLK_x:  zone.emplace_or_replace<Moving>(entity); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+					case SDLK_e:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY -= vel.speed; act.action = walk; break;
+					case SDLK_d:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY += vel.speed; act.action = walk; break;
+					case SDLK_s:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fX -= vel.speed; act.action = walk; break;
+					case SDLK_f:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fX += vel.speed; act.action = walk; break;
+					case SDLK_w:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
+					case SDLK_r:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+					case SDLK_v:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY += vel.speed; vel.magnitude.fX += vel.speed; act.action = walk; break;
+					case SDLK_x:  zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); vel.magnitude.fY += vel.speed; vel.magnitude.fX -= vel.speed; act.action = walk; break;
 					}
 				}
 			}
 			if (event.type == SDL_KEYUP) {
+				auto& position = zone.get<Position>(entity);
 				switch (event.key.keysym.sym)
 				{
 				//case SDLK_e: vel.magnitude.fY += vel.speed; act.action = idle; break;
@@ -92,14 +94,14 @@ namespace Event_Handler {
 				//case SDLK_v: vel.magnitude.fY -= vel.speed; vel.magnitude.fX -= vel.speed; act.action = idle; break;
 				//case SDLK_x: vel.magnitude.fY -= vel.speed; vel.magnitude.fX += vel.speed; act.action = idle; break;
 
-				case SDLK_e: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; break;
-				case SDLK_d: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; break;
-				case SDLK_s: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed; break;
-				case SDLK_f: if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed; break;
-				case SDLK_w: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
-				case SDLK_r: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_v: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
-				case SDLK_x: if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
+				case SDLK_e: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; break;
+				case SDLK_d: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; break;
+				case SDLK_s: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed; break;
+				case SDLK_f: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed; break;
+				case SDLK_w: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
+				case SDLK_r: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY += vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_v: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX -= vel.speed;  break;
+				case SDLK_x: zone.emplace_or_replace<Moving>(entity); zone.emplace_or_replace<Potential_Position>(entity, position.x, position.y); if (fabs(vel.magnitude.fY) > 0) vel.magnitude.fY -= vel.speed; if (fabs(vel.magnitude.fX) > 0) vel.magnitude.fX += vel.speed;  break;
 				}
 			}
 			if (act.action == slash) {
@@ -108,6 +110,7 @@ namespace Event_Handler {
 			}
 			if ((vel.magnitude.fX == 0.0f) && (vel.magnitude.fY == 0.0f) && zone.any_of<Moving>(entity)) {
 				zone.remove<Moving>(entity);
+				zone.remove<Potential_Position>(entity);
 				act.action = idle;
 			}
 
@@ -133,7 +136,7 @@ namespace Event_Handler {
 				}
 				else {
 					Mouse::bRight_Mouse_Pressed = true;
-					User_Mouse_Input::Order_Unit(World::zone); //if units are currently selected
+					User_Mouse_Input::Select_Unit(World::zone); //if units are currently selected
 				}
 			}
 		}

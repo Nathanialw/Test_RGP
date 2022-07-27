@@ -15,7 +15,7 @@
 
 //item drop
 
-using namespace Components;
+using namespace Component;
 using namespace Item_Components;
 
 namespace Items {
@@ -46,12 +46,12 @@ namespace Items {
 		World::zone.emplace<Actions>(item, isStatic);
 		World::zone.emplace<Direction>(item, W);
 
-		auto& position2 = World::zone.emplace<Position>(item, position.fX, position.fY);
-		World::zone.emplace<Potential_Position>(item, position.fX, position.fY);
+		auto& position2 = World::zone.emplace<Position>(item, position.x, position.y);
+		World::zone.emplace<Potential_Position>(item, position.x, position.y);
 	
 		World::zone.emplace<Ground_Item>(item, 
-			position2.fX - (32.0f * scale), 
-			position2.fY - (32.0f * scale),
+			position2.x - (32.0f * scale), 
+			position2.y - (32.0f * scale),
 			64.0f * scale,
 			64.0f * scale);
 		//Scenes::scene.emplace<Assigned>(item);	//stores the entity holding the item	
@@ -80,8 +80,8 @@ namespace Items {
 		auto mouseInput = zone.view<Position, Input, Radius>();
 		
 		for (auto entity : mouseInput) {
-			auto &x = mouseInput.get<Position>(entity).fX;
-			auto &y = mouseInput.get<Position>(entity).fY;
+			auto &x = mouseInput.get<Position>(entity).x;
+			auto &y = mouseInput.get<Position>(entity).y;
 			auto &radius = mouseInput.get<Radius>(entity).fRadius;
 			// rect surrounding unit
 			SDL_FRect unitRect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
@@ -128,12 +128,12 @@ namespace Items {
 
 				auto &scale = zone.get<Scale>(item).scale;
 				auto &position = zone.get<Potential_Position>(item);
-				position.fPX = unitPosition.fX;
-				position.fPY = unitPosition.fY;
+				position.x = unitPosition.x;
+				position.y = unitPosition.y;
 
 				zone.emplace<Ground_Item>(item,
-					position.fPX - (32.0f * scale),
-					position.fPY - (32.0f * scale),
+					position.x - (32.0f * scale),
+					position.y - (32.0f * scale),
 					64.0f * scale,
 					64.0f * scale);
 
@@ -151,8 +151,8 @@ namespace Items {
 		//set item in mouse array position to mouse x, y every frame
 		if (isItemCurrentlyHeld == true) {
 			Potential_Position& position = zone.get<Potential_Position>(item);
-			position.fPX = mouseX;
-			position.fPY = mouseY;
+			position.x = mouseX;
+			position.y = mouseY;
 		}
 	}
 

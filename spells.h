@@ -24,7 +24,7 @@ namespace Spells {
 		}
 	}
 
-	DataTypes::f2d Spell_Direction(DataTypes::f2d& pos, Components::Compass& direction, float& scale) {
+	DataTypes::f2d Spell_Direction(DataTypes::f2d& pos, Component::Compass& direction, float& scale) {
 		switch (direction) {
 		case N: return { pos.fX, pos.fY - (20.0f * scale) };
 		case S: return { pos.fX, pos.fY + (20.0f * scale) };
@@ -96,8 +96,8 @@ namespace Spells {
 			auto& target = view.get<Cast>(entity);
 
 			auto& direction = view.get<Direction>(entity).eDirection;
-			auto& x = view.get<Position>(entity).fX;
-			auto& y = view.get<Position>(entity).fY;
+			auto& x = view.get<Position>(entity).x;
+			auto& y = view.get<Position>(entity).y;
 			auto& angle = view.get<Velocity>(entity).angle;
 	
 			auto& name = view.get<Spell_Name>(entity).spell;
@@ -132,8 +132,8 @@ namespace Spells {
 	void Destroy_NonMoving_Spells() {
 		auto view = World::zone.view<Spell, Position>(entt::exclude<Mouse_Move, Linear_Move, Explosion>);
 		for (auto entity : view) {
-			auto& x = view.get<Position>(entity).fX;
-			auto& y = view.get<Position>(entity).fY;
+			auto& x = view.get<Position>(entity).x;
+			auto& y = view.get<Position>(entity).y;
 			
 			//create explosion
 			Create_Explosion(x, y);
@@ -146,8 +146,8 @@ namespace Spells {
 		auto view = World::zone.view<Spell, Position, Alive>();
 		for (auto entity : view)
 		if (view.get<Alive>(entity).bIsAlive == false) {
-			auto& x = view.get<Position>(entity).fX;
-			auto& y = view.get<Position>(entity).fY;
+			auto& x = view.get<Position>(entity).x;
+			auto& y = view.get<Position>(entity).y;
 
 			//create explosion
 			Create_Explosion(x, y);

@@ -160,8 +160,8 @@ namespace Rendering {
 					anim.renderPosition = Scale_Sprite_for_Render(xClipPos, scale);										//save sprite for vector
 					anim.clipSprite = xClipPos;											//save position for renderer			
 				}
-				sx = x.fX - camera_offset.x;
-				sy = y.fY - camera_offset.y;
+				sx = x.x - camera_offset.x;
+				sy = y.y - camera_offset.y;
 
 				anim.renderPosition.x = (int)(sx - spriteOffset.fX);
 				anim.renderPosition.y = (int)(sy - spriteOffset.fY);
@@ -245,8 +245,8 @@ namespace Rendering {
 					//Scenes::scene.destroy(spell);
 					//continue;
 				}
-				sx = x.fX - camera_offset.screen.x - anim.offsetToAlignWithFireball.fX; 
-				sy = y.fY - camera_offset.screen.y - anim.offsetToAlignWithFireball.fY;
+				sx = x.x - camera_offset.screen.x - anim.offsetToAlignWithFireball.fX; 
+				sy = y.y - camera_offset.screen.y - anim.offsetToAlignWithFireball.fY;
 				anim.renderPosition.x = sx - anim.posOffset.x;
 				anim.renderPosition.y = sy - anim.posOffset.y;
 
@@ -272,8 +272,8 @@ namespace Rendering {
 			for (auto item : view) {
 				
 				const auto& icon = view.get<Icon>(item);
-				const auto& x = view.get<Position>(item).fX;
-				const auto& y = view.get<Position>(item).fY;
+				const auto& x = view.get<Position>(item).x;
+				const auto& y = view.get<Position>(item).y;
 								
 				DisplayRect.x = (x - camera.screen.x) - (icon.renderPositionOffset.x / camera.scale.fX);
 				DisplayRect.y = (y - camera.screen.y) - (icon.renderPositionOffset.y / camera.scale.fY);
@@ -304,8 +304,8 @@ namespace Rendering {
 				//sets the sprite to render so that it is always rendered behind living sprites
 				Items::Create_And_Drop_Item(position);
 				
-				position.fX -= offset.fX;
-				position.fY -= offset.fY;				
+				position.x -= offset.fX;
+				position.y -= offset.fY;				
 				offset.fX = 0.0f;
 				offset.fY = 0.0f;
 
@@ -385,8 +385,8 @@ namespace Rendering {
 			float bottomOfRenderRect = renderRect.y + renderRect.h;
 			
 			for (auto entity : objectsView) {
-				auto& x = objectsView.get<Position>(entity).fX;
-				auto& y = objectsView.get<Position>(entity).fY;
+				auto& x = objectsView.get<Position>(entity).x;
+				auto& y = objectsView.get<Position>(entity).y;
 				SDL_FPoint point = { x, y};
 				if (SDL_PointInFRect(&point, &renderRect)) {
 					int alpha = Set_Render_Position_Alpha(bottomOfScreenEdge, bottomOfRenderRect, y);
@@ -450,7 +450,7 @@ namespace Rendering {
 		Render_Explosions(zone);
 		//std::cout << "Animation_Frame = Good" << std::endl;
 		UI::Render_UI(zone, Graphics::renderer);
-		Interface::Run_Interface();
+		Interface::Run_Interface(zone);
 		Items::Update_Mouse_Slot_Position(zone, Mouse::mouseItem, Mouse::itemCurrentlyHeld, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 		Render_Mouse_Item(zone); 
 		Update_Camera_And_Mouse(zone);

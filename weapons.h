@@ -7,7 +7,7 @@
 namespace Weapons {
 
 	//take input of unit Radius and Weapon_Size to fill this out for any wielder and any weapon
-	SDL_FRect Attack_Direction(DataTypes::f2d& pos, Components::Compass& direction) {
+	SDL_FRect Attack_Direction(DataTypes::f2d& pos, Component::Compass& direction) {
 		switch (direction) {
 		case N: return { pos.fX - 15, pos.fY - 55, 30, 40 };
 		case S: return { pos.fX - 15, pos.fY + 15, 30, 40 };
@@ -22,7 +22,7 @@ namespace Weapons {
 		return {0,0,0,0};
 	}
 
-	SDL_FRect Check_For_Target(float &x, float &y, Components::Compass& direction, float &radius) {
+	SDL_FRect Check_For_Target(float &x, float &y, Component::Compass& direction, float &radius) {
 		switch (direction) {
 		case N: return { x - radius, y - 55,    30, 40 };
 		case S: return { x - radius, y + radius, 30, 40 };
@@ -37,20 +37,20 @@ namespace Weapons {
 		return { 0,0,0,0 };
 	}
 
-	void create_attack(DataTypes::f2d& pos, Components::Compass& direction) {
+	void create_attack(DataTypes::f2d& pos, Component::Compass& direction) {
 		SDL_FRect attackPos = Attack_Direction(pos, direction);
 
 		auto weapon = World::zone.create();
 		//Scenes::scene.emplace<Components::Weapon_Type>(weapon, sword);
-		World::zone.emplace<Components::Damage>(weapon, 1, 4);
-		World::zone.emplace<Components::Melee>(weapon);
-		World::zone.emplace<Components::Attack_Box_Duration>(weapon, 0, 0);
-		World::zone.emplace<Components::Radius>(weapon, 20.0f);
-		World::zone.emplace<Components::Mass>(weapon, 500.0f);
-		World::zone.emplace<Components::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
-		World::zone.emplace<Components::Position>(weapon, pos.fX, pos.fY);
-		World::zone.emplace<Components::Potential_Position>(weapon, pos.fX, pos.fY);
-		World::zone.emplace<Components::Alive>(weapon, true);
+		World::zone.emplace<Component::Damage>(weapon, 1, 4);
+		World::zone.emplace<Component::Melee>(weapon);
+		World::zone.emplace<Component::Attack_Box_Duration>(weapon, 0, 0);
+		World::zone.emplace<Component::Radius>(weapon, 20.0f);
+		World::zone.emplace<Component::Mass>(weapon, 500.0f);
+		World::zone.emplace<Component::Weapon_Size>(weapon, attackPos.x, attackPos.y, attackPos.w, attackPos.h); //set x, y to in front of char when he attacks
+		World::zone.emplace<Component::Position>(weapon, pos.fX, pos.fY);
+		World::zone.emplace<Component::Potential_Position>(weapon, pos.fX, pos.fY);
+		World::zone.emplace<Component::Alive>(weapon, true);
 	}
 
 	void Attack_cast() {
@@ -61,8 +61,8 @@ namespace Weapons {
 			act.action = slash;
 			act.frameCount[act.action].currentFrame = 0;
 			auto& dir = view.get<Direction>(entity);
-			auto& x = view.get<Position>(entity).fX;
-			auto& y = view.get<Position>(entity).fY;
+			auto& x = view.get<Position>(entity).x;
+			auto& y = view.get<Position>(entity).y;
 			auto& angle = view.get<Velocity>(entity).angle;
 			auto& target = view.get<Attack>(entity);
 			

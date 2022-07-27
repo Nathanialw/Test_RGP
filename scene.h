@@ -11,7 +11,7 @@
 #include "unit_formations.h"
 
 
-using namespace Components;
+using namespace Component;
 
 namespace Scene {
 
@@ -22,12 +22,12 @@ namespace Scene {
 
 	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = World::zone.view<Potential_Position, Radius, Environment>(entt::exclude<Assigned_To>);
+		auto view = World::zone.view<Position, Radius, Environment>(entt::exclude<Assigned_To>);
 		for (auto entity : view) {
-			auto& x = view.get<Potential_Position>(entity);
-			auto& y = view.get<Potential_Position>(entity);
+			auto& x = view.get<Position>(entity).x;
+			auto& y = view.get<Position>(entity).y;
 			auto& r = view.get<Radius>(entity).fRadius;
-			SDL_FRect rect = { x.fPX - r, y.fPY - r, r * 2, r * 2 };
+			SDL_FRect rect = { x - r, y - r, r * 2, r * 2 };
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
 			World::zone.emplace_or_replace<Assigned_To>(entity);
@@ -69,8 +69,8 @@ namespace Scene {
 		World::zone.emplace<Sprite_Offset>(tree, 313.0f * scale, 609.0f * scale);
 		World::zone.emplace<Scale>(tree, scale);
 
-		World::zone.emplace<Position>(tree, 100.0f, 100.0f);
-		World::zone.emplace<Potential_Position>(tree, (x * 952.0f), 100.0f + (y * 1165.0f));
+		World::zone.emplace<Position>(tree, (x * 952.0f), 100.0f + (y * 1165.0f));
+		
 		World::zone.emplace<Actions>(tree, isStatic);
 		World::zone.get<Actions>(tree).frameCount = { { 0, 0} };
 		World::zone.emplace<Direction>(tree, W);
@@ -111,8 +111,7 @@ namespace Scene {
 
 		//positon components
 		World::zone.emplace<Position>(skeleton, 1100.0f, 1100.0f);
-		World::zone.emplace<Potential_Position>(skeleton, 1100.0f, 1100.0f);
-
+		
 		World::zone.emplace<Radius>(skeleton, 15.0f * scale);
 
 		World::zone.emplace<Velocity>(skeleton, 0.f, 0.0f, 0.f, 0.0f, 0.2f);
@@ -140,8 +139,9 @@ namespace Scene {
 				World::zone.get<Actions>(grass).frameCount = { { 0, 0} };
 
 				World::zone.emplace<Radius>(grass, 50.0f);
-				World::zone.emplace<Terrain_Position_X>(grass, 0.0f, i * 100.0f);
-				World::zone.emplace<Terrain_Position_Y>(grass, 0.0f, j * 100.0f);
+
+				World::zone.emplace<Terrain_Position_X>(grass, i * 100.0f);
+				World::zone.emplace<Terrain_Position_Y>(grass, j * 100.0f);
 
 				World::zone.emplace<Terrain>(grass);
 			}
@@ -156,24 +156,7 @@ namespace Scene {
 		//trees
 		Spawn_Trees();
 
-		//set positions
-		auto view = World::zone.view<Position, Potential_Position>();
-		for (auto entity : view) {
-			auto& x = view.get<Position>(entity);
-			auto& y = view.get<Position>(entity);
-			auto& px = view.get<Potential_Position>(entity);
-			auto& py = view.get<Potential_Position>(entity);
-			x.fX = px.fPX;
-			y.fY = py.fPY;
-		}
-
-		auto view2 = World::zone.view<Terrain_Position_X, Terrain_Position_Y>();
-		for (auto entity2 : view2) {
-			auto& xx = view2.get<Terrain_Position_X>(entity2);
-			auto& yy = view2.get<Terrain_Position_Y>(entity2);
-			xx.fX = xx.fPX;
-			yy.fY = yy.fPY;
-		}
+		
 	}	
 
 	void Update_Army() {
@@ -206,15 +189,15 @@ namespace Scene {
 			}
 		}
 
-		add_unit_to_grid(Map::map);
-		//std::cout << "add_unit_to_grid = Good" << std::endl;
 		add_terrain_to_grid(Map::terrain);		
 		//std::cout << "add_terrain_to_grid = Good" << std::endl;
+		add_unit_to_grid(Map::map);
+		//std::cout << "add_unit_to_grid = Good" << std::endl;
 	}
 
 	void Init_Zone(entt::registry &zone) {
-		Map::Build_Map(Map::map);
 		Map::Build_Map(Map::terrain);
+		Map::Build_Map(Map::map);
 		Entity_Loader::init_db();
 		Load_Entities(zone);
 		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);

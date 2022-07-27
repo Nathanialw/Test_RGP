@@ -43,8 +43,8 @@ namespace Interface {
 				SDL_FRect o = squad_view.get<Squad>(squads).sCollide_Box;
 				o.x -= cam.screen.x;
 				o.y -= cam.screen.y;
-				SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
-				SDL_RenderDrawRectF(Graphics::renderer, &o);
+				//SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
+				//SDL_RenderDrawRectF(Graphics::renderer, &o);
 			}
 
 			auto platoon_view = World::zone.view<Platoon>();
@@ -69,14 +69,29 @@ namespace Interface {
 		}
 	}
 
+	void Display_Unite_Formations(Component::Camera &camera) {
+		int i = 0;
+		auto unitFormations_view = World::zone.view<Test::Unit_Formation_Data>();
+		for (auto unitFormation : unitFormations_view) {
+			i++;
+			SDL_FRect formationRect = unitFormations_view.get<Test::Unit_Formation_Data>(unitFormation).sCollide_Box;
+			formationRect.x -= camera.screen.x;
+			formationRect.y -= camera.screen.y;
+			SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
+			SDL_RenderDrawRectF(Graphics::renderer, &formationRect);
+		}
+		std::cout << i << std::endl;
+	}
+
+
 	void Display_Selected() {
 		auto view1 = World::zone.view<Camera>();
 		auto view = World::zone.view<Selected, Position, Radius>();
 		SDL_Color a = { 155, 255, 50, 255 };
 		for (auto focus : view1) {
 			for (auto entity : view) {
-				auto& x = view.get<Position>(entity).fX;
-				auto& y = view.get<Position>(entity).fY;
+				auto& x = view.get<Position>(entity).x;
+				auto& y = view.get<Position>(entity).y;
 				auto& d = view.get<Radius>(entity).fRadius;
 				SDL_SetRenderDrawColor(Graphics::renderer, 55, 255, 55, 255);
 				SDL_FRect p = { x - d, y - d, d * 2, d * 2 };
@@ -213,14 +228,20 @@ namespace Interface {
 		}
 	}
 
-	void Run_Interface() {
-		Show_Grid(Map::terrain);
-		Display_Military_Groups();
-		Debug_System::Debugger();
-		//Unit_Arrive_UI();
-		Display_Selected();
-		Display_Mouse();
-		Display_Selection_Box();
-		Show_Attacks();
+	void Run_Interface(entt::registry &zone) {
+		auto camera_view = zone.view<Camera>();
+		for (auto cameras : camera_view) {
+			auto &camera = camera_view.get<Camera>(cameras);
+
+			Show_Grid(Map::terrain);
+			Display_Military_Groups();
+			//Display_Unite_Formations(camera);
+			Debug_System::Debugger();
+			//Unit_Arrive_UI();
+			Display_Selected();
+			Display_Mouse();
+			Display_Selection_Box();
+			Show_Attacks();
+		}
 	}
 }

@@ -17,7 +17,7 @@ namespace Movement {
 
 
 	void Mouse_Moving(entt::registry &zone, entt::entity& player) { // maybe change to move and attack?
-		if (zone.empty<Components::Selected>()) {
+		if (zone.empty<Component::Selected>()) {
 			if (Mouse::bRight_Mouse_Pressed) {
 				AI::Move_Order(zone, player, Mouse::iXWorld_Mouse, Mouse::iYWorld_Mouse);
 			}
@@ -28,17 +28,17 @@ namespace Movement {
 
 
 	
-	void Update_Position() {
-		auto view = World::zone.view<Components::Potential_Position, Components::Velocity>();
+	void Update_Potential_Position() {
+		auto view = World::zone.view<Component::Potential_Position, Component::Velocity>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
 		float angleY = 0.0f;
 		//std::cout << Update_Position_Poll << std::endl;
 		if (Update_Position_Poll >= 20) {
 			for (auto entity : view) {
-				auto& vel = view.get<Components::Velocity>(entity);
-				auto& pX = view.get<Components::Potential_Position>(entity);
-				auto& pY = view.get<Components::Potential_Position>(entity);
+				auto& vel = view.get<Component::Velocity>(entity);
+				auto& pX = view.get<Component::Potential_Position>(entity);
+				auto& pY = view.get<Component::Potential_Position>(entity);
 				if (vel.magnitude.fX != 0 || vel.magnitude.fY != 0) {
 					number_of_units++;
 					if (fabs(vel.magnitude.fX) < 0.01) { vel.magnitude.fX = 0; }; //clamp rounding errors
@@ -49,8 +49,8 @@ namespace Movement {
 					float velocityY = sinf(angleY) * vel.speed;
 					vel.dX = velocityX;
 					vel.dY = velocityY;
-					pX.fPX += velocityX * Update_Position_Poll;
-					pY.fPY += velocityY * Update_Position_Poll;
+					pX.x += velocityX * Update_Position_Poll;
+					pY.y += velocityY * Update_Position_Poll;
 				}
 			}
 			Update_Position_Poll = 0;
@@ -91,23 +91,6 @@ namespace Movement {
 		}
 	}
 
-	void Mouse_Move_To() { //calculates unit direction after you give them a "Mouse_Move" component with destination coordinates
-		Player_Move_Poll += Timer::timeStep;
-		if (Player_Move_Poll >= 200) {
-			Player_Move_Poll = 0;
-			auto view = World::zone.view<Potential_Position, Velocity, Mouse_Move, Actions, Moving>();
-			for (auto entity : view) {	
-				auto& x = view.get<Potential_Position>(entity);
-				auto& y = view.get<Potential_Position>(entity);
-				auto& act = view.get<Actions>(entity);
-				auto& v = view.get<Velocity>(entity);
-				auto& mov = view.get<Mouse_Move>(entity);				
-				act.action = walk;
-				v.magnitude.fX = v.speed * (mov.fX_Destination - x.fPX);
-				v.magnitude.fY = v.speed * (mov.fY_Destination - y.fPY);
-			}
-		}
-	}
 
 	//takes in the x,y of the unit and checks if it is within the destination x,y within an accuracy of the set variable
 	bool Check_If_Arrived(float &unitX, float &unitY, float &destinationX, float &destinationY) {
@@ -131,10 +114,11 @@ namespace Movement {
 			auto& x = view.get<Potential_Position>(entity);
 			auto& y = view.get<Potential_Position>(entity);
 			auto& mov = view.get<Mouse_Move>(entity);
-			if (Check_If_Arrived(x.fPX, y.fPY, mov.fX_Destination, mov.fY_Destination)) {
+			if (Check_If_Arrived(x.x, y.y, mov.fX_Destination, mov.fY_Destination)) {
 				v.magnitude.fX = 0.0f;
 				v.magnitude.fY = 0.0f;
 				act.action = idle;
+				World::zone.remove<Potential_Position>(entity);
 				World::zone.remove<Mouse_Move>(entity);
 				World::zone.remove<Moving>(entity);
 			}
@@ -142,6 +126,23 @@ namespace Movement {
 	}
 
 
+	void Mouse_Move_To() { //calculates unit direction after you give them a "Mouse_Move" component with destination coordinates
+		Player_Move_Poll += Timer::timeStep;
+		if (Player_Move_Poll >= 200) {
+			Player_Move_Poll = 0;
+			auto view = World::zone.view<Potential_Position, Velocity, Mouse_Move, Actions, Moving>();
+			for (auto entity : view) {	
+				auto& x = view.get<Potential_Position>(entity);
+				auto& y = view.get<Potential_Position>(entity);
+				auto& act = view.get<Actions>(entity);
+				auto& v = view.get<Velocity>(entity);
+				auto& mov = view.get<Mouse_Move>(entity);				
+				act.action = walk;
+				v.magnitude.fX = v.speed * (mov.fX_Destination - x.x);
+				v.magnitude.fY = v.speed * (mov.fY_Destination - y.y);
+			}
+		}
+	}
 
 
 	void Linear_Move_To() {
@@ -165,19 +166,33 @@ namespace Movement {
 				}
 				else {
 					World::zone.remove<Linear_Move>(entity);
+					World::zone.remove<Potential_Position>(entity);
 				}
 			}
 			linearMovePoll = 0;
 		}
 	}
 
-	void Movement_Handler() {
+	void Update_Positions(entt::registry& zone) {
+		auto view = zone.view<Position, Potential_Position>();
+		for (auto entity : view) {
+			auto& x = view.get<Position>(entity);
+			auto& y = view.get<Position>(entity);
+			auto& px = view.get<Potential_Position>(entity);
+			auto& py = view.get<Potential_Position>(entity);
+			x.x = px.x;
+			y.y = py.y;
+		}
+	}
+
+	void Movement_Handler(entt::registry  &zone) {
 		//Mouse_Attack_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location
 		Linear_Move_To();
 		Mouse_Move_To();
 		Mouse_Move_Arrived();
-		Update_Position();
+		Update_Potential_Position();
 		Update_Direction();
+		Update_Positions(zone);
 	}
 
 }

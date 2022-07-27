@@ -13,8 +13,8 @@ namespace Death_Spells {
 		Entity_Loader::Data data = Entity_Loader::parse_data(name);
 
 		auto skeleton0 = zone.create();
-		zone.emplace<Components::animation>(skeleton0, texture); /// need to load the texture nly once and pass the pointer intothis function
-		zone.get<Components::animation>(skeleton0).sheet = { //populate the vector
+		zone.emplace<Component::animation>(skeleton0, texture); /// need to load the texture nly once and pass the pointer intothis function
+		zone.get<Component::animation>(skeleton0).sheet = { //populate the vector
 			{ NULL },
 			{ {0   , 0, 128, 128}, 0,    512,  1, 0, 75.0f, 0.0f},//idle array[numframes] = { 2ms, 4ms, 2ms}
 			{ {512,  0, 128, 128}, 512,  1024, 0, 0, 75.0f, 0.0f},//walk
@@ -24,28 +24,27 @@ namespace Death_Spells {
 			{ {2816, 0, 128, 128}, 2816, 768,  0, 0, 75.0f, 0.0f}, //reverse to summon
 			{ {3584, 0, 128, 128}, 3584, 512,  1, 0, 75.0f, 0.0f},//ranged
 		};
-		zone.emplace<Components::Sprite_Offset>(skeleton0, 60.0f, 95.0f );
-		zone.emplace<Components::Scale>(skeleton0, 1.0f);
+		zone.emplace<Component::Sprite_Offset>(skeleton0, 60.0f, 95.0f );
+		zone.emplace<Component::Scale>(skeleton0, 1.0f);
 
-		zone.emplace<Components::Actions>(skeleton0, Components::idle);
-		zone.get<Components::Actions>(skeleton0).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4,0}, {2,0}, {5,0}, {4,0} };
+		zone.emplace<Component::Actions>(skeleton0, Component::idle);
+		zone.get<Component::Actions>(skeleton0).frameCount = { {0, 0}, { 4, 0}, {7, 0}, {4, 0}, {4,0}, {2,0}, {5,0}, {4,0} };
 
-		zone.emplace<Components::Position>(skeleton0, x, y);
-		zone.emplace<Components::Potential_Position>(skeleton0, x, y);
-		zone.emplace<Components::Radius>(skeleton0, data.radius);
-		zone.emplace<Components::Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
+		zone.emplace<Component::Position>(skeleton0, x, y);
+		zone.emplace<Component::Radius>(skeleton0, data.radius);
+		zone.emplace<Component::Velocity>(skeleton0, 0.f, 0.0f, 0.f, 0.0f, data.speed);
 
-		zone.emplace<Components::Direction>(skeleton0, Components::SE);
-		zone.emplace<Components::handle>(skeleton0, "Skeleton");
-		zone.emplace<Components::Mass>(skeleton0, data.mass);
+		zone.emplace<Component::Direction>(skeleton0, Component::SE);
+		zone.emplace<Component::handle>(skeleton0, "Skeleton");
+		zone.emplace<Component::Mass>(skeleton0, data.mass);
 		
-		zone.emplace<Components::Alive>(skeleton0, true);
-		zone.emplace<Components::Health>(skeleton0, 1);
-		zone.emplace<Components::Sight_Range>(skeleton0, x - 250.0f, y - 250.0f, 500.0f, 500.0f);
+		zone.emplace<Component::Alive>(skeleton0, true);
+		zone.emplace<Component::Health>(skeleton0, 1);
+		zone.emplace<Component::Sight_Range>(skeleton0, x - 250.0f, y - 250.0f, 500.0f, 500.0f);
 				
-		zone.emplace<Components::Soldier>(skeleton0);
-		zone.emplace<Components::Commandable>(skeleton0);
-		zone.emplace<Components::Spellbook>(skeleton0);
+		zone.emplace<Component::Soldier>(skeleton0);
+		zone.emplace<Component::Commandable>(skeleton0);
+		zone.emplace<Component::Spellbook>(skeleton0);
 
 	}
 

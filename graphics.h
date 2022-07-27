@@ -84,7 +84,7 @@ namespace Graphics {
 
 	void Create_Default_Icon_Entity(entt::registry& zone) {
 		defaultIcon = zone.create();
-		auto& icon = zone.emplace<Components::Icon>(defaultIcon, default_icon);
+		auto& icon = zone.emplace<Component::Icon>(defaultIcon, default_icon);
 		icon.clipSprite = { 0, 0, 100, 100 };
 		icon.renderRectSize = { 48, 48 };
 		icon.renderPositionOffset = { icon.renderRectSize.x / 2, icon.renderRectSize.y / 2 };

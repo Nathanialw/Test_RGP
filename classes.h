@@ -174,7 +174,7 @@ namespace Map {
 
 
 
-namespace Components {
+namespace Component {
 
 	
 	//wil have Regiments and Companies as administrative units
@@ -617,31 +617,33 @@ namespace Test {
 		bool bAlive;
 	};
 
-	struct Soldiers_Assigned {
+
+
+
+	struct Soldiers_Assigned_List {
 		int size = 8;
 		std::vector<Soldier_Data>unitData;
 
-		Soldiers_Assigned() {
+		Soldiers_Assigned_List() {
 			unitData.reserve(size);
 		}
 	};
 
 
-
-
-	
-	struct Unit_Formation {
+	struct Unit_Formation_Data {
 		int size;
 		bool bAlive;
 		Formation_Type formationType;
 		SDL_FRect sCollide_Box;
-		entt::entity formation_ID;	
-		std::vector<Unit_Formation>formationData;
+		//entt::entity formation_ID;	
+		std::vector<Unit_Formation_Data>subformationData;
 
-		Unit_Formation() {
+		Unit_Formation_Data() {
 			size = 6;
 			bAlive = true;
-			formationData.reserve(size);
+			formationType = squad;
+			sCollide_Box = { 0.0f, 0.0f, 0.0f, 0.0f };
+			subformationData.reserve(size);
 		}
 
 	};

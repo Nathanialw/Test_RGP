@@ -12,20 +12,20 @@ namespace Camera_Control {
 
 	};
 
-	void Update_Camera_Follow(Components::Camera &camera, Components::Position &position, SDL_FRect &resolution) {
+	void Update_Camera_Follow(Component::Camera &camera, Component::Position &position, SDL_FRect &resolution) {
 			//center camera on the entity with the component
 			camera.screen.w = resolution.w / camera.scale.fX;
 			camera.screen.h = resolution.h / camera.scale.fY;
-			camera.screen.x = ((position.fX) - (camera.screen.w / 2));
-			camera.screen.y = ((position.fY) - (camera.screen.h / 2));
+			camera.screen.x = ((position.x) - (camera.screen.w / 2));
+			camera.screen.y = ((position.y) - (camera.screen.h / 2));
 	}
 
 	SDL_FRect Convert_Rect_To_Screen_Coods(entt::registry& zone, SDL_FRect& frect) {
-		auto view = zone.view<Components::Camera>();
+		auto view = zone.view<Component::Camera>();
 		SDL_FRect screenRect = {};
 		
 		for (auto focus : view) {
-			auto& componentCamera = view.get<Components::Camera>(focus);
+			auto& componentCamera = view.get<Component::Camera>(focus);
 
 
 			screenRect.x = frect.x - componentCamera.screen.x;
@@ -39,10 +39,10 @@ namespace Camera_Control {
 
 
 	SDL_Rect Convert_Rect_To_Scale(entt::registry &zone, SDL_Rect& rect) {
-		auto view = zone.view<Components::Camera>();
+		auto view = zone.view<Component::Camera>();
 
 		for (auto focus : view) {
-			auto& componentCamera = view.get<Components::Camera>(focus);
+			auto& componentCamera = view.get<Component::Camera>(focus);
 
 			SDL_FRect fRenderToScreen = {
 				float(rect.x) / componentCamera.scale.fX,
@@ -55,10 +55,10 @@ namespace Camera_Control {
 	}
 
 	SDL_Point Convert_Point_To_Scale(entt::registry& zone, SDL_Point& rect) {
-		auto view = zone.view<Components::Camera>();
+		auto view = zone.view<Component::Camera>();
 
 		for (auto focus : view) {
-			auto& componentCamera = view.get<Components::Camera>(focus);
+			auto& componentCamera = view.get<Component::Camera>(focus);
 
 			SDL_FPoint fRenderToScreen = {
 				float(rect.x) / componentCamera.scale.fX,

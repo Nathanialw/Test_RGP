@@ -23,13 +23,13 @@ namespace Equipment {
 	void Equip_Item(entt::registry &zone, entt::entity& item, bool& mouseHasItem, int& slotNum) {
 		UI_bagSlots.at(slotNum) = item;
 		mouseHasItem = false;
-		zone.remove<Components::On_Mouse>(item);
+		zone.remove<Component::On_Mouse>(item);
 	}
 
 	void Unequip_Item(entt::registry& zone, entt::entity& item, bool& mouseHasItem, int& slotNum) {
 		item = UI_bagSlots.at(slotNum);
 		UI_bagSlots.at(slotNum) = Graphics::defaultIcon;
-		zone.emplace<Components::On_Mouse>(item);
+		zone.emplace<Component::On_Mouse>(item);
 		mouseHasItem = true;
 	}
 
@@ -90,7 +90,7 @@ namespace Equipment {
 			for (j = 0; j < numOfSlots.y; j++) {
 				slotRect.y = (j * iBagSlotPixelSize) + Bag.y;
 
-				auto& icon = zone.get<Components::Icon>(UI_bagSlots.at(slot));
+				auto& icon = zone.get<Component::Icon>(UI_bagSlots.at(slot));
 				SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
 				SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 				if (j < (numOfSlots.y - 1)) {
@@ -98,7 +98,7 @@ namespace Equipment {
 				}
 			}
 
-			auto icon = zone.get<Components::Icon>(UI_bagSlots.at(slot));
+			auto icon = zone.get<Component::Icon>(UI_bagSlots.at(slot));
 			SDL_Rect scaledSlot = Camera_Control::Convert_Rect_To_Scale(slotRect);
 			SDL_RenderCopy(Graphics::renderer, icon.pTexture, &icon.clipSprite, &scaledSlot);
 			if (i < (numOfSlots.x - 1)) {

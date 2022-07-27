@@ -56,7 +56,7 @@ namespace Mouse {
 		
 	};
 
-	void Update_Cursor (Components::Camera &camera) {
+	void Update_Cursor (Component::Camera &camera) {
 		int mx, my;
 		SDL_GetMouseState(&mx, &my);
 		iXMouse = (float)mx;

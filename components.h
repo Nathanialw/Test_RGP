@@ -5,7 +5,7 @@
 #include "classes.h"
 
 
-namespace Components {
+namespace Component {
 
 
 
@@ -40,23 +40,26 @@ namespace Components {
 
 	//Position		
 	struct Position {
-		float fX;
-		float fY;
+		float x;
+		float y;
 	};	
 	
 	struct Potential_Position {
-		float fPX;
-		float fPY;
+		float x;
+		float y;
+	};
+
+	struct Collided {
+		float x;
+		float y;
 	};
 
 	struct Terrain_Position_X {
 		float fX;
-		float fPX;
 	};
 
 	struct Terrain_Position_Y {
 		float fY;
-		float fPY;
 	};
 	////////////
 
@@ -178,10 +181,6 @@ namespace Components {
 	};
 
 	struct Selected {
-
-	};
-
-	struct Collided {
 
 	};
 
