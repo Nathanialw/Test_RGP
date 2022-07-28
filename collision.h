@@ -487,7 +487,6 @@ namespace collision {
 	}
 
 
-
 	void Formation_vs_Grid_collision(entt::registry& zone, Map::Node3& map) { //waaaaay too slow		
 
 		auto company_view = zone.view<Company>();

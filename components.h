@@ -318,7 +318,8 @@ namespace Component {
 		armour,
 		potion
 	};
-
+	
+	
 	struct Icon {		
 		SDL_Texture* pTexture;		
 		SDL_Rect clipSprite;

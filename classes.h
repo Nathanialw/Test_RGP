@@ -631,20 +631,24 @@ namespace Test {
 
 
 	struct Unit_Formation_Data {
+		entt::entity formation_ID;
 		int size;
 		bool bAlive;
 		Formation_Type formationType;
-		SDL_FRect sCollide_Box;
-		//entt::entity formation_ID;	
+		SDL_FRect sCollide_Box;		
 		std::vector<Unit_Formation_Data>subformationData;
 
 		Unit_Formation_Data() {
-			size = 6;
+			size = 3;
 			bAlive = true;
-			formationType = squad;
+			formationType;
 			sCollide_Box = { 0.0f, 0.0f, 0.0f, 0.0f };
 			subformationData.reserve(size);
 		}
+
+	};
+
+	struct Assigned_To_Formation {
 
 	};
 

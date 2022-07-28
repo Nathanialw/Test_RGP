@@ -28,7 +28,7 @@ namespace Movement {
 
 
 	
-	void Update_Potential_Position() {
+	void Update_Position() {
 		auto view = World::zone.view<Component::Position, Component::Velocity, Component::Moving>();
 		Update_Position_Poll += Timer::timeStep;
 		number_of_units = 0;
@@ -148,10 +148,8 @@ namespace Movement {
 	void Linear_Move_To() {
 		linearMovePoll += Timer::timeStep;
 		if (linearMovePoll >= 50) {
-			auto view = World::zone.view<Position, Velocity, Actions, Moving, Linear_Move, Spell_Range>();
+			auto view = World::zone.view<Velocity, Actions, Moving, Linear_Move, Spell_Range>();
 			for (auto entity : view) {
-				auto& x = view.get<Position>(entity);
-				auto& y = view.get<Position>(entity);
 				auto& act = view.get<Actions>(entity);
 				auto& v = view.get<Velocity>(entity);
 				auto& mov = view.get<Linear_Move>(entity);
@@ -161,38 +159,23 @@ namespace Movement {
 					act.action = walk;
 					v.magnitude.fX = v.speed * (mov.fX_Direction - range.fSourceX);
 					v.magnitude.fY = v.speed * (mov.fY_Direction - range.fSourceY);
-					range.fRange += linearMovePoll;
-					
+					range.fRange += linearMovePoll;					
 				}
 				else {
 					World::zone.remove<Linear_Move>(entity);
-					World::zone.remove<Potential_Position>(entity);
 				}
 			}
 			linearMovePoll = 0;
 		}
 	}
 
-	void Update_Positions(entt::registry& zone) {
-		auto view = zone.view<Position, Potential_Position>();
-		for (auto entity : view) {
-			auto& x = view.get<Position>(entity);
-			auto& y = view.get<Position>(entity);
-			auto& px = view.get<Potential_Position>(entity);
-			auto& py = view.get<Potential_Position>(entity);
-			x.x = px.x;
-			y.y = py.y;
-		}
-	}
 
 	void Update_Entity_Positions(entt::registry  &zone) {
 		//Mouse_Attack_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location
 		Linear_Move_To();
 		Mouse_Move_To();
 		Mouse_Move_Arrived();
-		Update_Potential_Position();
 		Update_Direction();
-		//Update_Positions(zone);
+		Update_Position();
 	}
-
 }

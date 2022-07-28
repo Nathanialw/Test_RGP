@@ -69,18 +69,26 @@ namespace Interface {
 		}
 	}
 
-	void Display_Unite_Formations(Component::Camera &camera) {
+	void Display_Unit_Formations(Component::Camera &camera) {
 		int i = 0;
 		auto unitFormations_view = World::zone.view<Test::Unit_Formation_Data>();
 		for (auto unitFormation : unitFormations_view) {
+			auto& formation = unitFormations_view.get<Test::Unit_Formation_Data>(unitFormation);
+			if (formation.formationType != Test::Formation_Type::platoon) {
+				formation.sCollide_Box.x -= camera.screen.x;
+				formation.sCollide_Box.y -= camera.screen.y;
+				SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 125);
+				SDL_RenderDrawRectF(Graphics::renderer, &formation.sCollide_Box);
+			}
+			else {
+				formation.sCollide_Box.x -= camera.screen.x;
+				formation.sCollide_Box.y -= camera.screen.y;
+				SDL_SetRenderDrawColor(Graphics::renderer, 255, 55, 55, 255);
+				SDL_RenderDrawRectF(Graphics::renderer, &formation.sCollide_Box);
+			}
 			i++;
-			SDL_FRect formationRect = unitFormations_view.get<Test::Unit_Formation_Data>(unitFormation).sCollide_Box;
-			formationRect.x -= camera.screen.x;
-			formationRect.y -= camera.screen.y;
-			SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 255);
-			SDL_RenderDrawRectF(Graphics::renderer, &formationRect);
 		}
-		std::cout << i << std::endl;
+		//std::cout << i << std::endl;
 	}
 
 
@@ -235,7 +243,7 @@ namespace Interface {
 
 			Show_Grid(Map::terrain);
 			Display_Military_Groups();
-			//Display_Unite_Formations(camera);
+			Display_Unit_Formations(camera);
 			Debug_System::Debugger();
 			//Unit_Arrive_UI();
 			Display_Selected();

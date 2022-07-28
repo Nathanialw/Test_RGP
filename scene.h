@@ -150,7 +150,7 @@ namespace Scene {
 		}
 
 		//Skeletons
-		Spawn_Skeletons(zone, 8, 4);
+		Spawn_Skeletons(zone, 4, 1);
 
 		//archers
 		Units::Create_Archer(0.0f, 0.0f);
@@ -193,8 +193,7 @@ namespace Scene {
 		Map::Build_Map(Map::map);
 		Entity_Loader::init_db();
 		Load_Entities(zone);
-		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);
-		Test_Units::Assign_Soldiers_On_Spawn(World::zone);
+
 		SDL_RenderSetScale(Graphics::renderer, 2.0f, 2.0f);
 		
 	}

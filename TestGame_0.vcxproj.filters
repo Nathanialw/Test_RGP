@@ -140,6 +140,9 @@
     <ClInclude Include="unit_status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="formation_positions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL2.dll" />

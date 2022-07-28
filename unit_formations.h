@@ -9,16 +9,18 @@ namespace Test_Units {
 	// All other units do not have this component
 
 	entt::entity Create_New_Squad(entt::registry& zone) {
-		auto squad = zone.create();
-		auto& Soldiers = zone.emplace<Test::Soldiers_Assigned_List>(squad);
-		auto& Unit = zone.emplace<Test::Unit_Formation_Data>(squad);
-		zone.get<Test::Unit_Formation_Data>(squad).formationType = Test::squad;
-		return squad;
+		auto squad_ID = zone.create();
+		auto& Soldiers = zone.emplace<Test::Soldiers_Assigned_List>(squad_ID);
+		auto& squadData = zone.emplace<Test::Unit_Formation_Data>(squad_ID);
+		squadData.formationType = Test::squad;
+		squadData.formation_ID = squad_ID;
+		return squad_ID;
 	}
 	entt::entity Create_New_Formation(entt::registry& zone) {
-		auto formation = zone.create();
-		auto& Unit = zone.emplace<Test::Unit_Formation_Data>(formation);
-		return formation;
+		auto formation_ID = zone.create();
+		auto& formation = zone.emplace<Test::Unit_Formation_Data>(formation_ID);
+		formation.formation_ID = formation_ID;
+		return formation_ID;
 	}
 
 	bool Is_ParentFormation_One_Level_Above(Test::Unit_Formation_Data &parentFormationData, Test::Unit_Formation_Data& subformationData) {
@@ -28,11 +30,9 @@ namespace Test_Units {
 		}
 		return false;
 	}
-	Test::Unit_Formation_Data Set_ParentFormation_Formation_Type(entt::registry &zone, entt::entity &parentFormation_ID, Test::Unit_Formation_Data& subformationData) {
-		int parentFormationType_int = (int)subformationData.formationType + 1;
-		Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(parentFormation_ID);
+	void Set_ParentFormation_Formation_Type(Test::Unit_Formation_Data &parentFormationData, Test::Unit_Formation_Data& subformationData) {
+		int parentFormationType_int = (int)subformationData.formationType + 1;		
 		parentFormationData.formationType = (Test::Formation_Type)parentFormationType_int;
-		return parentFormationData;
 	}
 
 	bool Replace_Subformation_In_Formation(entt::registry& zone, entt::entity& parentFormation_ID, Test::Unit_Formation_Data& parentFormationData, entt::entity& subformation_ID, Test::Unit_Formation_Data & subformationData) {
@@ -52,52 +52,67 @@ namespace Test_Units {
 	bool Emplace_Subformation_In_Formation(entt::registry& zone, entt::entity& parentFormation_ID, Test::Unit_Formation_Data& parentFormationData, entt::entity& subformation_ID, Test::Unit_Formation_Data& subformationData) {
 		if (parentFormationData.subformationData.size() < parentFormationData.size) {
 			auto& subformation = zone.emplace_or_replace<Component::Assigned_To>(subformation_ID, 0, parentFormation_ID);
-			subformation.iIndex = parentFormationData.subformationData.size() - 1;
-			
+			subformation.iIndex = parentFormationData.subformationData.size();
 			parentFormationData.subformationData.emplace_back(subformationData);
 			return true;
 		}
 		return false;
 	}
 
-	bool Assign_Selected_Formations_To_ParentFormations(entt::registry& zone, entt::entity & subformation_ID, Test::Unit_Formation_Data &subformationData) {
-		
+	bool Assign_Selected_Formations_To_ParentFormations(entt::registry& zone, entt::entity& subformation_ID, Test::Unit_Formation_Data& subformationData) {
+
 		// get the selected formations => check which type they are => add them to the parent formation type
+
+		auto parentFormations_view = zone.view<Test::Unit_Formation_Data>();
+
+		//So that it doesn't place it within intself
+		for (auto parentFormation_ID : parentFormations_view) {
+			if (parentFormation_ID != subformation_ID) {
+				Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(parentFormation_ID);
+				if (Is_ParentFormation_One_Level_Above(parentFormationData, subformationData)) {
+					if (Replace_Subformation_In_Formation(zone, parentFormation_ID, parentFormationData, subformation_ID, subformationData)) {
+						return true;
+					}
+				}
+			}
+			//search exist formations for space and insert the subformation data
+			for (auto parentFormation_ID : parentFormations_view) {
+				if (parentFormation_ID != subformation_ID) {
+					Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(parentFormation_ID);
+					if (Is_ParentFormation_One_Level_Above(parentFormationData, subformationData)) {
+						if (Emplace_Subformation_In_Formation(zone, parentFormation_ID, parentFormationData, subformation_ID, subformationData)) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+	
+
+		//so it doesn't recursively grouop forever
 		
-		auto parentFormations_view = zone.view<Test::Unit_Formation_Data>(); 
-
-		for (auto parentFormation_ID : parentFormations_view) {
-			Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(parentFormation_ID);
-			if (Is_ParentFormation_One_Level_Above(parentFormationData, subformationData)) {
-				if (Replace_Subformation_In_Formation(zone, parentFormation_ID, parentFormationData, subformation_ID, subformationData)) {
-					return true;
-				}
+		if (subformationData.formationType != Test::Formation_Type::platoon){
+			//create a new formation and insert the subformation data
+			entt::entity new_parentFormation_ID = Create_New_Formation(zone);
+			//set the formation type one level above the subformation being inserted
+			Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(new_parentFormation_ID);
+			Set_ParentFormation_Formation_Type(parentFormationData, subformationData);
+			//assign subformation to parent formation
+			if (Emplace_Subformation_In_Formation(zone, new_parentFormation_ID, parentFormationData, subformation_ID, subformationData)) {
+			
+				return true;
 			}
+			return false;
 		}
-		//search exist formations for space and insert the subformation data
-		for (auto parentFormation_ID : parentFormations_view) {
-			Test::Unit_Formation_Data& parentFormationData = zone.get<Test::Unit_Formation_Data>(parentFormation_ID);
-			if (Is_ParentFormation_One_Level_Above(parentFormationData, subformationData)) {
-				if (Emplace_Subformation_In_Formation(zone, parentFormation_ID, parentFormationData, subformation_ID, subformationData)) {
-					return true;
-				}
-			}
-		}
-
-		//create a new formation and insert the subformation data
-		entt::entity new_parentFormation_ID = Create_New_Formation(zone);
-		//set the formation type one level above the subformation being inserted
-		Test::Unit_Formation_Data parentFormationData = Set_ParentFormation_Formation_Type(zone, new_parentFormation_ID, subformationData);
-		//assign subformation to parent formation
-		Emplace_Subformation_In_Formation(zone, new_parentFormation_ID, parentFormationData, subformation_ID, subformationData);
+		return false;
 	};
 
 	void Create_Formation(entt::registry& zone) {
-		auto subformations_view = zone.view<Test::Unit_Formation_Data>(); // this should be only the selected formations I think
+		auto subformations_view = zone.view<Test::Unit_Formation_Data>(entt::exclude<Component::Assigned_To>); // this should be only the selected formations I think
 		for (auto subformation_ID : subformations_view) {
 			auto & subformationData = subformations_view.get<Test::Unit_Formation_Data>(subformation_ID);
 			Assign_Selected_Formations_To_ParentFormations(zone, subformation_ID, subformationData);
-		}
+		}	
 	}
 
 
@@ -114,19 +129,17 @@ namespace Test_Units {
 		}
 		return false;
 	}
-
 	bool Emplace_Umit_In_Squad(entt::registry& zone, entt::entity& squad_ID, Test::Soldier_Data &soldierData) {
 		Test::Soldiers_Assigned_List& squad = zone.get<Test::Soldiers_Assigned_List>(squad_ID);
 
 		if (squad.unitData.size() < squad.size) {
 			auto& soldier = zone.emplace_or_replace<Component::Assigned_To>(soldierData.unit_ID, 0, squad_ID);
-			soldier.iIndex = squad.unitData.size() - 1;
+			soldier.iIndex = squad.unitData.size();
 			squad.unitData.emplace_back(soldierData);
 			return true;
 		}
 		return false;
 	}
-
 	bool Assign_Selected_Units_To_Squad(entt::registry& zone, Test::Soldier_Data &soldierData) {
 
 		auto view = zone.view<Test::Soldiers_Assigned_List>();
@@ -145,11 +158,9 @@ namespace Test_Units {
 		Emplace_Umit_In_Squad(zone, new_squad_ID, soldierData);
 		return true;
 	}
-
-
 	void Create_And_Fill_New_Squad(entt::registry& zone) {
 
-		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier, Component::Selected>(entt::exclude<Component::Assigned_To>);
+		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier>(entt::exclude<Component::Assigned_To>);
 		
 		for (auto unit_ID : view) {
 			auto& x = view.get<Component::Position>(unit_ID).x;
@@ -161,6 +172,7 @@ namespace Test_Units {
 			Assign_Selected_Units_To_Squad(zone, soldierData);
 		}
 	};
+
 
 	bool Assign_All_Units_To_Squad(entt::registry& zone, entt::entity& squad_ID) {
 		Test::Soldiers_Assigned_List& squad = zone.get<Test::Soldiers_Assigned_List>(squad_ID);
@@ -184,10 +196,10 @@ namespace Test_Units {
 				return true;
 			}
 		}
+		Component::Item_Type dsfa;
+		dsfa = Component::weapon;
 		return false;
 	}
-
-
 	void Create_Squads_From_All_Unassigned(entt::registry& zone) {
 		entt::entity squad_ID;
 		bool units = true;
@@ -198,8 +210,11 @@ namespace Test_Units {
 		}
 	}
 
+
 	void Assign_Soldiers_On_Spawn(entt::registry& zone) {
 		Create_Squads_From_All_Unassigned(zone);		
 	}
 
+
+	
 }
