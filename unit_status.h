@@ -19,8 +19,8 @@ namespace Unit_Status {
 
 			//if the soldier is in the assignment vector it will be set as dead if it dies
 			if (health == 0) {
-				if (zone.any_of<Component::Assigned_To>(entity)) {
-					auto& assignment = zone.get<Component::Assigned_To>(entity);
+				if (zone.any_of<Component::Assigned_To_Formation>(entity)) {
+					auto& assignment = zone.get<Component::Assigned_To_Formation>(entity);
 					auto& squad = zone.get<Component::Squad>(assignment.iUnit_Assigned_To);
 					squad.bAlive.at(assignment.iIndex) = false;
 				}

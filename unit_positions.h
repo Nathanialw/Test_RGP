@@ -6,12 +6,12 @@ namespace Unit_Position {
 
 
 	void Update_Formation_Unit_Positions(entt::registry& zone) { // updates positions of soldiers stored in units for collision box
-		auto view = zone.view<Component::Position, Component::Assigned_To, Component::Soldier>();
+		auto view = zone.view<Component::Position, Component::Assigned_To_Formation, Component::Soldier>();
 		
 		for (auto entity : view) {
 			auto& x = view.get<Component::Position>(entity);
 			auto& y = view.get<Component::Position>(entity);
-			auto& soldier = view.get<Component::Assigned_To>(entity);
+			auto& soldier = view.get<Component::Assigned_To_Formation>(entity);
 			
 			auto& formation = zone.get<Test::Soldiers_Assigned_List>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			formation.unitData.at(soldier.iIndex).x = x.x;
@@ -124,10 +124,36 @@ namespace Unit_Position {
 		}
 	}
 
+	/*
+	
+	A really janky way to quickly grab the right grouping level	
+	*/
+	void Set_Component(entt::registry & zone) {
+		auto formation_view = zone.view<Test::Unit_Formation_Data>(entt::exclude<Test::Grouped>);
+		for (auto formation_ID : formation_view) { //update colliders
+			auto& formationType = formation_view.get<Test::Unit_Formation_Data>(formation_ID).formationType;	
 
+
+			switch (formationType) {
+				//case Test::Formation_Type::soldier:	{	zone.emplace<Test::Soldier>(formation_ID); }; break;
+				case Test::Formation_Type::squad:	{	zone.emplace<Test::Squad>(formation_ID); }; break;
+				case Test::Formation_Type::platoon: { 	zone.emplace<Test::Platoon>(formation_ID); }; break;
+				case Test::Formation_Type::company: { 	zone.emplace<Test::Company>(formation_ID); }; break;
+				case Test::Formation_Type::battalion: { zone.emplace<Test::Battalion>(formation_ID); }; break;
+				case Test::Formation_Type::brigade: { 	zone.emplace<Test::Brigade>(formation_ID); }; break;
+				case Test::Formation_Type::division: { 	zone.emplace<Test::Division>(formation_ID); }; break;
+				case Test::Formation_Type::corps: { 	zone.emplace<Test::Corps>(formation_ID); }; break;
+				case Test::Formation_Type::army: { 		zone.emplace<Test::Army>(formation_ID); }; break;
+			}
+			zone.emplace<Test::Grouped>(formation_ID);
+
+		
+		}
+	}
 	
 
 	void Update_Formation_Positions(entt::registry& zone) {
+		Set_Component(zone);
 		Update_Formation_Unit_Positions(zone);
 		Update_Soldier_Formation_Rect(zone);
 		Update_Formation_Rect(zone);

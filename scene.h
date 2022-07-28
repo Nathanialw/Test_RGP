@@ -22,7 +22,7 @@ namespace Scene {
 
 	//adds Environment items to world grid
 	void add_unit_to_grid(Map::Node3& map) {
-		auto view = World::zone.view<Position, Radius, Environment>(entt::exclude<Assigned_To>);
+		auto view = World::zone.view<Position, Radius, Environment>(entt::exclude<Assigned_To_Formation>);
 		for (auto entity : view) {
 			auto& x = view.get<Position>(entity).x;
 			auto& y = view.get<Position>(entity).y;
@@ -30,14 +30,14 @@ namespace Scene {
 			SDL_FRect rect = { x - r, y - r, r * 2, r * 2 };
 
 			Map::Place_Rect_On_Grid(rect, Map::map, entity);
-			World::zone.emplace_or_replace<Assigned_To>(entity);
+			World::zone.emplace_or_replace<Assigned_To_Formation>(entity);
 		}
 	}
 
 	//adds Environment items to map grid
 
 	void add_terrain_to_grid(Map::Node3& map) {
-		auto view = World::zone.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned_To>);
+		auto view = World::zone.view<Terrain_Position_X, Terrain_Position_Y, Radius, Terrain>(entt::exclude<Assigned_To_Formation>);
 		for (auto entity : view) {
 			auto& x = view.get<Terrain_Position_X>(entity);
 			auto& y = view.get<Terrain_Position_Y>(entity);
@@ -45,7 +45,7 @@ namespace Scene {
 			SDL_FRect rect = { x.fX, y.fY, 100, 100 };
 
 			Map::Place_Rect_On_Grid_Once(rect, map, entity);
-			World::zone.emplace_or_replace<Assigned_To>(entity);
+			World::zone.emplace_or_replace<Assigned_To_Formation>(entity);
 		}
 	}
 
@@ -74,6 +74,7 @@ namespace Scene {
 		World::zone.emplace<Actions>(tree, isStatic);
 		World::zone.get<Actions>(tree).frameCount = { { 0, 0} };
 		World::zone.emplace<Direction>(tree, W);
+		World::zone.emplace<Alive>(tree, true);
 
 		World::zone.emplace<Radius>(tree, data.radius * scale);
 		World::zone.emplace<Environment>(tree);
@@ -150,7 +151,7 @@ namespace Scene {
 		}
 
 		//Skeletons
-		Spawn_Skeletons(zone, 4, 1);
+		Spawn_Skeletons(zone, 8, 8);
 
 		//archers
 		Units::Create_Archer(0.0f, 0.0f);

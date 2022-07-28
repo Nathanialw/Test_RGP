@@ -157,7 +157,7 @@ namespace collision {
 
 	void Entity_vs_Formation_Collision(entt::registry& zone) { //seems to work and pushes the units
 		if (1) {
-			auto players_view = zone.view<Radius, Position, Mass>(entt::exclude<Assigned_To>);
+			auto players_view = zone.view<Radius, Position, Mass>(entt::exclude<Assigned_To_Formation>);
 			for (auto player : players_view) {
 				auto& radius = players_view.get<Radius>(player);
 				auto& position = players_view.get<Position>(player);
@@ -552,11 +552,11 @@ namespace collision {
 	}
 
 	void Update_Vector_From_Unit(entt::registry& zone) { // updates positions of soldiers stored in units for collision box
-		auto view = zone.view<Component::Position, Component::Assigned_To, Component::Soldier>();
+		auto view = zone.view<Component::Position, Component::Assigned_To_Formation, Component::Soldier>();
 		for (auto entity : view) {
 			auto& x = view.get<Component::Position>(entity);
 			auto& y = view.get<Component::Position>(entity);
-			auto& soldier = view.get<Component::Assigned_To>(entity);
+			auto& soldier = view.get<Component::Assigned_To_Formation>(entity);
 			auto& squad = zone.get<Component::Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			squad.fPX.at(soldier.iIndex) = x.x;
 			squad.fPY.at(soldier.iIndex) = y.y;

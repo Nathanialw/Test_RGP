@@ -12,7 +12,7 @@ namespace Test_Units {
 		auto squad_ID = zone.create();
 		auto& Soldiers = zone.emplace<Test::Soldiers_Assigned_List>(squad_ID);
 		auto& squadData = zone.emplace<Test::Unit_Formation_Data>(squad_ID);
-		squadData.formationType = Test::squad;
+		squadData.formationType = Test::Formation_Type::squad;
 		squadData.formation_ID = squad_ID;
 		return squad_ID;
 	}
@@ -25,7 +25,7 @@ namespace Test_Units {
 
 	bool Is_ParentFormation_One_Level_Above(Test::Unit_Formation_Data &parentFormationData, Test::Unit_Formation_Data& subformationData) {
 		int subformationType = (int)parentFormationData.formationType - 1;
-		if (subformationType == (subformationData.formationType)) {
+		if (subformationType == (int)(subformationData.formationType)) {
 			return true;
 		}
 		return false;
@@ -41,7 +41,7 @@ namespace Test_Units {
 		for (int i = 0; i < parentFormationData.subformationData.size(); i++) {
 			//check for an index without an active subformation
 			if (parentFormationData.subformationData.at(i).bAlive == false) {
-				zone.emplace_or_replace<Component::Assigned_To>(subformation_ID, i, parentFormation_ID);
+				zone.emplace_or_replace<Component::Assigned_To_Formation>(subformation_ID, i, parentFormation_ID);
 				
 				parentFormationData.subformationData.at(i) = subformationData;
 				return true;
@@ -50,12 +50,13 @@ namespace Test_Units {
 		return false;
 	}
 	bool Emplace_Subformation_In_Formation(entt::registry& zone, entt::entity& parentFormation_ID, Test::Unit_Formation_Data& parentFormationData, entt::entity& subformation_ID, Test::Unit_Formation_Data& subformationData) {
+		
 		if (parentFormationData.subformationData.size() < parentFormationData.size) {
-			auto& subformation = zone.emplace_or_replace<Component::Assigned_To>(subformation_ID, 0, parentFormation_ID);
+			auto& subformation = zone.emplace_or_replace<Component::Assigned_To_Formation>(subformation_ID, 0, parentFormation_ID);
 			subformation.iIndex = parentFormationData.subformationData.size();
 			parentFormationData.subformationData.emplace_back(subformationData);
 			return true;
-		}
+		}		
 		return false;
 	}
 
@@ -91,7 +92,7 @@ namespace Test_Units {
 
 		//so it doesn't recursively grouop forever
 		
-		if (subformationData.formationType != Test::Formation_Type::platoon){
+		if (subformationData.formationType != Test::Formation_Type::army){
 			//create a new formation and insert the subformation data
 			entt::entity new_parentFormation_ID = Create_New_Formation(zone);
 			//set the formation type one level above the subformation being inserted
@@ -108,7 +109,7 @@ namespace Test_Units {
 	};
 
 	void Create_Formation(entt::registry& zone) {
-		auto subformations_view = zone.view<Test::Unit_Formation_Data>(entt::exclude<Component::Assigned_To>); // this should be only the selected formations I think
+		auto subformations_view = zone.view<Test::Unit_Formation_Data>(entt::exclude<Component::Assigned_To_Formation, Test::Army>); // this should be only the selected formations I think
 		for (auto subformation_ID : subformations_view) {
 			auto & subformationData = subformations_view.get<Test::Unit_Formation_Data>(subformation_ID);
 			Assign_Selected_Formations_To_ParentFormations(zone, subformation_ID, subformationData);
@@ -122,7 +123,7 @@ namespace Test_Units {
 
 		for (int i = 0; i < squad.unitData.size(); i++) {
 			if (squad.unitData.at(i).bAlive == false) {				
-				auto& soldier = zone.emplace_or_replace<Component::Assigned_To>(soldierData.unit_ID, i, squad_ID);
+				auto& soldier = zone.emplace_or_replace<Component::Assigned_To_Formation>(soldierData.unit_ID, i, squad_ID);
 				squad.unitData.at(i) = soldierData;			
 				return true;
 			}
@@ -133,7 +134,7 @@ namespace Test_Units {
 		Test::Soldiers_Assigned_List& squad = zone.get<Test::Soldiers_Assigned_List>(squad_ID);
 
 		if (squad.unitData.size() < squad.size) {
-			auto& soldier = zone.emplace_or_replace<Component::Assigned_To>(soldierData.unit_ID, 0, squad_ID);
+			auto& soldier = zone.emplace_or_replace<Component::Assigned_To_Formation>(soldierData.unit_ID, 0, squad_ID);
 			soldier.iIndex = squad.unitData.size();
 			squad.unitData.emplace_back(soldierData);
 			return true;
@@ -158,9 +159,27 @@ namespace Test_Units {
 		Emplace_Umit_In_Squad(zone, new_squad_ID, soldierData);
 		return true;
 	}
+
+	//void Create_And_Fill_New_Squad(entt::registry& zone) {
+
+	//	auto view = zone.view<Component::Position, Component::Radius, Component::Soldier>(entt::exclude<Component::Assigned_To>);
+
+	//	for (auto unit_ID : view) {
+	//		auto& x = view.get<Component::Position>(unit_ID).x;
+	//		auto& y = view.get<Component::Position>(unit_ID).y;
+	//		auto& radius = view.get<Component::Radius>(unit_ID).fRadius;
+	//		SDL_FRect rect = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
+
+	//		Test::Unit_Formation_Data soldierData = {unit_ID, 1, true, Test::Formation_Type::soldier, rect};
+
+	//		Assign_Selected_Units_To_Squad(zone, soldierData);
+	//	}
+	//};
+
+
 	void Create_And_Fill_New_Squad(entt::registry& zone) {
 
-		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier>(entt::exclude<Component::Assigned_To>);
+		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier>(entt::exclude<Component::Assigned_To_Formation>);
 		
 		for (auto unit_ID : view) {
 			auto& x = view.get<Component::Position>(unit_ID).x;
@@ -178,7 +197,7 @@ namespace Test_Units {
 		Test::Soldiers_Assigned_List& squad = zone.get<Test::Soldiers_Assigned_List>(squad_ID);
 		int iUnit = 0;
 
-		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier>(entt::exclude<Component::Assigned_To>);
+		auto view = zone.view<Component::Position, Component::Radius, Component::Mass, Component::Soldier>(entt::exclude<Component::Assigned_To_Formation>);
 		for (auto entity : view) {
 			auto& x = view.get<Component::Position>(entity).x;
 			auto& y = view.get<Component::Position>(entity).y;
@@ -188,7 +207,7 @@ namespace Test_Units {
 			Test::Soldier_Data soldier_data = {entity, x, y, m, r, 0, true};
 			squad.unitData.emplace_back(soldier_data);
 			
-			auto& soldier = zone.emplace_or_replace<Component::Assigned_To>(entity, 0, squad_ID);
+			auto& soldier = zone.emplace_or_replace<Component::Assigned_To_Formation>(entity, 0, squad_ID);
 			soldier.iIndex = squad.unitData.size() - 1;
 
 			iUnit++;

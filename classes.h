@@ -595,17 +595,28 @@ namespace Military {
 
 namespace Test {
 
-	enum Formation_Type {	
+	enum class Formation_Type {
 		squad,	
 		platoon,	
 		company,	
 		battalion,	
-		Regiment,	
 		brigade,
 		division,
 		corps,
 		army
 	};
+
+
+	struct Soldier {};
+	struct Squad {};
+	struct Platoon {};
+	struct Company {};
+	struct Battalion {};
+	struct Brigade {};
+	struct Division {};
+	struct Corps {};
+	struct Army {};
+	struct Grouped {};
 
 	struct Soldier_Data {
 		entt::entity unit_ID;
@@ -618,7 +629,9 @@ namespace Test {
 	};
 
 
+	struct Collision {
 
+	};
 
 	struct Soldiers_Assigned_List {
 		int size = 8;
@@ -639,6 +652,7 @@ namespace Test {
 		std::vector<Unit_Formation_Data>subformationData;
 
 		Unit_Formation_Data() {
+			formation_ID;
 			size = 3;
 			bAlive = true;
 			formationType;
@@ -648,9 +662,7 @@ namespace Test {
 
 	};
 
-	struct Assigned_To_Formation {
 
-	};
 
 };
 

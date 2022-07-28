@@ -214,6 +214,7 @@
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="equipment.h" />
     <ClInclude Include="event_handler.h" />
+    <ClInclude Include="formation_collisions.h" />
     <ClInclude Include="formation_positions.h" />
     <ClInclude Include="gameLoop.h" />
     <ClInclude Include="graphics.h" />

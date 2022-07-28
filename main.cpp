@@ -9,9 +9,13 @@
 #include "spells.h"
 #include "unit_Positions.h"
 #include "unit_status.h"
+#include "formation_collisions.h"
 
 int main(int argc, char* argv[]) {
 	
+	bool collisionmode = false;
+	bool fastcollision = true;
+
 	//initialization
 	Init::init();
 	Graphics::createGraphicsContext(World::zone);
@@ -19,9 +23,14 @@ int main(int argc, char* argv[]) {
 	UI::Init_UI();
   
 	while (Graphics::running == true) {
-		//User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);//tries to add new ungrouped units to the unit vector every frame
-		Test_Units::Create_And_Fill_New_Squad(World::zone);
-		Test_Units::Create_Formation(World::zone);
+		if (collisionmode) {
+			User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);//tries to add new ungrouped units to the unit vector every frame
+		}
+		if (fastcollision) {
+			Test_Units::Create_And_Fill_New_Squad(World::zone);
+			Test_Units::Create_Formation(World::zone);
+		}
+		
 		update_scene(); //tries to add new environment objects and terrain the the world grid every frame
 	
 		
@@ -40,12 +49,15 @@ int main(int argc, char* argv[]) {
 		Movement::Update_Entity_Positions(World::zone);
 
 		//std::cout << "Movement_Handler = Good" << std::endl;		
-		//Formation_Positions::Update_Formation_Positions(World::zone);
+		if (collisionmode) {
+			Formation_Positions::Update_Formation_Positions(World::zone);
+			collision::Resolve_Collisions(World::zone);
+		}
 		//std::cout << "Update_Formation_Rects = Good" << std::endl;
-		//collision::Resolve_Collisions(World::zone);		
-
-		Unit_Position::Update_Formation_Positions(World::zone);
-
+		if (fastcollision) {
+			Formation_Collision::Test_Collision(World::zone);
+			Unit_Position::Update_Formation_Positions(World::zone);
+		}
 		//std::cout << "Collisions = Good" << std::endl;
 		Unit_Status ::Update_Unit_Status(World::zone);
 

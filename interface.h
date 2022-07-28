@@ -74,21 +74,24 @@ namespace Interface {
 		auto unitFormations_view = World::zone.view<Test::Unit_Formation_Data>();
 		for (auto unitFormation : unitFormations_view) {
 			auto& formation = unitFormations_view.get<Test::Unit_Formation_Data>(unitFormation);
-			if (formation.formationType != Test::Formation_Type::platoon) {
-				formation.sCollide_Box.x -= camera.screen.x;
-				formation.sCollide_Box.y -= camera.screen.y;
-				SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 255, 125);
-				SDL_RenderDrawRectF(Graphics::renderer, &formation.sCollide_Box);
+
+			switch (formation.formationType) {
+			//case Test::Formation_Type::squad: { SDL_SetRenderDrawColor(Graphics::renderer, 0, 55, 255, 125); }; break;
+			case Test::Formation_Type::platoon: { SDL_SetRenderDrawColor(Graphics::renderer, 0, 55, 155, 125); }; break;
+			case Test::Formation_Type::company: { SDL_SetRenderDrawColor(Graphics::renderer, 0, 55, 55, 125); }; break;
+			case Test::Formation_Type::battalion: { SDL_SetRenderDrawColor(Graphics::renderer, 0, 255, 0, 125); }; break;
+			case Test::Formation_Type::brigade: { SDL_SetRenderDrawColor(Graphics::renderer, 0, 155, 0, 125); }; break;
+			case Test::Formation_Type::division: { SDL_SetRenderDrawColor(Graphics::renderer, 55, 55, 0, 125); }; break;
+			case Test::Formation_Type::corps: { SDL_SetRenderDrawColor(Graphics::renderer, 155, 55, 0, 125); }; break;
+			case Test::Formation_Type::army: { SDL_SetRenderDrawColor(Graphics::renderer, 255, 55, 0, 125); }; break;			
 			}
-			else {
-				formation.sCollide_Box.x -= camera.screen.x;
-				formation.sCollide_Box.y -= camera.screen.y;
-				SDL_SetRenderDrawColor(Graphics::renderer, 255, 55, 55, 255);
-				SDL_RenderDrawRectF(Graphics::renderer, &formation.sCollide_Box);
-			}
+			
+			formation.sCollide_Box.x -= camera.screen.x;
+			formation.sCollide_Box.y -= camera.screen.y;
+			SDL_RenderDrawRectF(Graphics::renderer, &formation.sCollide_Box);
 			i++;
 		}
-		//std::cout << i << std::endl;
+		std::cout << i << std::endl;
 	}
 
 
@@ -243,7 +246,7 @@ namespace Interface {
 
 			Show_Grid(Map::terrain);
 			Display_Military_Groups();
-			Display_Unit_Formations(camera);
+			//Display_Unit_Formations(camera);
 			Debug_System::Debugger();
 			//Unit_Arrive_UI();
 			Display_Selected();
