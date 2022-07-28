@@ -337,69 +337,69 @@ namespace Formation_Collision {
 
 
 
-	void Formation_vs_Grid_collision(entt::registry& zone, Map::Node3& map) { //waaaaay too slow		
+	//void Formation_vs_Grid_collision(entt::registry& zone, Map::Node3& map) { //waaaaay too slow		
 
-		auto company_view = zone.view<Company>();
+	//	auto company_view = zone.view<Company>();
 
-		for (auto companies : company_view) {
-			auto& company = company_view.get<Company>(companies);
-			if (Utilities::bFRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
-				for (int b = 0; b < company.iSub_Units.size(); b++) {
-					for (int i = 0; i < Map::size; i++) {
-						for (int j = 0; j < Map::size; j++) {
+	//	for (auto companies : company_view) {
+	//		auto& company = company_view.get<Company>(companies);
+	//		if (Utilities::bFRect_Intersect(company.sCollide_Box, map.sCollide_Box)) {
+	//			for (int b = 0; b < company.iSub_Units.size(); b++) {
+	//				for (int i = 0; i < Map::size; i++) {
+	//					for (int j = 0; j < Map::size; j++) {
 
-							if (Utilities::bFRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
-								auto& platoon = zone.get<Platoon>(company.iSub_Units[b]);
-								for (int c = 0; c < platoon.iSub_Units.size(); c++) {
-									for (int k = 0; k < Map::size; k++) {
+	//						if (Utilities::bFRect_Intersect(company.sCollide_Box, map.nodes[i].nodes[j].sCollide_Box)) {
+	//							auto& platoon = zone.get<Platoon>(company.iSub_Units[b]);
+	//							for (int c = 0; c < platoon.iSub_Units.size(); c++) {
+	//								for (int k = 0; k < Map::size; k++) {
 
-										if (Utilities::bFRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
-											auto& squad = zone.get<Squad>(platoon.iSub_Units[c]);
-											for (int l = 0; l < Map::size; l++) {
+	//									if (Utilities::bFRect_Intersect(platoon.sCollide_Box, map.nodes[i].nodes[j].nodes[k].sCollide_Box)) {
+	//										auto& squad = zone.get<Squad>(platoon.iSub_Units[c]);
+	//										for (int l = 0; l < Map::size; l++) {
 
-												if (Utilities::bFRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
-													for (int d = 0; d < squad.iSub_Units.size(); d++) {
-														if (squad.bAlive.at(d) != false) {
-															for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
-																auto& radius = zone.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& mass = zone.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& x = zone.get<Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																auto& y = zone.get<Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
-																for (int e = 0; e < squad.iSub_Units.size(); e++) {
-																	float fx = squad.fPX.at(e) - x.x;
-																	float fy = squad.fPY.at(e) - y.y;
-																	float fDistance = (fx * fx) + (fy * fy);
-																	if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-																		fDistance = sqrtf(fDistance);
-																		float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
-																		DataTypes::f2d resolver = {};
-																		resolver.fX = fOverlap * (x.x - squad.fPX.at(e)) / fDistance;
-																		resolver.fY = fOverlap * (y.y - squad.fPY.at(e)) / fDistance;
-																		float fTotalmass = squad.fMass.at(e) + mass.fKilos;
-																		float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
-																		float fNomalizedMassB = (mass.fKilos / fTotalmass);
-																		squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
-																		x.x -= (resolver.fX * fNomalizedMassA);
-																		squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
-																		y.y -= (resolver.fY * fNomalizedMassA);
-																		iunitGridCollisionCheck++;
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	//											if (Utilities::bFRect_Intersect(squad.sCollide_Box, map.nodes[i].nodes[j].nodes[k].cells[l].sCollide_Box)) {
+	//												for (int d = 0; d < squad.iSub_Units.size(); d++) {
+	//													if (squad.bAlive.at(d) != false) {
+	//														for (int m = 0; m < map.nodes[i].nodes[j].nodes[k].cells[l].entities.size(); m++) {
+	//															auto& radius = zone.get<Radius>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+	//															auto& mass = zone.get<Mass>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+	//															auto& x = zone.get<Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+	//															auto& y = zone.get<Position>(map.nodes[i].nodes[j].nodes[k].cells[l].entities.at(m));
+	//															for (int e = 0; e < squad.iSub_Units.size(); e++) {
+	//																float fx = squad.fPX.at(e) - x.x;
+	//																float fy = squad.fPY.at(e) - y.y;
+	//																float fDistance = (fx * fx) + (fy * fy);
+	//																if (fDistance <= ((squad.fRadius.at(e) + radius.fRadius) * (squad.fRadius.at(e) + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+	//																	fDistance = sqrtf(fDistance);
+	//																	float fOverlap = fDistance - (squad.fRadius.at(e) + radius.fRadius);
+	//																	DataTypes::f2d resolver = {};
+	//																	resolver.fX = fOverlap * (x.x - squad.fPX.at(e)) / fDistance;
+	//																	resolver.fY = fOverlap * (y.y - squad.fPY.at(e)) / fDistance;
+	//																	float fTotalmass = squad.fMass.at(e) + mass.fKilos;
+	//																	float fNomalizedMassA = (squad.fMass.at(e) / fTotalmass);
+	//																	float fNomalizedMassB = (mass.fKilos / fTotalmass);
+	//																	squad.fPX.at(e) += (resolver.fX * fNomalizedMassB); // * normalized mass
+	//																	x.x -= (resolver.fX * fNomalizedMassA);
+	//																	squad.fPY.at(e) += (resolver.fY * fNomalizedMassB);
+	//																	y.y -= (resolver.fY * fNomalizedMassA);
+	//																	iunitGridCollisionCheck++;
+	//																}
+	//															}
+	//														}
+	//													}
+	//												}
+	//											}
+	//										}
+	//									}
+	//								}
+	//							}
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 
 }
