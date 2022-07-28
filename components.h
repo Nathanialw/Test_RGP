@@ -52,6 +52,8 @@ namespace Component {
 	struct Collided {
 		float x;
 		float y;
+		entt::entity entity;
+		entt::entity struck;
 	};
 
 	struct Terrain_Position_X {
@@ -182,6 +184,13 @@ namespace Component {
 
 	struct Selected {
 
+	};
+
+	enum Unit_Type {
+		player,
+		unit,
+		spell,
+		melee
 	};
 
 	struct Moving {

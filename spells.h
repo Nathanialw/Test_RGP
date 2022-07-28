@@ -37,7 +37,7 @@ namespace Spells {
 		}
 	}
 
-	void create_spell(entt::entity& spell, DataTypes::f2d& pos, Compass& direction, const char* spellname, float& targetX, float& targetY) {
+	void create_spell(entt::entity& entity, DataTypes::f2d& pos, Compass& direction, const char* spellname, float& targetX, float& targetY) {
 		
 		float scale = 1.0f;
 		
@@ -45,35 +45,37 @@ namespace Spells {
 		DataTypes::f2d spelldir = Spell_Direction(pos, direction, scale);
  
 		//rendering data
-		World::zone.emplace<animation>(spell, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
-		World::zone.get<animation>(spell).sheet = { //populate the vector
+		World::zone.emplace<animation>(entity, Graphics::fireball_0); /// need to load the texture /only /once and pass the pointer into this function
+		World::zone.get<animation>(entity).sheet = { //populate the vector
 			{ NULL },
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f }, //idle
 			{ {0, 0, 64, 64 }, 0, 512, 0, 0, 16.0f } //walk
 		};
-		World::zone.emplace<Sprite_Offset>(spell, 32.0f * scale, 32.0f * scale);
-		World::zone.emplace<Scale>(spell, scale);
+		World::zone.emplace<Sprite_Offset>(entity, 32.0f * scale, 32.0f * scale);
+		World::zone.emplace<Scale>(entity, scale);
 
-		World::zone.emplace<Actions>(spell, walk);
-		World::zone.get<Actions>(spell).frameCount = { {0, 0}, {0, 0}, {8, 0} };
+		World::zone.emplace<Actions>(entity, walk);
+		World::zone.get<Actions>(entity).frameCount = { {0, 0}, {0, 0}, {8, 0} };
 		
 		//positon data
-		World::zone.emplace<Position>(spell, spelldir.fX, spelldir.fY); 
-		World::zone.emplace<Potential_Position>(spell, spelldir.fX, spelldir.fY);
+		World::zone.emplace<Position>(entity, spelldir.fX, spelldir.fY); 
 
 		//spell data
-		World::zone.emplace<Radius>(spell, data.radius * scale);
-		World::zone.emplace<Velocity>(spell, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
-		World::zone.emplace<Mass>(spell, data.mass * scale);
+		World::zone.emplace<Radius>(entity, data.radius * scale);
+		World::zone.emplace<Velocity>(entity, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
+		World::zone.emplace<Mass>(entity, data.mass * scale);
+		World::zone.emplace<Unit_Type>(entity, spell);
+		World::zone.emplace<Damage>(entity, 1);
+
 		//Scenes::scene.emplace<Spell_Range>(spell, 1000.0f);
 
 		//default data
-		World::zone.emplace<Spell>(spell);
-		World::zone.emplace<Casted>(spell);
-		World::zone.emplace<Renderable>(spell);
-		World::zone.emplace<Direction>(spell, direction); //match Direction of the caster
-		World::zone.emplace<Alive>(spell, true);		
-		Spell_Linear_Target(spell, targetX, targetY, spelldir.fX, spelldir.fY);
+		World::zone.emplace<Spell>(entity);
+		World::zone.emplace<Casted>(entity);
+		World::zone.emplace<Renderable>(entity);
+		World::zone.emplace<Direction>(entity, direction); //match Direction of the caster
+		World::zone.emplace<Alive>(entity, true);		
+		Spell_Linear_Target(entity, targetX, targetY, spelldir.fX, spelldir.fY);
 		//Spell_Move_Target(spell, targetX, targetY);
 		//std::cout << "casted " << scene.get<handle>(spell).sName << std::endl;
 	}

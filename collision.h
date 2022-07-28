@@ -30,7 +30,6 @@ namespace collision {
 			potentialPosition = { position.x += potentialX, position.y += potentialY };
 		}
 	}
-
 	void Add_Or_Update_Collider(entt::registry& zone, entt::entity& entity, Position& position, float& potentialX, float& potentialY) {
 		if (zone.any_of<Collided>(entity)) {
  			auto& potentialPosition = zone.get<Collided>(entity);
@@ -44,17 +43,25 @@ namespace collision {
 	}
 	
 	void Update_Collided_Unit(entt::registry &zone) {
-		auto view = zone.view<Position, Collided>();
+		auto view = zone.view<Position, Collided, Unit_Type, Alive>();
 		for (auto entity : view) {
+			auto& unitType = view.get<Unit_Type>(entity);
 			auto& x = view.get<Position>(entity);
 			auto& y = view.get<Position>(entity);
 			auto& px = view.get<Collided>(entity);
 			auto& py = view.get<Collided>(entity);
 			x.x = px.x;
-			y.y = py.y;		
+			y.y = py.y;
 			zone.remove<Collided>(entity);
+
+			if (unitType == spell) {
+				auto& alive = view.get<Alive>(entity);
+				alive.bIsAlive = false; //destroy spell on contact
+			}
 		}
 	}
+
+	
 
 	void Update_Vector_From_Unit(entt::registry& zone) { // updates positions of soldiers stored in units for collision box
 		auto view = zone.view<Position, Assigned_To, Soldier>();
@@ -65,20 +72,6 @@ namespace collision {
 			auto& squad = zone.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
 			squad.fPX.at(soldier.iIndex) = x.x;
 			squad.fPY.at(soldier.iIndex) = y.y;
-		}
-	}
-
-	void Update_Unit_From_Vector(entt::registry& zone) {
-		auto view = zone.view<Position, Assigned_To, Soldier>();
-		for (auto entity : view) {
-			auto& x = view.get<Position>(entity);
-			auto& y = view.get<Position>(entity);
-			//auto& z = view.get<Collision_Radius>(entity);
-			auto& soldier = view.get<Assigned_To>(entity);
-			auto& squad = zone.get<Squad>(soldier.iUnit_Assigned_To); // gets the squad that the soldier is attached to
-			x.x = squad.fPX.at(soldier.iIndex);
-			y.y = squad.fPY.at(soldier.iIndex);
-
 		}
 	}
 
@@ -219,41 +212,56 @@ namespace collision {
 		}
 	}
 
-	void Check_For_Unit_Collision_Circle(entt::registry& zone, entt::entity& entity, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget, bool& aliveUnit, bool aliveTarget) {
-		if (aliveTarget != false) {
-			float fx = xTarget - xUnit;
-			float fy = yTarget - yUnit;
-			float fDistance = (fx * fx) + (fy * fy);
-			// if the distance is zero it means they are the same unit or directly on top of each other
-			if (fDistance != 0.0f) {
-				//SDL_FPoint target = { xTarget, yTarget };
-				//if (Utilities::bPoint_RectIntersect(target, attackRect)) {
-				if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-					fDistance = sqrtf(fDistance);
-					float fOverlap = fDistance - (radiusTarget + radiusUnit);
-					DataTypes::f2d resolver = {};
-					resolver.fX = fOverlap * (xUnit - xTarget) / fDistance;
-					resolver.fY = fOverlap * (yUnit - yTarget) / fDistance;
-					float fTotalmass = massTarget + massUnit;
-					float fNomalizedMassA = (massTarget / massUnit);
-					float fNomalizedMassB = (massUnit / fTotalmass);
-					xTarget += (resolver.fX * fNomalizedMassB); // * normalized mass
-					xUnit -= (resolver.fX * fNomalizedMassA);
-					yTarget += (resolver.fY * fNomalizedMassB);
-					yUnit -= (resolver.fY * fNomalizedMassA);
-					aliveUnit = false;
+	void Check_For_Unit_Collision_Circle(entt::registry& zone, entt::entity& entity_ID, entt::entity& target_ID, SDL_FRect attackRect, float& xUnit, float& yUnit, float& xTarget, float& yTarget, float& radiusUnit, float& radiusTarget, float& massUnit, float& massTarget) {
+		
+		float fx = xTarget - xUnit;
+		float fy = yTarget - yUnit;
+		float fDistance = (fx * fx) + (fy * fy);
+		// if the distance is zero it means they are the same unit or directly on top of each other
+		if (fDistance != 0.0f) {
+			//SDL_FPoint target = { xTarget, yTarget };
+			//if (Utilities::bPoint_RectIntersect(target, attackRect)) {
+			if (fDistance <= ((radiusTarget + radiusUnit) * (radiusTarget + radiusUnit)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+				fDistance = sqrtf(fDistance);
+				float fOverlap = fDistance - (radiusTarget + radiusUnit);
+				DataTypes::f2d resolver = {};
+				resolver.fX = fOverlap * (xUnit - xTarget) / fDistance;
+				resolver.fY = fOverlap * (yUnit - yTarget) / fDistance;
+				float fTotalmass = massTarget + massUnit;
+				float fNomalizedMassA = (massTarget / massUnit);
+				float fNomalizedMassB = (massUnit / fTotalmass);
+					
+					
+					
+				//xTarget += (resolver.fX * fNomalizedMassB); // * normalized mass
+				//yTarget += (resolver.fY * fNomalizedMassB);
+				//xUnit -= (resolver.fX * fNomalizedMassA);
+				//yUnit -= (resolver.fY * fNomalizedMassA);
+					
+					
+				//aliveUnit = false;
 
-					if (zone.any_of<Struck>(entity)) {
-						auto& struck = zone.get<Struck>(entity).struck;
-						struck++;
-					}
-					else {
-						zone.emplace<Struck>(entity, 1);
-					}
-					std::cout << "Hit!!!" << std::endl;
-				}
+				Position position = { xUnit, yUnit };
+				float resolverX = (resolver.fX * fNomalizedMassA);
+				float resolverY = (resolver.fY * fNomalizedMassA);
+				Add_Or_Update_Collider(zone, entity_ID, position, resolverX, resolverY);
+
+				position = { xTarget, yTarget};
+				resolverX = (resolver.fX * fNomalizedMassB); // * normalized mass
+				resolverY = (resolver.fY * fNomalizedMassB);
+				Add_Or_Update_Collidee(zone, target_ID, position, resolverX, resolverY);
+
+				//PERHAPS emplace the ID of the unit that damaged and resolve the damage in another routine
+				//if (zone.any_of<Struck>(target_ID)) {
+				//	auto& struck = zone.get<Struck>(target_ID).struck;
+				//	struck++;
+				//}
+				//else {
+				//	zone.emplace<Struck>(target_ID, 1);
+				//}
 			}
 		}
+		
 	}
 
 	void player_unit_Collision(entt::registry& zone) { //seems to work and pushes the units
@@ -391,11 +399,11 @@ namespace collision {
 	//Use this for melee weapon collision as well
 	void Spell_unit_Collision(entt::registry& zone) { //seems to work and pushes the units
 		if (1) {
-			auto spells = zone.view<Spell, Radius, Potential_Position, Mass, Alive>();
+			auto spells = zone.view<Spell, Radius, Position, Mass, Alive>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell).fRadius;
-				auto& x = spells.get<Potential_Position>(spell).x;
-				auto& y = spells.get<Potential_Position>(spell).y;
+				auto& x = spells.get<Position>(spell).x;
+				auto& y = spells.get<Position>(spell).y;
 				auto& mass = spells.get<Mass>(spell).fKilos;
 				auto& alive = spells.get<Alive>(spell).bIsAlive;
 				SDL_FRect spell_collider = Utilities::Get_FRect_From_Point_Radius(radius, x, y);
@@ -411,7 +419,7 @@ namespace collision {
 								auto& squad = zone.get<Squad>(platoon.iSub_Units[p]);
 									if (Utilities::bFRect_Intersect(squad.sCollide_Box, spell_collider)) { //checks against itself too so that units with the squad will have collision
 										for (int i = 0; i < squad.iSub_Units.size(); i++) {
-											Check_For_Unit_Collision_Circle(zone, squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i), alive, squad.bAlive.at(i));
+											Check_For_Unit_Collision_Circle(zone, spell, squad.iSub_Units.at(i), spell_collider, x, y, squad.fPX.at(i), squad.fPY.at(i), radius, squad.fRadius.at(i), mass, squad.fMass.at(i));
 										}
 									}
 								}
@@ -577,13 +585,12 @@ namespace collision {
 	void player_grid_collision(entt::registry& zone, Map::Node3& map) {
 		int p = 0;
 		if (1) { // for the player
-			auto spells = zone.view<Radius, Position, Mass, Input>();
+			auto spells = zone.view<Radius, Position, Mass>();
 			for (auto spell : spells) {
 				auto& radius = spells.get<Radius>(spell);
-				auto& x = spells.get<Position>(spell);
-				auto& y = spells.get<Position>(spell);
+				auto& position = spells.get<Position>(spell);
 				auto& mass = spells.get<Mass>(spell);
-				SDL_FRect unit_collider = { x.x - radius.fRadius, y.y - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+				SDL_FRect unit_collider = { position.x - radius.fRadius, position.y - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
 
 				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);
 
@@ -597,22 +604,26 @@ namespace collision {
 							auto& map_y = zone.get<Position>(cell[j].at(i));
 							auto& map_mass = zone.get<Mass>(cell[j].at(i));
 							auto& map_radius = zone.get<Radius>(cell[j].at(i));
-							float fx = map_x.x - x.x;
-							float fy = map_y.y - y.y;
+							float fx = map_x.x - position.x;
+							float fy = map_y.y - position.y;
 							float fDistance = (fx * fx) + (fy * fy);
 							if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
 								fDistance = sqrtf(fDistance);
 								float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
 								DataTypes::f2d resolver = {};
-								resolver.fX = fOverlap * (x.x - map_x.x) / fDistance;
-								resolver.fY = fOverlap * (y.y - map_y.y) / fDistance;
+								resolver.fX = fOverlap * (position.x - map_x.x) / fDistance;
+								resolver.fY = fOverlap * (position.y - map_y.y) / fDistance;
 								float fTotalmass = map_mass.fKilos + mass.fKilos;
 								float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
 								float fNomalizedMassB = (mass.fKilos / fTotalmass);
 								map_x.x += (resolver.fX * fNomalizedMassB); // * normalized mass
 								map_y.y += (resolver.fY * fNomalizedMassB);
-								x.x -= (resolver.fX * fNomalizedMassA);
-								y.y -= (resolver.fY * fNomalizedMassA);
+								
+
+								float resolverX = resolver.fX * fNomalizedMassA;
+								float resolverY = resolver.fY * fNomalizedMassA;
+
+								Add_Or_Update_Collider(zone, spell, position, resolverX, resolverY);
 							}
 							//	}
 						}
@@ -626,57 +637,59 @@ namespace collision {
 
 
 	
-	void spell_grid_collision(entt::registry& zone, Map::Node3& map) {
-		int p = 0;
-		if (1) { // for the player
-			auto spells = zone.view<Radius, Potential_Position, Mass, Spell, Alive>();
-			for (auto spell : spells) {
-				auto& radius = spells.get<Radius>(spell);
-				auto& a = spells.get<Alive>(spell);
-				auto& x = spells.get<Potential_Position>(spell);
-				auto& y = spells.get<Potential_Position>(spell);
-				auto& mass = spells.get<Mass>(spell);
-				SDL_FRect unit_collider = { x.x - radius.fRadius, y.y - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
-			
-				std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);				
+	//void spell_grid_collision(entt::registry& zone, Map::Node3& map) {
+	//	int p = 0;
+	//	if (1) { // for the player
+	//		auto spells = zone.view<Radius, Position, Mass>();
+	//		for (auto spell : spells) {
+	//			auto& radius = spells.get<Radius>(spell);
+	//			auto& a = spells.get<Alive>(spell);
+	//			auto& position = spells.get<Position>(spell);
+	//			auto& mass = spells.get<Mass>(spell);
+	//			SDL_FRect unit_collider = { position.x - radius.fRadius, position.y - radius.fRadius, radius.fRadius * 2.0f, radius.fRadius * 2.0f };
+	//		
+	//			std::vector<std::vector<entt::entity>> cell = grid_collision(unit_collider, map);				
 
-				for (int j = 0; j < cell.size(); j++) {
-					for (int i = 0; i < cell[j].size(); i++) {
-						if (spell != cell[j].at(i)) {
-							p++;
-							//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
-								//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
-								auto& map_x = zone.get<Position>(cell[j].at(i));
-								auto& map_y = zone.get<Position>(cell[j].at(i));
-								auto& map_mass = zone.get<Mass>(cell[j].at(i));
-								auto& map_radius = zone.get<Radius>(cell[j].at(i));
-								float fx = map_x.x - x.x;
-								float fy = map_y.y - y.y;
-								float fDistance = (fx * fx) + (fy * fy);
-								if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
-									fDistance = sqrtf(fDistance);
-									float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
-									DataTypes::f2d resolver = {};
-									resolver.fX = fOverlap * (x.x - map_x.x) / fDistance;
-									resolver.fY = fOverlap * (y.y - map_y.y) / fDistance;
-									float fTotalmass = map_mass.fKilos + mass.fKilos;
-									float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
-									float fNomalizedMassB = (mass.fKilos / fTotalmass);
-									map_x.x += (resolver.fX * fNomalizedMassB); // * normalized mass
-									x.x -= (resolver.fX * fNomalizedMassA);
-									map_y.y += (resolver.fY * fNomalizedMassB);
-									y.y -= (resolver.fY * fNomalizedMassA);
-									a.bIsAlive = false; //destroy spell on contact
-								}
-						//	}
-						}
-					}
-				}
-			}			
-		}
-		//std::cout << stat << std::endl;
-		stat = 0;
-	}
+	//			for (int j = 0; j < cell.size(); j++) {
+	//				for (int i = 0; i < cell[j].size(); i++) {
+	//					if (spell != cell[j].at(i)) {
+	//						p++;
+	//						//if (scene.all_of<Radius, Mass, Position_Y, Position_X>(cell[j].at(i))) {
+	//							//std::cout << cell.size() << " || " << cell[j].size() << std::endl;
+	//							auto& map_x = zone.get<Position>(cell[j].at(i));
+	//							auto& map_y = zone.get<Position>(cell[j].at(i));
+	//							auto& map_mass = zone.get<Mass>(cell[j].at(i));
+	//							auto& map_radius = zone.get<Radius>(cell[j].at(i));
+	//							float fx = map_x.x - position.x;
+	//							float fy = map_y.y - position.y;
+	//							float fDistance = (fx * fx) + (fy * fy);
+	//							if (fDistance <= ((map_radius.fRadius + radius.fRadius) * (map_radius.fRadius + radius.fRadius)) * 0.9999f) { // the constant keeps it from check collisions overlapping by round errors							
+	//								fDistance = sqrtf(fDistance);
+	//								float fOverlap = fDistance - (map_radius.fRadius + radius.fRadius);
+	//								DataTypes::f2d resolver = {};
+	//								resolver.fX = fOverlap * (position.x - map_x.x) / fDistance;
+	//								resolver.fY = fOverlap * (position.y - map_y.y) / fDistance;
+	//								float fTotalmass = map_mass.fKilos + mass.fKilos;
+	//								float fNomalizedMassA = (map_mass.fKilos / fTotalmass);
+	//								float fNomalizedMassB = (mass.fKilos / fTotalmass);
+	//								map_x.x += (resolver.fX * fNomalizedMassB); // * normalized mass
+	//								map_y.y += (resolver.fY * fNomalizedMassB);
+
+	//								float &resolverX = (resolver.fX * fNomalizedMassA);
+	//								float &resolverY = (resolver.fY * fNomalizedMassA);
+
+	//								Add_Or_Update_Collider(zone, spell, position, resolverX, resolverY);
+	//								
+	//							
+	//					//	}
+	//					}
+	//				}
+	//			}
+	//		}			
+	//	}
+	//	//std::cout << stat << std::endl;
+	//	stat = 0;
+	//}
 
 
 
@@ -790,7 +803,7 @@ namespace collision {
 		Update_Unit_Boxes(zone);
 		//
 		player_grid_collision(zone, Map::map);
-		spell_grid_collision(zone, Map::map);
+		//spell_grid_collision(zone, Map::map);
 		unit_grid_collision(zone,Map::map);
 		//
 		player_unit_Collision(zone);
@@ -801,13 +814,12 @@ namespace collision {
 		Melee_Unit_Player_Collision(zone);
 		MeleeAttack_unit_Collision(zone);
 		//
-		//Update_Unit_From_Vector(zone);
 		Update_Collided_Unit(zone);
 		Update_Vector_From_Unit(zone);
-		Update_Potential_Positions(zone);
+		//Update_Potential_Positions(zone);
 		Update_Health(zone);
 
 
-		CollisionsT(zone);
+		//CollisionsT(zone);
 	}
 }
