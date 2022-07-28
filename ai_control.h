@@ -183,7 +183,7 @@ namespace AI {
 		}
 	}
 
-	void Run_AI(entt::registry& zone) {
+	void Update_AI(entt::registry& zone) {
 		time += Timer::timeStep;
 		//std::cout << time << std::endl;
 		if (time >= 1000) {

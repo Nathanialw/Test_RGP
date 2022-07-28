@@ -45,6 +45,8 @@ namespace Death_Spells {
 		zone.emplace<Component::Soldier>(skeleton0);
 		zone.emplace<Component::Commandable>(skeleton0);
 		zone.emplace<Component::Spellbook>(skeleton0);
+		zone.emplace<Component::Entity_Type>(skeleton0, Component::unit);
+		
 
 	}
 

@@ -64,7 +64,7 @@ namespace Spells {
 		World::zone.emplace<Radius>(entity, data.radius * scale);
 		World::zone.emplace<Velocity>(entity, 0.f, 0.0f, 0.0f, 0.0f, data.speed);
 		World::zone.emplace<Mass>(entity, data.mass * scale);
-		World::zone.emplace<Unit_Type>(entity, spell);
+		World::zone.emplace<Entity_Type>(entity, spell);
 		World::zone.emplace<Damage>(entity, 1);
 
 		//Scenes::scene.emplace<Spell_Range>(spell, 1000.0f);

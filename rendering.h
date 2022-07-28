@@ -247,8 +247,8 @@ namespace Rendering {
 				}
 				sx = x.x - camera_offset.screen.x - anim.offsetToAlignWithFireball.fX; 
 				sy = y.y - camera_offset.screen.y - anim.offsetToAlignWithFireball.fY;
-				anim.renderPosition.x = sx - anim.posOffset.x;
-				anim.renderPosition.y = sy - anim.posOffset.y;
+				anim.renderPosition.x = sx - anim.positionOffset.x;
+				anim.renderPosition.y = sy - anim.positionOffset.y;
 
 				
 				SDL_RenderCopyF(Graphics::renderer, texture.pTexture, &texture.clippedSpriteFrame, &anim.renderPosition);

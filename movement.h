@@ -185,7 +185,7 @@ namespace Movement {
 		}
 	}
 
-	void Movement_Handler(entt::registry  &zone) {
+	void Update_Entity_Positions(entt::registry  &zone) {
 		//Mouse_Attack_Move(); //runs every frame to see if mouse is down, if it is it moves you to the new location
 		Linear_Move_To();
 		Mouse_Move_To();

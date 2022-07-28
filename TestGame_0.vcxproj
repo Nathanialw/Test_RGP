@@ -216,6 +216,7 @@
     <ClInclude Include="event_handler.h" />
     <ClInclude Include="gameLoop.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="unit_status.h" />
     <ClInclude Include="init.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="items.h" />

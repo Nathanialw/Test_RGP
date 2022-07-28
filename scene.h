@@ -78,6 +78,7 @@ namespace Scene {
 		World::zone.emplace<Radius>(tree, data.radius * scale);
 		World::zone.emplace<Environment>(tree);
 		World::zone.emplace<Mass>(tree, data.mass * scale);
+		World::zone.emplace<Component::Entity_Type>(tree, foliage);
 	}
 
 	void Spawn_Trees () {
@@ -120,6 +121,7 @@ namespace Scene {
 		World::zone.emplace<handle>(skeleton, "Skeleton");
 		World::zone.emplace<Mass>(skeleton, 200.0f * scale);
 		World::zone.emplace<Health>(skeleton, 10);
+		World::zone.emplace<Component::Entity_Type>(skeleton, player);
 
 		World::zone.emplace<Input>(skeleton);
 		World::zone.emplace<Camera>(skeleton, 0.0f, 0.0f, Graphics::resolution.w, Graphics::resolution.h, 2.0f, 2.0f);
@@ -179,16 +181,7 @@ namespace Scene {
 
 	void update_scene() {
 		//Update_Army();
-		//std::cout << "Update_Army = Good" << std::endl;
-
-		auto view = World::zone.view<Alive>();
-		for (auto entity : view) {
-			auto& x = view.get<Alive>(entity).bIsAlive;
-			if (x == false) {
-				//scene.destroy(entity);
-			}
-		}
-
+		//std::cout << "Update_Army = Good" << std::endl;	
 		add_terrain_to_grid(Map::terrain);		
 		//std::cout << "add_terrain_to_grid = Good" << std::endl;
 		add_unit_to_grid(Map::map);

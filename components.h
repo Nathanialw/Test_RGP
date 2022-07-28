@@ -32,10 +32,8 @@ namespace Component {
 	};
 
 	struct Alive {
-		bool bIsAlive;
-		
+		bool bIsAlive;		
 	};
-
 
 
 	//Position		
@@ -52,8 +50,8 @@ namespace Component {
 	struct Collided {
 		float x;
 		float y;
-		entt::entity entity;
-		entt::entity struck;
+		//entt::entity entity;
+		//entt::entity struck;
 	};
 
 	struct Terrain_Position_X {
@@ -186,9 +184,10 @@ namespace Component {
 
 	};
 
-	enum Unit_Type {
+	enum Entity_Type {
 		player,
 		unit,
+		foliage,
 		spell,
 		melee
 	};
@@ -263,7 +262,7 @@ namespace Component {
 	};
 
 	struct Explosion {
-		DataTypes::i2d posOffset;
+		DataTypes::i2d positionOffset;
 		SDL_FRect renderPosition;
 		DataTypes::f2d offsetToAlignWithFireball;
 
@@ -328,7 +327,7 @@ namespace Component {
 	};
 
 	struct On_Mouse {
-
+		entt::entity itemCurrentlyHeld;
 	};
 	
 

@@ -153,7 +153,7 @@ namespace Event_Handler {
 		}
 	}
 
-	void Player_Input(entt::registry &zone) {
+	void Update_User_Input(entt::registry &zone) {
 		while (SDL_PollEvent(&event) != 0) {
 			auto view = zone.view<Velocity, Actions, Input>();
 			for (auto player : view) {
@@ -186,7 +186,7 @@ namespace Event_Handler {
 	};
 
 	void Input_Handler(entt::registry& zone) {
-		Player_Input(zone);
+		Update_User_Input(zone);
 	}
 
 }

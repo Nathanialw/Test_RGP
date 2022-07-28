@@ -8,6 +8,7 @@
 #include "movement.h"
 #include "spells.h"
 #include "unit_Positions.h"
+#include "unit_status.h"
 
 int main(int argc, char* argv[]) {
 	
@@ -18,23 +19,26 @@ int main(int argc, char* argv[]) {
 	UI::Init_UI();
   
 	while (Graphics::running == true) {
-		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);
-		AI::Run_AI(World::zone);
-
+		User_Mouse_Input::Assign_Soldiers_On_Spawn(World::zone);//tries to add new ungrouped units to the unit vector every frame
+		update_scene(); //tries to add new environment objects and terrain the the world grid every frame
+		
+		Event_Handler::Update_User_Input(World::zone);
+		//std::cout << "Player_Input = Good" << std::endl;
+		AI::Update_AI(World::zone);
 		//std::cout << "AI = Good" << std::endl;
 		Weapons::Update_Attacks();
 		//std::cout << "Update_Attacks = Good" << std::endl;
 		Spells::Update_Spells();
 		//std::cout << "Update_Spells = Good" << std::endl;
-		Event_Handler::Player_Input(World::zone);
-		//std::cout << "Player_Input = Good" << std::endl;
-		Movement::Movement_Handler(World::zone);
-		//std::cout << "Movement_Handler = Good" << std::endl;
-		collision::Collisions(World::zone);		
-		//Unit_Position::Run_Position(World::zone);
+		Movement::Update_Entity_Positions(World::zone);
+		//std::cout << "Movement_Handler = Good" << std::endl;		
+		Formation_Positions::Update_Formation_Positions(World::zone);
+		//std::cout << "Update_Formation_Rects = Good" << std::endl;
+		collision::Resolve_Collisions(World::zone);		
+			//Unit_Position::Run_Position(World::zone);
 		//std::cout << "Collisions = Good" << std::endl;
-		update_scene();
-			
+		Unit_Status ::Update_Unit_Status(World::zone);
+		//std::cout << "Update_Unit_Status = Good" << std::endl;	
 		Rendering::Rendering(World::zone);
 		//std::cout << "Rendering = Good" << std::endl;
 		Timer::frameTime();	
